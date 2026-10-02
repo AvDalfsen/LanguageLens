@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=69", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "language-lens"
+version = "0.1.0"
+description = "A local-first screen OCR and word translation overlay for language learners."
+readme = "README.md"
+requires-python = ">=3.10,<3.13"
+license = { text = "MIT" }
+dependencies = [
+  "PySide6>=6.7,<7",
+  "rapidocr>=3.9,<4",
+  "onnxruntime>=1.20,<2",
+  "argostranslate>=1.9,<2",
+  "numpy>=1.26,<3",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8,<9"]
+
+[project.scripts]
+language-lens = "language_lens.app:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+
