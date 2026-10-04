@@ -1,0 +1,43 @@
+{
+  "repository": "rhasspy/piper-voices",
+  "revision": "c10ece1aade47bb51c153c893d14e5bf8e5b7117",
+  "note": "Research fixtures only. Model cards describe dataset licences; they are not a completed redistribution review.",
+  "voices": {
+    "en-US": {
+      "id": "en_US-lessac-medium",
+      "directory": "en/en_US/lessac/medium",
+      "files": {
+        "en_US-lessac-medium.onnx": [63201294, "2fc642b535197b6305c7c8f92dc8b24f"],
+        "en_US-lessac-medium.onnx.json": [4885, "c1f2b7bddefe113f3255ff9ef234cfd3"],
+        "MODEL_CARD": [351, "42f2dd4a98149e12fc70b301d9579dfd"]
+      }
+    },
+    "en-GB": {
+      "id": "en_GB-alan-medium",
+      "directory": "en/en_GB/alan/medium",
+      "files": {
+        "en_GB-alan-medium.onnx": [63201294, "8f6b35eeb8ef6269021c6cb6d2414c9b"],
+        "en_GB-alan-medium.onnx.json": [4888, "b11d9afd0a8f5372c42a52fbd6e021d4"],
+        "MODEL_CARD": [320, "24a2232470ca1be071debf53c984666e"]
+      }
+    },
+    "pt-PT": {
+      "id": "pt_PT-tugão-medium",
+      "directory": "pt/pt_PT/tugão/medium",
+      "files": {
+        "pt_PT-tugão-medium.onnx": [63201294, "0642048511ffe36c3b519520614b53f4"],
+        "pt_PT-tugão-medium.onnx.json": [5026, "c4113a1da477aa6db28420454c142ebd"],
+        "MODEL_CARD": [282, "d894d2aedf10b01ff8ee3bd13970a79e"]
+      }
+    },
+    "pt-BR": {
+      "id": "pt_BR-faber-medium",
+      "directory": "pt/pt_BR/faber/medium",
+      "files": {
+        "pt_BR-faber-medium.onnx": [63201294, "e0724a2f07965f6523d2a1e96b488a4c"],
+        "pt_BR-faber-medium.onnx.json": [4855, "a1258e1e113c47d9a1486a9bef1daab4"],
+        "MODEL_CARD": [279, "f636a9f4c8b0e5107a1255ebcd4bc6c5"]
+      }
+    }
+  }
+}

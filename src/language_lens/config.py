@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, field
 import json
 import os
 from pathlib import Path
@@ -42,6 +42,9 @@ class Settings:
     hotkey: str = "<ctrl>+<shift>+t"
     send_escape: bool = True
     min_ocr_confidence: float = 0.45
+    speech_enabled: bool = True
+    show_ipa: bool = False
+    speech_voices: dict[str, str] = field(default_factory=dict)
 
 
 def settings_path() -> Path:
@@ -63,6 +66,8 @@ def load_settings(path: Path | None = None) -> Settings:
         raw = json.loads(path.read_text(encoding="utf-8"))
         if "send_escape" not in raw and "pause_game" in raw:
             raw["send_escape"] = raw["pause_game"]
+        if not isinstance(raw.get("speech_voices", {}), dict):
+            raw["speech_voices"] = {}
         allowed = Settings.__dataclass_fields__.keys()
         return Settings(**{key: value for key, value in raw.items() if key in allowed})
     except (FileNotFoundError, json.JSONDecodeError, TypeError, ValueError):

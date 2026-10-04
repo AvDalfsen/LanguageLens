@@ -105,6 +105,7 @@ class LensController(QObject):
         self.setup = SetupWindow(self.settings)
         self.setup.listen_requested.connect(self.start_listening)
         self.setup.capture_requested.connect(lambda: self.begin_capture(from_external_app=False))
+        self.app.aboutToQuit.connect(self._shutdown_speech)
         self.global_capture.connect(lambda: self.begin_capture(from_external_app=True))
         self._listener = None
         self._selector: SelectionOverlay | None = None
@@ -169,6 +170,8 @@ class LensController(QObject):
         if self._busy:
             return
         self.settings = self.setup.current_settings()
+        save_settings(self.settings)
+        self.setup.pronunciation.player.stop()
         self._busy = True
         self._return_to_settings = not from_external_app
         self._previous_window = foreground_window()
@@ -228,7 +231,14 @@ class LensController(QObject):
         self._escape_sent = False
         self._return_to_settings = False
 
+    def _shutdown_speech(self) -> None:
+        self.setup.pronunciation.shutdown()
+        if self._review is not None:
+            self._review.shutdown_speech()
+
     def quit(self) -> None:
+        save_settings(self.setup.current_settings())
+        self._shutdown_speech()
         if self._listener is not None:
             self._listener.stop()
         self.tray.hide()

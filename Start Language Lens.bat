@@ -17,7 +17,7 @@ if not exist "%VENV_PYTHON%" set "NEEDS_SETUP=1"
 if not exist "%VENV_PYTHONW%" set "NEEDS_SETUP=1"
 
 if "%NEEDS_SETUP%"=="0" (
-    "%VENV_PYTHON%" -c "import language_lens, PySide6, rapidocr, onnxruntime, argostranslate, ctranslate2" >nul 2>&1
+    "%VENV_PYTHON%" -c "import language_lens, PySide6, rapidocr, onnxruntime, argostranslate, ctranslate2; from language_lens.services.voices import runtime_ready; assert runtime_ready()" >nul 2>&1
     if errorlevel 1 set "NEEDS_SETUP=1"
 )
 
@@ -33,7 +33,7 @@ if "%NEEDS_SETUP%"=="1" (
     if errorlevel 1 goto :setup_failed
 
     if not exist "%VENV_PYTHON%" goto :setup_failed
-    "%VENV_PYTHON%" -c "import language_lens, PySide6, rapidocr, onnxruntime, argostranslate, ctranslate2" >nul 2>&1
+    "%VENV_PYTHON%" -c "import language_lens, PySide6, rapidocr, onnxruntime, argostranslate, ctranslate2; from language_lens.services.voices import runtime_ready; assert runtime_ready()" >nul 2>&1
     if errorlevel 1 goto :setup_failed
 )
 

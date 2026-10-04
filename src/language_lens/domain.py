@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, replace
 import re
+import unicodedata
 from typing import Iterable
 
 
@@ -38,14 +39,24 @@ class OcrLine:
 
 
 @dataclass(frozen=True, slots=True)
+class WordTranslation:
+    """Distinct candidates in model rank order; note explains degraded results."""
+
+    candidates: tuple[str, ...]
+    note: str = ""
+
+
+@dataclass(frozen=True, slots=True)
 class WordHit:
     text: str
     lookup_text: str
     bounds: Rect
     line_index: int
-    translation: str | None = None
+    translation: WordTranslation | None = None
+    source_start: int = -1
+    source_end: int = -1
 
-    def with_translation(self, translation: str) -> "WordHit":
+    def with_translation(self, translation: WordTranslation | None) -> "WordHit":
         return replace(self, translation=translation)
 
 
@@ -55,8 +66,28 @@ WORD_PATTERN = re.compile(r"[^\W_]+(?:[’'\-][^\W_]+)*", re.UNICODE)
 
 def normalize_lookup_word(word: str) -> str:
     """Trim punctuation while preserving meaningful internal apostrophes/hyphens."""
-    match = WORD_PATTERN.search(word)
+    match = WORD_PATTERN.search(unicodedata.normalize("NFC", word))
     return match.group(0).casefold() if match else word.casefold().strip()
+
+
+def word_spans(text: str):
+    """Unicode word boundaries that keep combining accents attached to letters."""
+    index = 0
+    while index < len(text):
+        if unicodedata.category(text[index])[0] not in "LN":
+            index += 1
+            continue
+        start = index
+        index += 1
+        while index < len(text):
+            if unicodedata.category(text[index])[0] in "LMN":
+                index += 1
+            elif (text[index] in "’'-" and index + 1 < len(text)
+                  and unicodedata.category(text[index + 1])[0] in "LN"):
+                index += 1
+            else:
+                break
+        yield start, index
 
 
 def build_word_hits(lines: Iterable[OcrLine]) -> list[WordHit]:
@@ -66,24 +97,29 @@ def build_word_hits(lines: Iterable[OcrLine]) -> list[WordHit]:
     horizontal screen text gets a deterministic proportional fallback here.
     """
     hits: list[WordHit] = []
+    source_offset = 0
     for line_index, line in enumerate(lines):
         text = line.text.strip()
+        line_start = source_offset + len(line.text) - len(line.text.lstrip())
+        source_offset += len(line.text) + 1  # same single-space join as speech/translation
         if not text:
             continue
         bounds = line.bounds
         span = max(len(text), 1)
-        for match in WORD_PATTERN.finditer(text):
-            left_ratio = match.start() / span
-            right_ratio = match.end() / span
+        for start, end in word_spans(text):
+            left_ratio = start / span
+            right_ratio = end / span
             x = bounds.x + bounds.width * left_ratio
             width = max(4.0, bounds.width * (right_ratio - left_ratio))
-            word = match.group(0)
+            word = text[start:end]
             hits.append(
                 WordHit(
                     text=word,
                     lookup_text=normalize_lookup_word(word),
                     bounds=Rect(x, bounds.y, width, max(bounds.height, 4.0)),
                     line_index=line_index,
+                    source_start=line_start + start,
+                    source_end=line_start + end,
                 )
             )
     return hits

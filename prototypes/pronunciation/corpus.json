@@ -1,0 +1,16 @@
+[
+  {"id":"english-title","locales":["en-US","en-GB"],"text":"This song broke my heart.","review":"Ordinary short screenshot selection."},
+  {"id":"record","locales":["en-US","en-GB"],"text":"I record a record.","different_words":[1,3],"review":"The verb and noun should have different stress."},
+  {"id":"read-tense","locales":["en-US","en-GB"],"text":"I read books. Yesterday I read a book.","different_words":[1,5],"review":"The second read should rhyme with red. A failed check is an engine limitation, not an alignment test to hide."},
+  {"id":"capitalization","locales":["en-US","en-GB"],"text":"The Polish artist will polish the table.","different_words":[1,4],"review":"Capitalisation must survive: Polish and polish differ."},
+  {"id":"expansions","locales":["en-US","en-GB"],"text":"Dr. Smith paid $12.50 and can't re-read it.","review":"Check abbreviation pauses, currency/decimal reading, apostrophes, and hyphens. Exact mapping does not establish correct number reading."},
+  {"id":"merged-words","locales":["en-US","en-GB"],"text":"It is kind of a problem.","review":"eSpeak can merge of a; both must fall back explicitly rather than assigning their combined phones to of."},
+  {"id":"unicode","locales":["en-US","en-GB"],"text":"🙂 “Don’t stop,” she said.\nPlease continue!","review":"Exercise non-BMP characters, curly quotes, newline and multiple clauses."},
+  {"id":"literal-brackets","locales":["en-US","en-GB"],"text":"Read [[hello]] and <voice> aloud.","review":"Screenshot content must be treated as text, never as raw phonemes or SSML instructions."},
+  {"id":"portuguese-dialogue","locales":["pt-PT","pt-BR"],"text":"Mestre bruxo! Tem um cemitério élfico nas cavernas próximas de Centrobosque.","review":"Game-style dialogue and an invented place name. Listen for proper-name errors."},
+  {"id":"portuguese-title","locales":["pt-PT","pt-BR"],"text":"Os cintos de segurança são incríveis.","review":"Compare both accents, nasal vowels, de, and word-final consonants."},
+  {"id":"portuguese-accents","locales":["pt-PT","pt-BR"],"text":"A avó e o avô bebem café.","different_words":[1,4],"review":"Avó and avô must preserve their different vowels."},
+  {"id":"decomposed-accents","locales":["pt-PT","pt-BR"],"text":"A avó e o avô bebem café.","different_words":[1,4],"review":"Same content using combining accents; displayed source offsets must still be exact."},
+  {"id":"portuguese-numbers","locales":["pt-PT","pt-BR"],"text":"Custou €12,50 às 10:30.","review":"Numbers/time expansions; mapping fallback is acceptable, wrong attribution is not."},
+  {"id":"portuguese-context","locales":["pt-PT","pt-BR"],"text":"Eu gosto do gosto deste café.","review":"A listening check for a repeated spelling in different grammatical roles; no claim of semantic correctness."}
+]
