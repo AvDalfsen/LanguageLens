@@ -13,7 +13,9 @@ SCRIPT_BY_LANGUAGE = {
     "ar": "ARABIC",
     "el": "EL",
     "hi": "DEVANAGARI",
-    "ja": "JAPAN",
+    # PP-OCRv5's CH model recognizes Chinese, English and Japanese; there is
+    # no separate JAPAN recognition model in that generation.
+    "ja": "CH",
     "ko": "KOREAN",
     "ru": "CYRILLIC",
     "uk": "CYRILLIC",
