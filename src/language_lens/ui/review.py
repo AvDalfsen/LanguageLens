@@ -325,14 +325,24 @@ class ImageCanvas(QWidget):
         )
         bubble.ipa.setVisible(self._show_ipa and bool(item and item["ipa"]))
         bubble.ipa.setText(f'[{item["ipa"]}]' if item and item["ipa"] else "")
+        notes = item.get("ipa_notes", ()) if item else ()
+        bubble.ipa.setToolTip("\n".join((
+            "Estimated pronunciation, not a measurement of the voice's audio.",
+            *notes,
+            f'Original synthesis phonemes: [{item["phonemes"]}]' if item else "",
+        )))
         detail = self._pronunciation_message
         if item:
             detail = {"context": "From selected sentence", "isolated": "Word in isolation",
                       "unavailable": "Pronunciation unavailable"}[item["mode"]]
             if self._show_ipa and item["ipa"]:
-                detail = "Estimated IPA · " + detail.lower()
-            bubble.detail.setToolTip(item.get("reason") or
-                "Mapped from the selected sentence. The engine can still misread ambiguous words.")
+                notation = "Engine notation" if item.get("ipa_notation") == "engine" else "Estimated IPA"
+                detail = notation + " · " + detail.lower()
+            origin = item.get("reason") or (
+                "Mapped from the selected sentence. The engine can still misread ambiguous words."
+                if item["mode"] == "context" else "Generated for this word in isolation."
+            )
+            bubble.detail.setToolTip("\n".join((origin, *notes)))
         else:
             bubble.detail.setToolTip(detail)
         bubble.detail.setText(detail)

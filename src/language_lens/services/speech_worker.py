@@ -50,8 +50,9 @@ def download(voice: Voice, root: Path, scratch: Path, progress=emit) -> None:
 def validate_text(text: str) -> str:
     if not isinstance(text, str) or not text.strip() or len(text) > MAX_TEXT_LENGTH:
         raise ValueError(f"Select between 1 and {MAX_TEXT_LENGTH:,} characters to read aloud.")
-    if any(unicodedata.category(c) == "Cc" and c not in "\n\r\t" for c in text):
-        raise ValueError("The selected text contains unsupported control characters.")
+    if any(unicodedata.category(c) == "Cs" or
+           (unicodedata.category(c) == "Cc" and c not in "\n\r\t") for c in text):
+        raise ValueError("The selected text contains invalid Unicode or unsupported control characters.")
     return unicodedata.normalize("NFC", text)
 
 

@@ -17,7 +17,9 @@ import unicodedata
 
 # Use the exact phonemizer each pinned voice was trained with. Alan's configuration
 # requests RP, not eSpeak's generic English default.
-from language_lens.services.voices import PIPER_VERSION, VOICES
+from language_lens.services.voices import MAX_TEXT_LENGTH, PIPER_VERSION, VOICES
+from language_lens.services.ipa import STRESS, format_ipa
+from language_lens.text import normalized_offsets
 
 LOCALES = {voice.locale: voice.espeak for voice in VOICES}
 _LOCK = threading.RLock()
@@ -51,6 +53,8 @@ class WordPronunciation:
     sentence_index: int | None = None
     phoneme_start: int | None = None
     phoneme_end: int | None = None
+    ipa_notation: str = "ipa"
+    ipa_notes: tuple[str, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -69,18 +73,7 @@ class Pronunciation:
 
 def normalize_with_offsets(text: str) -> tuple[str, list[tuple[int, int]]]:
     """NFC for the engine; maintain offsets into the unmodified OCR text."""
-    parts: list[str] = []
-    offsets: list[tuple[int, int]] = []
-    start = 0
-    while start < len(text):
-        end = start + 1
-        while end < len(text) and unicodedata.category(text[end]).startswith("M"):
-            end += 1
-        part = unicodedata.normalize("NFC", text[start:end])
-        parts.append(part)
-        offsets.extend([(start, end)] * len(part))
-        start = end
-    return "".join(parts), offsets
+    return normalized_offsets(text)
 
 
 def tokenize(text: str) -> list[Token]:
@@ -212,6 +205,8 @@ class Pronouncer:
         self.lib.espeak_Info.argtypes = [ct.c_void_p]
         self.lib.espeak_Info.restype = ct.c_char_p
         self.engine_version = self.lib.espeak_Info(None).decode("ascii")
+        self._last_switches: tuple[bool, ...] = ()
+        self._component_cache: dict[tuple[str, str], str] = {}
         data = Path(bridge.__file__).parent / "espeak-ng-data"
         # Synchronous retrieval, IPA events, and failure rather than process exit.
         with _LOCK:
@@ -221,19 +216,70 @@ class Pronouncer:
     def _sentences(self, text: str, voice: str) -> tuple[str, ...]:
         self.bridge.set_voice(voice)
         sentences: list[str] = []
+        switches: list[bool] = []
         pending = ""
+        switched = False
         for phonemes, terminator, ended in self.bridge.get_phonemes(text):
             # Same transformation as Piper 1.8.0's eSpeak phonemizer. Call the
             # bridge directly to avoid Piper interpreting OCR [[text]] as phones.
+            switched |= bool(re.search(r"\([^)]+\)", phonemes))
             pending += re.sub(r"\([^)]+\)", "", phonemes) + terminator
             if terminator in (",", ":", ";"):
                 pending += " "
             if ended:
                 sentences.append(unicodedata.normalize("NFD", pending))
+                switches.append(switched)
                 pending = ""
+                switched = False
         if pending:
             sentences.append(unicodedata.normalize("NFD", pending))
+            switches.append(switched)
+        self._last_switches = tuple(switches)
         return tuple(sentences)
+
+    def _display_word(self, phones: str, locale: str, source: str, switched: bool):
+        """Verify hyphen component boundaries by exact segment equality only.
+
+        Isolated component readings are never substituted for contextual phones.
+        A mismatch (sandhi, vowel reduction, language switching) is not guessed.
+        """
+        raw = unicodedata.normalize("NFD", phones)
+        parts = re.split(r"[-‐‑]+", source)
+        boundaries: tuple[int, ...] = ()
+        unverified = len(parts) > 1
+        # Initialisms can lose spaces too: USA is /juː ɛs eɪ/, not /juː ɛ seɪ/.
+        # A lexical acronym such as NASA must not be replaced by letter readings.
+        initialism = source.isalpha() and source.isupper() and len(source) > 1 and raw.count("ˈ") + raw.count("ˌ") > 1
+        if initialism and not unverified:
+            parts = list(source)
+        if len(parts) > 1 and all(parts) and not switched:
+            def key(value):
+                return "".join(c for c in unicodedata.normalize("NFD", value)
+                               if c not in STRESS and c not in _SEPARATORS)
+            component_keys = []
+            for part in parts:
+                cache_key = (locale, part)
+                if cache_key not in self._component_cache:
+                    try:
+                        component = " ".join(self._sentences(part, LOCALES[locale]))
+                    except (RuntimeError, ValueError, UnicodeError):
+                        # A failed optional boundary probe must not discard an
+                        # already prepared contextual pronunciation or its audio.
+                        component = ""
+                    self._component_cache[cache_key] = "" if not component or any(self._last_switches) else key(component)
+                component_keys.append(self._component_cache[cache_key])
+            if all(component_keys) and "".join(component_keys) == key(raw):
+                positions = [i for i, c in enumerate(raw) if c not in STRESS and c not in _SEPARATORS]
+                length = 0
+                located = []
+                for component in component_keys[:-1]:
+                    length += len(component)
+                    located.append(positions[length])
+                boundaries, unverified = tuple(located), False
+            elif initialism:
+                unverified = True
+        return format_ipa(raw, locale, boundaries=boundaries, language_switch=switched,
+                          compound_unverified=unverified)
 
     def _events(self, text: str, voice: str) -> list[SpokenUnit]:
         units: list[SpokenUnit] = []
@@ -275,15 +321,17 @@ class Pronouncer:
     def prepare(self, text: str, locale: str) -> Pronunciation:
         if locale not in LOCALES:
             raise ValueError(f"Unsupported pronunciation locale: {locale}")
-        if not text.strip() or len(text) > 2000:
-            raise ValueError("Use a non-empty selection of at most 2,000 characters.")
-        if any(unicodedata.category(c) == "Cc" and c not in "\n\r\t" for c in text):
-            raise ValueError("Control characters are not supported in screenshot text.")
+        if not isinstance(text, str) or not text.strip() or len(text) > MAX_TEXT_LENGTH:
+            raise ValueError(f"Use a non-empty selection of at most {MAX_TEXT_LENGTH:,} characters.")
+        if any(unicodedata.category(c) == "Cs" or
+               (unicodedata.category(c) == "Cc" and c not in "\n\r\t") for c in text):
+            raise ValueError("Invalid Unicode or control characters are not supported in screenshot text.")
         normalized, offsets = normalize_with_offsets(text)
         voice = LOCALES[locale]
         warnings: list[str] = []
         with _LOCK:
             sentences = self._sentences(normalized, voice)
+            sentence_switches = self._last_switches
             try:
                 units = self._events(normalized, voice)
                 aligned, matches, reasons = align_units(normalized, sentences, units)
@@ -296,16 +344,20 @@ class Pronouncer:
                 if index in aligned:
                     sentence, phone_start, phone_end = aligned[index]
                     phones = sentences[sentence][phone_start:phone_end]
+                    switched = sentence_switches[sentence]
                     mode, reason = "context", None
                 else:
                     # Standalone fallback is explicit, never represented as contextual.
                     phones = " ".join(self._sentences(token.text, voice)).strip(" .,:;!?")
+                    switched = any(self._last_switches)
                     sentence = phone_start = phone_end = None
                     mode = "isolated" if sound_chars(phones) else "unavailable"
                     reason = reasons.get(index, "Native source alignment unavailable.")
+                display = self._display_word(phones, locale, token.text, switched)
                 words.append(WordPronunciation(
-                    index, start, end, text[start:end], unicodedata.normalize("NFC", phones),
+                    index, start, end, text[start:end], display.text,
                     phones, mode, reason, sentence, phone_start, phone_end,
+                    display.notation, display.notes,
                 ))
         if not matches:
             warnings.append("Context mapping was not verified; word results use isolated fallback.")
@@ -340,9 +392,11 @@ class Pronouncer:
                 phones = " ".join(self._sentences(
                     unicodedata.normalize("NFC", text[start:end]), LOCALES[locale]
                 )).strip(" .,:;!?")
+                display = self._display_word(phones, locale, text[start:end], any(self._last_switches))
                 words.append(WordPronunciation(
-                    index, start, end, text[start:end], unicodedata.normalize("NFC", phones),
+                    index, start, end, text[start:end], display.text,
                     phones, "isolated" if sound_chars(phones) else "unavailable",
                     "The highlighted word does not match a complete engine word boundary.",
+                    ipa_notation=display.notation, ipa_notes=display.notes,
                 ))
         return replace(prepared, words=tuple(words))

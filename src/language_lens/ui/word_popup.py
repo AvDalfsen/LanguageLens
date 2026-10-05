@@ -67,8 +67,9 @@ class WordPopup(QFrame):
         for label in (self.translation, self.alternatives):
             label.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
         self.ipa = self._label("popupIpa")
+        self.ipa.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
         self.ipa.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
-        self.ipa.setToolTip("Estimated IPA used as input to the selected voice; not a measurement of its audio.")
+        self.ipa.setToolTip("Estimated pronunciation with display-only stress formatting; not a measurement of the voice's audio.")
         self.detail = self._label("popupDetail")
         self.voice = self._label("popupVoice")
         self.more = QPushButton("More candidates")
