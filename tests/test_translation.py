@@ -95,7 +95,7 @@ def test_word_candidates_rank_deduplicate_and_cache_without_changing_accents(mon
     def hypotheses(text, num_hypotheses):
         calls.append((text, num_hypotheses))
         return [SimpleNamespace(value=value, score=score) for value, score in [
-            ("Cursos:", -3), (" pratos ", -.5), ("cursos", -1),
+            ("cursos:", -3), (" pratos ", -.5), ("cursos", -1),
             ("avo\u0301", -1.5), ("avô", -2),
         ]]
     translator = candidate_backend(monkeypatch, hypotheses)
@@ -103,6 +103,17 @@ def test_word_candidates_rank_deduplicate_and_cache_without_changing_accents(mon
     assert result == WordTranslation(("pratos", "cursos", "avó", "avô"))
     assert translator.word_candidates("courses", "en", "pt") == result
     assert calls == [("courses", 5)]
+
+
+def test_word_candidates_preserve_meaningful_capitalization(monkeypatch):
+    translator = candidate_backend(monkeypatch, lambda *_args, **_kwargs: [
+        SimpleNamespace(value=value, score=-index) for index, value in enumerate(
+            ("Polish", "polish", "US", "us", "US!")
+        )
+    ])
+    assert translator.word_candidates("word", "en", "pt", expanded=True).candidates == (
+        "Polish", "polish", "US", "us",
+    )
 
 
 def test_word_candidates_limit_to_four_unique_results_and_preserve_phrases(monkeypatch):

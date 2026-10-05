@@ -1,5 +1,7 @@
 import os
 
+import pytest
+
 os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
 from PySide6.QtCore import QRect, QRectF, QSize
@@ -7,7 +9,7 @@ from PySide6.QtGui import QImage, QPixmap
 
 from language_lens.config import Settings
 import language_lens.ui.review as review_module
-from language_lens.domain import OcrLine, WordTranslation, build_word_hits
+from language_lens.domain import OcrLine, OcrSpanBox, WordTranslation, build_word_hits
 from language_lens.ui.review import OcrTask, ReviewWindow
 
 
@@ -26,6 +28,43 @@ def test_ocr_task_can_be_created_without_a_pixmap():
     task = OcrTask(image, Settings())
 
     assert task.image.size() == QSize(120, 40)
+
+
+def test_enlarged_retry_transforms_native_boxes_without_changing_word_offsets():
+    task = OcrTask(
+        QImage(100, 30, QImage.Format.Format_RGB888), Settings(),
+        retry_offset=review_module.QPoint(-20, -20), selection_size=QSize(100, 30),
+    )
+    source = OcrLine("cat", .99, ((60, 50), (160, 50), (160, 90), (60, 90)), (
+        OcrSpanBox(0, 3, ((70, 50), (150, 50), (150, 90), (70, 90))),
+    ), ((0, 3),))
+    mapped = task._map_retry_lines([source])[0]
+    assert mapped.token_spans == ((0, 3),)
+    assert mapped.span_boxes[0].polygon == ((15, 5), (55, 5), (55, 25), (15, 25))
+
+
+def test_review_retains_ocr_word_boxes_when_moving_back_to_screenshot(monkeypatch, qapp):
+    monkeypatch.setattr(review_module, "QThreadPool", IdleThreadPool)
+    window = ReviewWindow(QPixmap(800, 600), QRect(100, 200, 400, 40), Settings(speech_enabled=False))
+    source = OcrLine("cat", .99, ((0, 0), (100, 0), (100, 20), (0, 20)), (
+        OcrSpanBox(0, 3, ((10, 0), (70, 0), (70, 20), (10, 20))),
+    ), ((0, 3),))
+    window._ocr_finished([source])
+    assert window._hits[0].bounds == review_module.Rect(110, 200, 60, 20)
+    assert (window._hits[0].source_start, window._hits[0].source_end) == (0, 3)
+    window.close()
+
+
+@pytest.mark.parametrize("target", ["es", "nl", "en"])
+def test_review_segments_japanese_independently_of_translation_target(monkeypatch, qapp, target):
+    monkeypatch.setattr(review_module, "QThreadPool", IdleThreadPool)
+    window = ReviewWindow(QPixmap(800, 600), QRect(100, 200, 400, 40),
+                          Settings(source_language="ja", target_language=target))
+    source = OcrLine("私は本を読みます。", .99, ((0, 0), (400, 0), (400, 20), (0, 20)))
+    window._ocr_finished([source])
+    assert [hit.text for hit in window._hits] == ["私", "は", "本", "を", "読み", "ます"]
+    assert all(source.text[hit.source_start:hit.source_end] == hit.text for hit in window._hits)
+    window.close()
 
 
 def test_ocr_task_retries_with_padding_and_maps_results_back(monkeypatch, qapp):

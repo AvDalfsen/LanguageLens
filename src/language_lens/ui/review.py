@@ -75,14 +75,12 @@ class OcrTask(QRunnable):
     def _map_retry_lines(self, lines: list[OcrLine]) -> list[OcrLine]:
         mapped: list[OcrLine] = []
         for line in lines:
-            polygon = tuple(
-                (
+            adjusted = line.map_geometry(
+                lambda x, y: (
                     x / self.retry_scale + self.retry_offset.x(),
                     y / self.retry_scale + self.retry_offset.y(),
                 )
-                for x, y in line.polygon
             )
-            adjusted = OcrLine(line.text, line.confidence, polygon)
             bounds = adjusted.bounds
             center_x = bounds.x + bounds.width / 2
             center_y = bounds.y + bounds.height / 2
@@ -599,17 +597,12 @@ class ReviewWindow(QWidget):
         if self._closed:
             return
         self._lines = [
-            OcrLine(
-                text=line.text,
-                confidence=line.confidence,
-                polygon=tuple(
-                    (x + self._selection.x(), y + self._selection.y())
-                    for x, y in line.polygon
-                ),
+            line.map_geometry(
+                lambda x, y: (x + self._selection.x(), y + self._selection.y())
             )
             for line in result
         ]
-        self._hits = build_word_hits(self._lines)
+        self._hits = build_word_hits(self._lines, self.settings.source_language)
         self.canvas.set_hits(self._hits)
         self._speech_text = " ".join(line.text for line in self._lines)
         self._refresh_speech()

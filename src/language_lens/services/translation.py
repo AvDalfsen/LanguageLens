@@ -134,8 +134,9 @@ class ArgosTranslator:
                 ranked.sort(key=lambda item: item[1], reverse=True)
                 candidates, seen = [], set()
                 for value, _score in ranked:
-                    # Case/terminal punctuation variants do not add another meaning.
-                    key = value.casefold().strip(" \t.,;:!?…。！？\"'“”‘’«»")
+                    # Capitalization can distinguish meanings (US/us, Polish/polish).
+                    # Ignore terminal punctuation, but retain case for every language.
+                    key = value.strip(" \t.,;:!?…。！？\"'“”‘’«»")
                     if key and key not in seen:
                         seen.add(key)
                         candidates.append(value)
