@@ -86,10 +86,14 @@ def test_conventional_stress_with_segment_quality_intact(raw, expected, locale):
         assert stress_targets(result.text) == stress_targets(raw)
 
 
-def test_all_shipping_accents_have_explicit_display_profiles():
+def test_unreviewed_accents_preserve_engine_notation():
     from language_lens.services.pronunciation import LOCALES
-    assert set(PROFILES) == {voice.locale for voice in VOICES}
-    assert all(LOCALES[voice.locale] == voice.espeak for voice in VOICES)
+    assert set(PROFILES) == {"en-US", "en-GB", "pt-PT", "pt-BR"}
+    assert all(LOCALES[voice.locale] == voice.espeak for voice in VOICES if voice.phoneme_type == "espeak")
+    for voice in VOICES:
+        if voice.locale not in PROFILES:
+            result = format_ipa("mˈa ↑#", voice.locale)
+            assert result.text == "mˈa ↑#" and result.notation == "engine"
 
 
 @pytest.mark.parametrize("raw", [

@@ -35,16 +35,18 @@ def test_expansion_is_on_demand_cached_and_not_overwritten_by_late_compact_resul
     assert not requested and popup.more.text() == "Show 1 other candidate"
     assert popup.translation.text() == "1. bank · Best match"
     assert popup.alternatives.isHidden()
-    assert popup.search_status.text() == "2 candidates found · showing best match"
+    assert popup.search_status.text() == "2 model suggestions available · showing best match"
     popup.more.click()
     assert not requested
     assert popup.alternatives.text() == "2. banken"
-    assert popup.more.text() == "Search for more candidates"
-    assert popup.search_status.text() == "2 candidates found · showing all"
+    assert popup.more.text() == "Show best match only"
+    assert popup.search_status.text() == "2 model suggestions available · showing all"
     popup.more.click()
+    assert popup.alternatives.isHidden() and not requested  # hide is always immediate
+    popup.search.click()
     assert requested == ["bank"] and canvas._pinned
-    assert not popup.more.isEnabled() and "Finding" in popup.more.text()
-    canvas._toggle_candidates()  # guard duplicate requests even outside the disabled button
+    assert not popup.search.isEnabled() and "Finding" in popup.search.text()
+    canvas._search_candidates()  # guard duplicate requests even outside the disabled button
     assert requested == ["bank"]
     # A wider beam can change the ranking; its best result must remain the best
     # result even after the expanded list is collapsed.
@@ -68,7 +70,7 @@ def test_expansion_is_on_demand_cached_and_not_overwritten_by_late_compact_resul
 def test_results_for_previous_word_do_not_change_current_popup_or_reopen_dismissed_one(canvas):
     popup = canvas._bubble
     popup.more.click()
-    popup.more.click()
+    popup.search.click()
     canvas._hovered = canvas._hits[1]
     canvas._refresh_bubble()
     canvas.set_more_candidates("bank", WordTranslation(("bank", "oever")))
@@ -90,14 +92,23 @@ def test_expansion_failure_keeps_existing_translation_and_offers_retry(canvas):
     canvas.more_candidates_requested.connect(requested.append)
     popup.more.click()
     assert not requested  # reveal the compact candidates first
-    popup.more.click()
+    popup.search.click()
     assert requested == ["bank"]
     canvas.set_more_candidates("bank", None, "Test failure")
     assert popup.translation.text() == "1. bank · Best match"
-    assert popup.more.text() == "Retry more candidates"
-    assert popup.more.isEnabled() and "Test failure" in popup.search_status.text()
-    popup.more.click()
+    assert popup.search.text() == "Retry wider search"
+    assert popup.search.isEnabled() and "Test failure" in popup.search_status.text()
+    popup.search.click()
     assert requested == ["bank", "bank"]
+
+
+def test_hide_during_search_remains_hidden_when_result_arrives(canvas):
+    popup = canvas._bubble
+    popup.search.click()
+    popup.more.click()
+    assert popup.alternatives.isHidden()
+    canvas.set_more_candidates("bank", WordTranslation(("oever", "bank", "banken")))
+    assert popup.alternatives.isHidden() and popup.translation.text() == "1. oever · Best match"
 
 
 def test_single_compact_candidate_can_search_for_more(canvas):
@@ -106,9 +117,9 @@ def test_single_compact_candidate_can_search_for_more(canvas):
     requested = []
     canvas.more_candidates_requested.connect(requested.append)
     assert popup.translation.text() == "bank"
-    assert popup.search_status.text() == "1 candidate found · showing best match"
-    assert popup.more.text() == "Search for more candidates"
-    popup.more.click()
+    assert popup.search_status.text() == "1 model suggestion available · showing best match"
+    assert popup.more.isHidden() and popup.search.text() == "Search for more candidates"
+    popup.search.click()
     assert requested == ["bank"]
 
 

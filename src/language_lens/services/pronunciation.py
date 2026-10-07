@@ -21,7 +21,7 @@ from language_lens.services.voices import MAX_TEXT_LENGTH, PIPER_VERSION, VOICES
 from language_lens.services.ipa import STRESS, format_ipa
 from language_lens.text import normalized_offsets
 
-LOCALES = {voice.locale: voice.espeak for voice in VOICES}
+LOCALES = {voice.locale: voice.espeak for voice in VOICES if voice.phoneme_type == "espeak"}
 _LOCK = threading.RLock()
 _SEPARATORS = frozenset(" \t\r\n.,:;!?-")
 
@@ -74,6 +74,45 @@ class Pronunciation:
 def normalize_with_offsets(text: str) -> tuple[str, list[tuple[int, int]]]:
     """NFC for the engine; maintain offsets into the unmodified OCR text."""
     return normalized_offsets(text)
+
+
+def validate_spans(text: str, spans: list) -> None:
+    previous_end = 0
+    if not isinstance(spans, list) or len(spans) > 2000:
+        raise ValueError("Invalid pronunciation word positions.")
+    for span in spans:
+        if (not isinstance(span, (tuple, list)) or len(span) != 2
+                or any(type(value) is not int for value in span)):
+            raise ValueError("Invalid pronunciation word positions.")
+        start, end = span
+        if not previous_end <= start < end <= len(text) or not text[start:end].strip():
+            raise ValueError("Pronunciation word positions must be ordered and non-overlapping.")
+        previous_end = end
+
+
+def prepare_japanese(text: str, spans: list) -> Pronunciation:
+    """Use the model's OpenJTalk phones, never eSpeak's incomplete Japanese voice.
+
+    Pitch cues belong to engine notation. Do not claim contextual word alignment
+    until a verified source-to-OpenJTalk alignment has been implemented.
+    """
+    from piper.phonemize_japanese import JapanesePhonemizer
+    validate_spans(text, spans)
+    engine = JapanesePhonemizer()
+    sentences = tuple("".join(phones) for phones in engine.phonemize(unicodedata.normalize("NFC", text)))
+    words = []
+    for index, (start, end) in enumerate(spans):
+        source = text[start:end]
+        phones = " ".join("".join(part) for part in engine.phonemize(unicodedata.normalize("NFC", source)))
+        words.append(WordPronunciation(
+            index, start, end, source, phones, phones, "isolated" if phones else "unavailable",
+            "Japanese word alignment is not yet verified; using an isolated-word reading.",
+            ipa_notation="engine", ipa_notes=(
+                "OpenJTalk engine notation includes pitch-accent and phrase cues; not a conventional IPA transcription.",
+            ),
+        ))
+    return Pronunciation(text, "ja-JP", "OpenJTalk / pyopenjtalk-plus 0.4.1.post9",
+                         sentences, tuple(words), False, ("Japanese word readings use isolated fallback.",))
 
 
 def tokenize(text: str) -> list[Token]:
@@ -369,17 +408,7 @@ class Pronouncer:
         OCR may split a currency/decimal into several hover targets. Never assign
         the pronunciation of that whole unit to one of its smaller targets.
         """
-        previous_end = 0
-        if not isinstance(spans, list) or len(spans) > 2000:
-            raise ValueError("Invalid pronunciation word positions.")
-        for span in spans:
-            if (not isinstance(span, (tuple, list)) or len(span) != 2
-                    or any(type(value) is not int for value in span)):
-                raise ValueError("Invalid pronunciation word positions.")
-            start, end = span
-            if not previous_end <= start < end <= len(text) or not text[start:end].strip():
-                raise ValueError("Pronunciation word positions must be ordered and non-overlapping.")
-            previous_end = end
+        validate_spans(text, spans)
         prepared = self.prepare(text, locale)
         by_span = {(word.start, word.end): word for word in prepared.words}
         words = []

@@ -91,7 +91,7 @@ def _attach_boxes(lines: list[OcrLine], word_results) -> list[OcrLine]:
 class RapidOcrEngine:
     """RapidOCR adapter configured for screen text in the selected script."""
 
-    def __init__(self, source_language: str) -> None:
+    def __init__(self, source_language: str, *, params: dict | None = None) -> None:
         try:
             from rapidocr import LangRec, ModelType, OCRVersion, RapidOCR
         except ImportError as exc:  # pragma: no cover - exercised in installed app
@@ -104,7 +104,7 @@ class RapidOcrEngine:
         self._return_character_boxes = script_name in {"LATIN", "CH"}
         language = getattr(LangRec, script_name)
         self._engine = RapidOCR(
-            params={
+            params=params or {
                 "Rec.lang_type": language,
                 "Rec.model_type": ModelType.MOBILE,
                 "Rec.ocr_version": OCRVersion.PPOCRV5,
@@ -113,7 +113,11 @@ class RapidOcrEngine:
         )
 
     def recognize(self, image: Any, min_confidence: float = 0.45) -> list[OcrLine]:
-        """Recognize an RGB numpy array and return filtered, ordered text lines."""
+        """Recognize a uint8 BGR numpy array and return filtered, ordered lines.
+
+        RapidOCR treats three-channel NumPy input as OpenCV/BGR and does not
+        swap channels. Qt images must use qimage_to_bgr_array before this call.
+        """
         result = self._engine(
             image, use_det=True, use_cls=True, use_rec=True,
             return_word_box=self._return_character_boxes,

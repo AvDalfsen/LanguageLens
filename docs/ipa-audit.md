@@ -129,6 +129,21 @@ results, not a certification of linguistic accuracy.
    systems, languages with different clusters, and additional accents require
    their own frontend/display review. They are not newly enabled by this change.
 
+## Voice-catalogue follow-up — 6 October 2026
+
+Audio now covers all 25 text-language entries (26 voices). This does **not**
+extend English/Portuguese syllabification conventions to other languages.
+Audited display profiles remain en-US, en-GB, pt-PT and pt-BR. Other supported
+eSpeak frontends keep their phones unchanged and are labelled engine notation;
+Japanese uses OpenJTalk and explicitly isolated word readings. Its pitch cues
+are not claimed as conventional IPA. Exact engine phones, not reformatted
+display strings, still drive audio. Native-speaker assessment and additional
+language-specific transcription reviews remain separate work.
+
+All 26 voices passed normal-speed and 0.75× real synthesis/integrity checks.
+See [audit follow-up](audit-followup.md) for the current full regression result
+and the distinction between technical verification and pronunciation quality.
+
 ## Primary references
 
 - [Cambridge IPA/stress examples](https://dictionary.cambridge.org/pt/help/phonetics.html): onset-based primary/secondary stress examples.

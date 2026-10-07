@@ -64,8 +64,9 @@ def test_ambiguous_native_word_boundaries_are_never_claimed_as_context():
 def test_real_worker_maps_each_occurrence_without_an_audio_model(qapp, tmp_path, voice):
     pytest.importorskip("piper.espeakbridge")
     text = ("I record a record. It is kind of a problem. [[hello]]"
-            if voice.language == "en" else "🙂 A avo\u0301 e o avo\u0302 bebem café. Custou €12,50.")
-    hits = build_word_hits([line(text)])
+            if voice.language == "en" else "🙂 A avo\u0301 e o avo\u0302 bebem café. Custou €12,50."
+            if voice.language in ("pt", "pb") else voice.sample)
+    hits = build_word_hits([line(text)], voice.language)
     spans = [[hit.source_start, hit.source_end] for hit in hits]
     job = SpeechJob(root=tmp_path)
     results, errors = [], []
@@ -97,7 +98,7 @@ def test_real_worker_maps_each_occurrence_without_an_audio_model(qapp, tmp_path,
         assert [word["text"] for word in result["words"][of_index:of_index + 2]] == ["of", "a"]
         assert all(word["mode"] == "isolated" for word in result["words"][of_index:of_index + 2])
         assert result["words"][-1]["phonemes"] != "hello"
-    else:
+    elif voice.language in ("pt", "pb"):
         assert result["words"][1]["phonemes"] != result["words"][4]["phonemes"]
         assert all(word["mode"] == "isolated" for word in result["words"] if word["text"] in ("12", "50"))
     assert not list(tmp_path.glob(".job-*"))
@@ -117,7 +118,7 @@ def test_prepared_audio_never_reinterprets_ipa_as_text(monkeypatch, tmp_path):
     model.with_suffix(".onnx.json").write_text("{}", encoding="utf-8")
     phones = "mˈɑːks sɐ̃w"
     config = SimpleNamespace(espeak_voice=voice.espeak, phoneme_type=SimpleNamespace(value="espeak"),
-                             vowel_clusters=None, phoneme_id_map=dict.fromkeys(phones), sample_rate=22050)
+                             vowel_clusters=None, phoneme_id_map=dict.fromkeys(phones), sample_rate=22050, length_scale=1.)
     monkeypatch.setattr(speech_worker, "verified_model", lambda *_: model)
     monkeypatch.setattr(PiperConfig, "from_dict", lambda *_: config)
     monkeypatch.setattr(onnxruntime, "InferenceSession", lambda *a, **kw: object())
@@ -197,6 +198,61 @@ def test_popup_stays_accessible_and_can_be_pinned(word_window, monkeypatch):
     assert popup.isVisible()
     popup.dismissed.emit()
     assert popup.isHidden() and not window.canvas._pinned
+
+
+def test_speed_slider_controls_word_and_sentence_audio_without_altering_phonemes(word_window, monkeypatch):
+    window = word_window
+    calls = []
+    monkeypatch.setattr(window.speech, "speak_phonemes", lambda phones, voice, context:
+        calls.append((phones, window.speech.speed)))
+    original = window._prepared
+    window.speed_slider.setValue(65)
+    window.canvas._bubble.play.click()
+    window.read_button.click()
+    assert calls == [(("ɹɪkˈɔːd",), .65), (tuple(original["sentence_phonemes"]), .65)]
+    assert window._prepared is original
+    assert window.canvas._bubble.ipa.text() == "[ɹɪˈkɔːd]"
+    assert window.speed_slider.isEnabled()
+
+
+@pytest.mark.parametrize("state", ["idle", "generating", "playing"])
+def test_ocr_retry_immediately_disables_audio_and_clears_prepared_pronunciation(word_window, monkeypatch, state):
+    window = word_window
+    calls, refreshed_text = [], []
+    monkeypatch.setattr(window.speech, "speak", lambda *_: calls.append(True))
+    monkeypatch.setattr(window.speech, "speak_phonemes", lambda *_: calls.append(True))
+    window.speech._set_state(state, "")
+    window._active_word = (2, 8)
+    assert window.read_button.isEnabled() and window.speed_slider.isEnabled()
+    window.speech.changed.connect(lambda *_: refreshed_text.append(window._speech_text))
+    window._retry_ocr()
+    assert refreshed_text and all(text == "" for text in refreshed_text)
+    assert not window.read_button.isEnabled() and not window.speed_slider.isEnabled()
+    assert window.read_button.text() == "Read selection"
+    assert not window.speech.busy and window._prepared is None and window._active_word is None
+    assert not window._speech_text and not window.canvas._pronunciations
+    assert window.canvas._bubble.isHidden()
+    window.read_button.click()
+    assert not calls
+
+
+def test_audio_stays_disabled_on_failed_or_empty_retry_and_recovers_with_new_text(word_window, monkeypatch):
+    window = word_window
+    calls = []
+    monkeypatch.setattr(window.speech, "speak", lambda text, *_: calls.append(text))
+    window._retry_ocr()
+    window._ocr_failed("Test scan failure")
+    assert not window.read_button.isEnabled() and not window.speed_slider.isEnabled()
+    assert window.retry_ocr.isEnabled()
+    window._retry_ocr()
+    window._ocr_finished([])
+    window.speech._set_state("idle", "")
+    assert not window.read_button.isEnabled() and not window.speed_slider.isEnabled()
+    window._retry_ocr()
+    window._ocr_finished([line("New sentence.")])
+    assert window.read_button.isEnabled() and window.speed_slider.isEnabled()
+    window.read_button.click()
+    assert calls == ["New sentence."]
 
 
 def test_ipa_can_be_hidden_without_removing_word_audio_and_fallback_is_visible(word_window):

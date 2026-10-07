@@ -138,12 +138,15 @@ def progress_window(qapp, monkeypatch):
     clock = [100.0]
     tasks = []
     monkeypatch.setattr(setup, "monotonic", lambda: clock[0])
-    monkeypatch.setattr(setup.ArgosTranslator, "is_pair_installed", lambda *args: False)
-    monkeypatch.setattr(setup, "QThreadPool", SimpleNamespace(globalInstance=lambda:
-        SimpleNamespace(start=tasks.append)))
+    monkeypatch.setattr(setup.ServiceJob, "start", lambda self, *args, **kwargs: tasks.append(self))
     window = setup.SetupWindow(Settings())
-    window.install_model()
-    yield window, clock, tasks[0]
+    window.prepare_button.click()
+    job = tasks[0]
+    task = SimpleNamespace(signals=SimpleNamespace(
+        progress=SimpleNamespace(emit=lambda value: job.event.emit({"progress": value})),
+        download_progress=SimpleNamespace(emit=lambda value: window._download_progress_changed(value)),
+        finished=job.finished, error=job.failed))
+    yield window, clock, task
     window._stop_model_progress()
     window.pronunciation.shutdown()
     window.close()
@@ -151,6 +154,15 @@ def progress_window(qapp, monkeypatch):
     # than leaving signal/fixture references for pytest's final garbage sweep.
     window.deleteLater()
     QCoreApplication.sendPostedEvents(None, QEvent.Type.DeferredDelete)
+
+
+def test_capture_area_choices_are_exposed_and_saved(progress_window):
+    window, _, _ = progress_window
+    assert window.capture_scope.currentData() == "all"
+    window.capture_scope.setCurrentIndex(window.capture_scope.findData("current"))
+    assert window.current_settings().capture_scope == "current"
+    window.capture_scope.setCurrentIndex(window.capture_scope.findData("all"))
+    assert window.current_settings().capture_scope == "all"
 
 
 def test_ui_shows_percent_speed_eta_and_stalled_connection(progress_window):
@@ -194,7 +206,7 @@ def test_unknown_size_and_retry_do_not_show_false_percentages(progress_window):
     assert window.model_progress.value() == 0
     task.signals.error.emit("Connection timed out")
     assert not window._progress_timer.isActive()
-    assert window.install_button.isEnabled()
-    window.install_model()
+    assert window.prepare_button.isEnabled()
+    window.prepare_button.click()
     assert window.model_progress.maximum() == 0
     assert window._download_snapshot is None

@@ -3,6 +3,8 @@ from __future__ import annotations
 
 from collections.abc import Callable
 from dataclasses import dataclass, field
+import hashlib
+import json
 from pathlib import Path
 import time
 from http.client import HTTPException
@@ -11,6 +13,34 @@ from urllib.request import Request, urlopen
 from uuid import uuid4
 import zipfile
 import zlib
+
+from language_lens.config import settings_path
+
+
+def configure_cache(package, scratch: Path) -> None:
+    """Persist completed archives; keep interrupted transfers in the job directory."""
+    package.settings.downloads_dir = settings_path().parent / "model-cache"
+    package.settings.language_lens_download_scratch = scratch / "downloads"
+
+
+def _prune_cache(directory: Path, keep: Path, limit: int = 2 * 1024**3) -> None:
+    archives = []
+    for path in directory.glob("*.argosmodel"):
+        try:
+            info = path.stat()
+            archives.append((info.st_mtime, info.st_size, path))
+        except OSError:
+            continue
+    total = sum(size for _, size, _ in archives)
+    for _, size, path in sorted(archives):
+        if total <= limit:
+            break
+        if path != keep:
+            try:
+                path.unlink()
+            except OSError:
+                continue  # retention must not invalidate a completed download
+            total -= size
 
 
 @dataclass(frozen=True)
@@ -40,12 +70,22 @@ def download_model(model, package, label: str, report: Callable[[str], None],
     name = package.argospm_package_name(model) + ".argosmodel"
     if Path(name).name != name or "\\" in name:
         raise ValueError("The model index contains an invalid package filename.")
+    managed = hasattr(package.settings, "language_lens_download_scratch")
+    if managed:
+        identity = {key: getattr(model, key, None) for key in ("from_code", "to_code", "package_version", "links")}
+        digest = hashlib.sha256(json.dumps(identity, sort_keys=True).encode()).hexdigest()[:24]
+        name = f"{Path(name).stem}-{digest}.argosmodel"
     directory = Path(package.settings.downloads_dir)
     directory.mkdir(parents=True, exist_ok=True)
+    partials = Path(package.settings.language_lens_download_scratch) if managed else directory
+    partials.mkdir(parents=True, exist_ok=True)
     destination = directory / name
     if destination.exists():
         report(f"Checking cached {label}…")
         if valid_archive(destination):
+            if managed:
+                destination.touch()
+                _prune_cache(directory, destination)
             return destination
 
     links = [url for url in model.links if urlparse(url).scheme in ("http", "https")]
@@ -56,7 +96,7 @@ def download_model(model, package, label: str, report: Callable[[str], None],
     for attempt, url in enumerate((url for url in links for _ in range(2)), 1):
         suffix = f" (attempt {attempt}/{attempts})" if attempt > 1 else ""
         report(f"Downloading {label}{suffix}…")
-        temporary = directory / f".{name}.{uuid4().hex}.part"
+        temporary = partials / f".{name}.{uuid4().hex}.part"
         try:
             request = Request(url, headers={"User-Agent": "ArgosTranslate", "Accept-Encoding": "identity"})
             with urlopen(request, timeout=30) as response, temporary.open("xb") as output:
@@ -84,9 +124,11 @@ def download_model(model, package, label: str, report: Callable[[str], None],
             if not valid_archive(temporary):
                 raise ValueError("The downloaded model archive is incomplete or damaged.")
             temporary.replace(destination)
+            if managed:
+                _prune_cache(directory, destination)
             return destination
         except (OSError, ValueError, EOFError, HTTPException) as exc:
             last_error = exc
         finally:
             temporary.unlink(missing_ok=True)
-    raise RuntimeError(f"Could not download {label} after {attempts} attempts: {last_error}")
+    raise RuntimeError(f"Could not download {label} after {attempts} attempts: {last_error}") from last_error

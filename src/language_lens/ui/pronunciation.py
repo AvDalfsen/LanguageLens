@@ -1,46 +1,108 @@
 from __future__ import annotations
+import html
+from time import monotonic
 
-from PySide6.QtCore import Qt
+from PySide6.QtCore import Qt, QTimer, Signal
 from PySide6.QtWidgets import (
     QCheckBox, QComboBox, QFrame, QHBoxLayout, QLabel, QProgressBar, QPushButton, QVBoxLayout,
 )
 
 from language_lens.config import Settings
 from language_lens.services.speech import SpeechJob, SpeechPlayer
-from language_lens.services.voices import runtime_ready, selected_voice, voice_present, voices_for
+from language_lens.services.voices import runtime_ready, voice_runtime_ready, selected_voice, voice_present, voices_for
+from language_lens.ui.style import set_help
+from language_lens.ui.progress import TransferMetrics
 
 
 class PronunciationSettings(QFrame):
+    preferences_changed = Signal()
+    activity_changed = Signal()
+
     def __init__(self, settings: Settings, parent=None) -> None:
         super().__init__(parent)
         self.setObjectName("card")
         self.preferences = dict(settings.speech_voices)
         self.language = settings.source_language
         self.player = SpeechPlayer(self)
+        self.player.speed = settings.speech_speed
+        self.speech_speed = settings.speech_speed
+        self._maintenance_blocked = False
         self.download = SpeechJob(self)
-        self.enabled = QCheckBox("Read selected text aloud")
+        self._download_phase = "downloading"
+        self._transfer_metrics = TransferMetrics(monotonic())
+        self._progress_timer = QTimer(self)
+        self._progress_timer.setInterval(250)
+        self._progress_timer.timeout.connect(self._update_download_metrics)
+        self.enabled = QCheckBox("Enable functionality to read selected text aloud")
         self.enabled.setChecked(settings.speech_enabled)
+        set_help(self.enabled,
+            "Enable buttons to read the original selected text and individual words aloud, not "
+            "their translations. Audio uses 'Text language' and the selected accent. It never "
+            "plays automatically when you hover. Download a matching voice once for offline "
+            "playback; disabling audio does not disable translation or the optional IPA display."
+        )
         self.show_ipa = QCheckBox("Show IPA in word popups")
         self.show_ipa.setChecked(settings.show_ipa)
-        self.show_ipa.setToolTip(
+        set_help(self.show_ipa,
             "Show estimated International Phonetic Alphabet transcriptions for the selected accent. "
-            "Useful if you read IPA; works without downloading an audio voice."
+            "IPA helps identify individual sounds if you know the notation. It is optional and "
+            "works without downloading the audio voice. The app tries to use the selected sentence "
+            "as context and labels isolated-word fallbacks. Estimates, names, and ambiguous words "
+            "can be wrong; IPA is not a measurement of the synthesized audio. English and Portuguese "
+            "have audited display conventions. Other languages retain clearly labelled engine notation; "
+            "Japanese word readings are isolated and do not claim sentence-context pitch accent."
         )
         self.voices = QComboBox()
         self.voices.setAccessibleName("Pronunciation voice")
+        set_help(self.voices,
+            "Choose the accent and voice for the source text, independently of the translation "
+            "language. This choice also sets the accent used by estimated IPA. The app remembers "
+            "your choice for each text language. Every offered text language has a local voice. "
+            "English offers US and UK accents; Portuguese uses Portugal or Brazil according to "
+            "'Text language'. Availability does not guarantee native-speaker pronunciation quality."
+        )
+        self.ipa_accent_note = QLabel("IPA uses this accent.")
+        self.ipa_accent_note.setObjectName("note")
+        self.ipa_accent_note.setWordWrap(True)
         self.status = QLabel()
+        self.status.setAccessibleName("Voice and audio status")
         self.status.setTextFormat(Qt.TextFormat.PlainText)
         self.status.setWordWrap(True)
         self.progress = QProgressBar()
         self.progress.setRange(0, 100)
         self.progress.hide()
+        self.progress.setAccessibleName("Voice download progress")
+        self.download_details = QLabel()
+        self.download_details.setObjectName("note")
+        self.download_details.setWordWrap(True)
+        self.download_details.setTextFormat(Qt.TextFormat.PlainText)
+        self.download_details.hide()
         self.install = QPushButton("Download voice")
         self.preview = QPushButton("Hear sample")
+        set_help(self.install,
+            "Download the selected voice for local playback. The button shows its actual download size. Once installed, "
+            "this button becomes 'Check voice files': an optional integrity check, not a warning that the voice is broken. "
+            "Only missing or damaged files are downloaded. While downloading, this button becomes 'Cancel download'. "
+            "Completed verified files are kept "
+            "if you cancel, so retrying does not start everything from scratch."
+        )
+        set_help(self.preview,
+            "Listen to a short original-language sample to judge the selected voice and accent. "
+            "A downloaded voice and the speech runtime are required. During playback the button "
+            "becomes 'Stop sample'. Samples are generated locally; no text is sent to a speech service."
+        )
         self.details = QLabel()
         self.details.setOpenExternalLinks(True)
+        self.details.setTextInteractionFlags(Qt.TextInteractionFlag.TextBrowserInteraction)
+        self.details.setAccessibleName("Voice details and licence")
         self.details.setWordWrap(True)
         self.details.setObjectName("note")
-        note = QLabel("Pronunciation uses the text language above. Voices work offline after a one-time download.")
+        set_help(self.details,
+            "Open the upstream voice's model card in your browser to read about its speaker, "
+            "training data, and licence. This external page is not needed for local playback; "
+            "opening it does not upload captured text or screenshots."
+        )
+        note = QLabel("Pronunciation uses 'Text language' above. Audio is generated locally after a one-time voice download.")
         note.setWordWrap(True)
         note.setObjectName("note")
         layout = QVBoxLayout(self)
@@ -49,8 +111,10 @@ class PronunciationSettings(QFrame):
         layout.addWidget(self.show_ipa)
         layout.addWidget(note)
         layout.addWidget(self.voices)
+        layout.addWidget(self.ipa_accent_note)
         layout.addWidget(self.status)
         layout.addWidget(self.progress)
+        layout.addWidget(self.download_details)
         row = QHBoxLayout()
         row.addWidget(self.install)
         row.addWidget(self.preview)
@@ -65,9 +129,14 @@ class PronunciationSettings(QFrame):
         self.preview.clicked.connect(self._preview)
         self.player.changed.connect(self._playback_changed)
         self.download.progress.connect(self._download_progress)
+        self.download.stage_changed.connect(self._download_stage_changed)
         self.download.succeeded.connect(lambda _path: self.refresh())
         self.download.cancelled.connect(self.refresh)
         self.download.failed.connect(self._download_failed)
+        self.download.activity_changed.connect(self._download_activity_changed)
+        self.enabled.toggled.connect(self.preferences_changed)
+        self.show_ipa.toggled.connect(self.preferences_changed)
+        self.voices.currentIndexChanged.connect(self.preferences_changed)
         self.set_language(self.language)
 
     @property
@@ -105,31 +174,38 @@ class PronunciationSettings(QFrame):
     def refresh(self) -> None:
         voice = self.voice
         enabled = self.enabled.isChecked()
-        self.voices.setEnabled((enabled or self.show_ipa.isChecked()) and voice is not None)
+        self.ipa_accent_note.setVisible(self.show_ipa.isChecked())
+        self.voices.setEnabled((enabled or self.show_ipa.isChecked()) and voice is not None and not self._maintenance_blocked)
         self.progress.setVisible(self.download.active)
-        self.install.setEnabled(enabled and voice is not None)
+        self.download_details.setVisible(self.download.active)
+        self.install.setEnabled(self.download.active or (enabled and voice is not None and not self._maintenance_blocked))
         ready = voice is not None and voice_present(voice)
-        self.preview.setEnabled(enabled and ready and runtime_ready() and not self.download.active)
+        self.preview.setEnabled(enabled and ready and runtime_ready() and voice_runtime_ready(voice)
+                                and not self.download.active and not self._maintenance_blocked)
         self.preview.setText("Hear sample")
         self.install.setText("Cancel download" if self.download.active else
-                             "Download / repair voice" if ready else "Download voice · 63 MB")
+                             "Check voice files" if ready else
+                             f"Download voice · {voice.total_bytes / 1_000_000:.0f} MB" if voice else "No voice available")
         if not enabled and not self.show_ipa.isChecked():
             message = "Pronunciation is turned off."
         elif voice is None:
-            message = "No voice is available for this language yet. English and both Portuguese variants are supported."
-        elif not runtime_ready():
-            message = "Restart with Start Language Lens.bat to install the speech components."
+            message = "No voice is available for this language."
+        elif not runtime_ready() or not voice_runtime_ready(voice):
+            message = "Restart with 'Start Language Lens.bat' to install the speech components."
         elif not enabled:
-            message = "IPA uses this accent. Audio is turned off."
+            message = "Audio is turned off."
         elif self.download.active:
-            message = "Downloading and verifying the voice…"
+            message = "Checking voice files and downloading any missing files…"
         elif ready:
-            message = "Voice installed. Hear a sample, or read your next selection aloud."
+            message = "Voice installed. Use 'Hear sample' to preview it, or read your next selection aloud."
         else:
             message = "Download this voice once to enable pronunciation."
         self.status.setText(message)
+        if self.download.active:
+            self._update_download_metrics()
         self.details.setText(
             f'<a style="color:#5eead4" href="{voice.url("MODEL_CARD", view=True)}">Voice details and licence</a>'
+            f' · {html.escape(voice.license_note)}'
             if voice else ""
         )
         if self.player.busy:
@@ -138,22 +214,53 @@ class PronunciationSettings(QFrame):
 
     def _install(self) -> None:
         if self.download.active:
-            self.download.cancel()
             self.install.setEnabled(False)
+            self._download_phase = "cancelling"
+            self._progress_timer.stop()
             self.status.setText("Cancelling download…")
+            # Cancellation may finish synchronously; let its final refresh win.
+            self.download.cancel()
             return
-        if self.voice is None:
+        if self.voice is None or self._maintenance_blocked:
             return
         self.player.stop()
-        self.progress.setValue(0)
+        self._download_stage_changed("checking")
         self.download.start("download", self.voice)
         if self.download.active:
             self.refresh()
 
+    def set_speech_speed(self, speed: float) -> None:
+        self.player.stop()
+        self.speech_speed = self.player.speed = speed
+
     def _download_progress(self, done: int, total: int) -> None:
-        percent = min(100, done * 100 // max(1, total))
-        self.progress.setValue(percent)
-        self.status.setText(f"Downloading voice: {percent}% · {done / 1_000_000:.1f} / {total / 1_000_000:.1f} MB")
+        if self._download_phase == "downloading":
+            self._transfer_metrics.update(done, total, monotonic())
+            self.progress.setRange(0, 1000 if total else 0)
+            self.progress.setValue(min(1000, done * 1000 // total) if total else 0)
+        self._update_download_metrics()
+
+    def _download_stage_changed(self, phase: str) -> None:
+        self._download_phase = phase
+        self._transfer_metrics.reset(monotonic())
+        self.progress.setRange(0, 0)
+        self._update_download_metrics()
+
+    def _update_download_metrics(self) -> None:
+        labels = {"checking": "Checking voice files…", "downloading": "Downloading voice…",
+                  "verifying": "Verifying voice files…", "cancelling": "Cancelling download…"}
+        self.status.setText(labels[self._download_phase])
+        details = self._transfer_metrics.text(monotonic())
+        self.download_details.setText(details)
+
+    def _download_activity_changed(self, active: bool) -> None:
+        if active:
+            self._progress_timer.start()
+        else:
+            self._progress_timer.stop()
+            self.progress.hide()
+            self.download_details.hide()
+        self.activity_changed.emit()
 
     def _download_failed(self, message: str) -> None:
         self.refresh()
@@ -162,8 +269,13 @@ class PronunciationSettings(QFrame):
     def _preview(self) -> None:
         if self.player.busy:
             self.player.stop()
-        elif self.voice is not None:
+        elif self.voice is not None and not self._maintenance_blocked:
             self.player.speak(self.voice.sample, self.voice)
+
+    def set_maintenance_blocked(self, blocked: bool) -> None:
+        if self._maintenance_blocked != blocked:
+            self._maintenance_blocked = blocked
+            self.refresh()
 
     def _playback_changed(self, state: str, message: str) -> None:
         self.refresh()
@@ -172,5 +284,6 @@ class PronunciationSettings(QFrame):
         self.preview.setEnabled(self.preview.isEnabled() and state != "stopping")
 
     def shutdown(self) -> None:
+        self._progress_timer.stop()
         self.player.shutdown()
         self.download.shutdown()

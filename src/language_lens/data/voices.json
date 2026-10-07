@@ -1,0 +1,618 @@
+[
+  {
+    "id": "ar_JO-kareem-medium",
+    "name": "Kareem · Arabic (Jordan)",
+    "locale": "ar-JO",
+    "language": "ar",
+    "espeak": "ar",
+    "directory": "ar/ar_JO/kareem/medium",
+    "sample": "مرحباً! اختر نصاً وسأقرأه بصوت عالٍ.",
+    "phoneme_type": "espeak",
+    "license_note": "See URL",
+    "files": [
+      [
+        "ar_JO-kareem-medium.onnx",
+        63201294,
+        "9e95cab07b679da603bba17c4dec7ab3111320571964ee95c0379603c086491e"
+      ],
+      [
+        "ar_JO-kareem-medium.onnx.json",
+        5024,
+        "ea6d9b9d9076dbdb6bf5c98c6a141ef154959d2359709b37855727964e7d6c4d"
+      ],
+      [
+        "MODEL_CARD",
+        283,
+        "38e1e4f94c4cb9eda041a639096763a8c5681d0be5a5b3e22f990aed6bb4b86e"
+      ]
+    ]
+  },
+  {
+    "id": "cs_CZ-jirka-medium",
+    "name": "Jirka · Czech",
+    "locale": "cs-CZ",
+    "language": "cs",
+    "espeak": "cs",
+    "directory": "cs/cs_CZ/jirka/medium",
+    "sample": "Dobrý den! Vyberte text a já ho přečtu nahlas.",
+    "phoneme_type": "espeak",
+    "license_note": "CC0",
+    "files": [
+      [
+        "cs_CZ-jirka-medium.onnx",
+        63201294,
+        "cbd5c900acacc8e8cbecd64347abb8de39c00a9d3104bed06fee92e4f319efc8"
+      ],
+      [
+        "cs_CZ-jirka-medium.onnx.json",
+        5025,
+        "fb38b1799b7354808227c065efa97b1ffa2b0cde59505babb56a36d35af9c637"
+      ],
+      [
+        "MODEL_CARD",
+        282,
+        "b8043c32e43496b109d49bbc28290e570c064a4ed949962a71a5ff6b2ad647e7"
+      ]
+    ]
+  },
+  {
+    "id": "da_DK-talesyntese-medium",
+    "name": "Talesyntese · Danish",
+    "locale": "da-DK",
+    "language": "da",
+    "espeak": "da",
+    "directory": "da/da_DK/talesyntese/medium",
+    "sample": "Hej! Vælg noget tekst, og jeg læser den højt.",
+    "phoneme_type": "espeak",
+    "license_note": "CC0",
+    "files": [
+      [
+        "da_DK-talesyntese-medium.onnx",
+        63201294,
+        "b9271efd25f7b8494bbd28d48dd675c8c119daa284f3ee488008935f515f1241"
+      ],
+      [
+        "da_DK-talesyntese-medium.onnx.json",
+        4878,
+        "89fe13bd251406cc0088570d103ea7ac35823211d8466faf913268ab8506f41b"
+      ],
+      [
+        "MODEL_CARD",
+        308,
+        "b5b7a51d4d815a307594619a519eb389b2e17839b30c0eb69a39d3ade5b1ed65"
+      ]
+    ]
+  },
+  {
+    "id": "nl_NL-pim-medium",
+    "name": "Pim · Dutch (Netherlands)",
+    "locale": "nl-NL",
+    "language": "nl",
+    "espeak": "nl",
+    "directory": "nl/nl_NL/pim/medium",
+    "sample": "Hallo! Selecteer wat tekst en ik lees het hardop voor.",
+    "phoneme_type": "espeak",
+    "license_note": "CC0",
+    "files": [
+      [
+        "nl_NL-pim-medium.onnx",
+        63516050,
+        "403e58c3675c394f505c2428117bf34cc56e9542dcf6eadbdd3a84706c12e048"
+      ],
+      [
+        "nl_NL-pim-medium.onnx.json",
+        5037,
+        "08b58456ca00cf77123826b1712758f99d5fd19ddfb7ec7da8e1a715b047f642"
+      ],
+      [
+        "MODEL_CARD",
+        277,
+        "512ccabe7312e8709abdb04df03f1bf3eee84a5a8420e189b4f5bda0d08b6a44"
+      ]
+    ]
+  },
+  {
+    "id": "fi_FI-harri-medium",
+    "name": "Harri · Finnish",
+    "locale": "fi-FI",
+    "language": "fi",
+    "espeak": "fi",
+    "directory": "fi/fi_FI/harri/medium",
+    "sample": "Hei! Valitse teksti ja luen sen ääneen.",
+    "phoneme_type": "espeak",
+    "license_note": "CC0",
+    "files": [
+      [
+        "fi_FI-harri-medium.onnx",
+        63201294,
+        "a44167faa34caed940e4fcad139fcc35922266b2593bcebe77701774c0fb2389"
+      ],
+      [
+        "fi_FI-harri-medium.onnx.json",
+        4873,
+        "3f9c9f76f74adf1fbe7279e41eea17d6610757e45effd6808bbea6be74b8916d"
+      ],
+      [
+        "MODEL_CARD",
+        304,
+        "a0a7fa3f046f1e582689db76f93099735530343a3126f3f40ed64380c419a0b2"
+      ]
+    ]
+  },
+  {
+    "id": "fr_FR-siwis-medium",
+    "name": "Siwis · French (France)",
+    "locale": "fr-FR",
+    "language": "fr",
+    "espeak": "fr",
+    "directory": "fr/fr_FR/siwis/medium",
+    "sample": "Bonjour ! Sélectionnez un texte et je le lirai à voix haute.",
+    "phoneme_type": "espeak",
+    "license_note": "CC-BY 4.0",
+    "files": [
+      [
+        "fr_FR-siwis-medium.onnx",
+        63201294,
+        "641d1ab097da2b81128c076810edb052b385decc8be3381814802a64a73baf99"
+      ],
+      [
+        "fr_FR-siwis-medium.onnx.json",
+        4875,
+        "39479916c2db192b5ac9764daddd0c744d83e023ad890c6976c0633ae4df8959"
+      ],
+      [
+        "MODEL_CARD",
+        284,
+        "bd8b8d079d4d3d2c4cc20345889bbcd586d72f021a132f93357a763eb5232cce"
+      ]
+    ]
+  },
+  {
+    "id": "de_DE-thorsten-high",
+    "name": "Thorsten · German",
+    "locale": "de-DE",
+    "language": "de",
+    "espeak": "de",
+    "directory": "de/de_DE/thorsten/high",
+    "sample": "Hallo! Wähle einen Text aus, und ich lese ihn vor.",
+    "phoneme_type": "espeak",
+    "license_note": "CC0",
+    "files": [
+      [
+        "de_DE-thorsten-high.onnx",
+        113895201,
+        "9df1c43c61149ef9b39e618e2b861fbe41e1fcea9390b2dac62e8761573ea4f1"
+      ],
+      [
+        "de_DE-thorsten-high.onnx.json",
+        4875,
+        "6de734444e4c3f9e33b7ebe2746dbc19b71e85f613e79c65acf623200b99a76a"
+      ],
+      [
+        "MODEL_CARD",
+        279,
+        "a49334fc36286c9d67f007605969a33f416cc4e35eb770c9c7f716d44711fc3a"
+      ]
+    ]
+  },
+  {
+    "id": "el_GR-rapunzelina-medium",
+    "name": "Rapunzelina · Greek",
+    "locale": "el-GR",
+    "language": "el",
+    "espeak": "el",
+    "directory": "el/el_GR/rapunzelina/medium",
+    "sample": "Γεια σας! Επιλέξτε ένα κείμενο και θα το διαβάσω δυνατά.",
+    "phoneme_type": "espeak",
+    "license_note": "CC0",
+    "files": [
+      [
+        "el_GR-rapunzelina-medium.onnx",
+        62950044,
+        "3ca9fb3092215ee92edfc019b43feb0115ff4dfe638eb34474833ab1de840952"
+      ],
+      [
+        "el_GR-rapunzelina-medium.onnx.json",
+        4973,
+        "3a6182ec7c7550e14ef15e5d9badbb18f973a434086ac9658a1b10991fd192f8"
+      ],
+      [
+        "MODEL_CARD",
+        276,
+        "dc69f15382dabed061fa8d31b65c14e5c4b57ba2fe6906012c756478da156b50"
+      ]
+    ]
+  },
+  {
+    "id": "hi_IN-pratham-medium",
+    "name": "Pratham · Hindi",
+    "locale": "hi-IN",
+    "language": "hi",
+    "espeak": "hi",
+    "directory": "hi/hi_IN/pratham/medium",
+    "sample": "नमस्ते! कोई पाठ चुनें और मैं उसे पढ़कर सुनाऊँगा।",
+    "phoneme_type": "espeak",
+    "license_note": "CC BY-NC-SA 4.0 (non-commercial)",
+    "files": [
+      [
+        "hi_IN-pratham-medium.onnx",
+        63516050,
+        "169964b0871667f6793416d4b35e97357a68ba1ad01df8580c28048989ee7693"
+      ],
+      [
+        "hi_IN-pratham-medium.onnx.json",
+        4970,
+        "b68edd2cd7950dd436314013b7cd12e9699e5a3f6fe5af5af94294cf6aa7b9fd"
+      ],
+      [
+        "MODEL_CARD",
+        304,
+        "89cf491ea99e69b27c94599cecea3f0fc6aeacb30f4ccdb12897f659868df29e"
+      ]
+    ]
+  },
+  {
+    "id": "hu_HU-anna-medium",
+    "name": "Anna · Hungarian",
+    "locale": "hu-HU",
+    "language": "hu",
+    "espeak": "hu",
+    "directory": "hu/hu_HU/anna/medium",
+    "sample": "Szia! Válassz egy szöveget, és felolvasom.",
+    "phoneme_type": "espeak",
+    "license_note": "CC0",
+    "files": [
+      [
+        "hu_HU-anna-medium.onnx",
+        63201294,
+        "968c0c3a66cb667811242cc88653bff9247395fc7a0517fbeef7d8c08cdae62a"
+      ],
+      [
+        "hu_HU-anna-medium.onnx.json",
+        5018,
+        "ccf967d8db8018c9d8ffdb0edc8814ffcb6b75273bb0d84337317240f710283a"
+      ],
+      [
+        "MODEL_CARD",
+        278,
+        "2134551c09f616ba333640f419267d45aeed5443b53ffde79a11a715737f8546"
+      ]
+    ]
+  },
+  {
+    "id": "ja_JP-hi_fi_captain-medium",
+    "name": "Hi_fi_captain · Japanese",
+    "locale": "ja-JP",
+    "language": "ja",
+    "espeak": "ja",
+    "directory": "ja/ja_JP/hi_fi_captain/medium",
+    "sample": "こんにちは。文章を選んでください。声に出して読みます。",
+    "phoneme_type": "japanese",
+    "license_note": "CC BY-NC-SA 4.0 (non-commercial)",
+    "files": [
+      [
+        "ja_JP-hi_fi_captain-medium.onnx",
+        76753841,
+        "5eafa1610fc7a0ff2e7fde9cbe0972d876266e23d8db331727eb2466f19460eb"
+      ],
+      [
+        "ja_JP-hi_fi_captain-medium.onnx.json",
+        5301,
+        "fe9aeda38318607ba114926d1d7ee7d56295f9af3774a99a42b36f4354cabf27"
+      ],
+      [
+        "MODEL_CARD",
+        361,
+        "26dcad3474c39c7fc394c1e57e60121c90832afa9f43e7942faa7c51e1e81905"
+      ]
+    ]
+  },
+  {
+    "id": "ko_KR-kss-medium",
+    "name": "Kss · Korean",
+    "locale": "ko-KR",
+    "language": "ko",
+    "espeak": "ko",
+    "directory": "ko/ko_KR/kss/medium",
+    "sample": "안녕하세요. 글을 선택하면 소리 내어 읽어 드립니다.",
+    "phoneme_type": "espeak",
+    "license_note": "CC BY-NC-SA 4.0 (non-commercial)",
+    "files": [
+      [
+        "ko_KR-kss-medium.onnx",
+        63221984,
+        "624fd774e26895f24bebae1bd9a3379e3394baeade4b584924f83e414096e2c9"
+      ],
+      [
+        "ko_KR-kss-medium.onnx.json",
+        5232,
+        "153b5619d0580f824a59108d83ca19434de410eb8e4fe80325b58684fdc8a1df"
+      ],
+      [
+        "MODEL_CARD",
+        333,
+        "792db9e4889b69bf56bf49ed584809292110e16bf1fc904ff2b99faf8f778d6d"
+      ]
+    ]
+  },
+  {
+    "id": "no_NO-talesyntese-medium",
+    "name": "Talesyntese · Norwegian Bokmål",
+    "locale": "no-NO",
+    "language": "nb",
+    "espeak": "nb",
+    "directory": "no/no_NO/talesyntese/medium",
+    "sample": "Hei! Velg en tekst, så leser jeg den høyt.",
+    "phoneme_type": "espeak",
+    "license_note": "CC0",
+    "files": [
+      [
+        "no_NO-talesyntese-medium.onnx",
+        63201294,
+        "b763aebe02e72c4628c4074c4b8b448f05ffe523b975bfcd58e2c5d531270c13"
+      ],
+      [
+        "no_NO-talesyntese-medium.onnx.json",
+        4880,
+        "b0eb0491fc8bf9843d2beac8acf8773b6cf59274316406b36ff579ae8a1909d5"
+      ],
+      [
+        "MODEL_CARD",
+        312,
+        "0a03b201db00e1bdc384e2dee4f8710075ef8d32ca3c64ed16782b04d2605f6c"
+      ]
+    ]
+  },
+  {
+    "id": "pl_PL-gosia-medium",
+    "name": "Gosia · Polish",
+    "locale": "pl-PL",
+    "language": "pl",
+    "espeak": "pl",
+    "directory": "pl/pl_PL/gosia/medium",
+    "sample": "Cześć! Wybierz tekst, a przeczytam go na głos.",
+    "phoneme_type": "espeak",
+    "license_note": "CC0",
+    "files": [
+      [
+        "pl_PL-gosia-medium.onnx",
+        63201294,
+        "38f66464240ed74f186e6b7dc13c6e3b22e023426299f25c2b3cc9dfa9373fbc"
+      ],
+      [
+        "pl_PL-gosia-medium.onnx.json",
+        4814,
+        "1aefb31a9d53ffe44a8163ff73ec833acb7a6253848f6bb0403d8a66f9c7510d"
+      ],
+      [
+        "MODEL_CARD",
+        275,
+        "6b4de033dfff0da758bbe4d438fd87fbd917ab843bdd83f591fa0f32b8eb5780"
+      ]
+    ]
+  },
+  {
+    "id": "ro_RO-mihai-medium",
+    "name": "Mihai · Romanian",
+    "locale": "ro-RO",
+    "language": "ro",
+    "espeak": "ro",
+    "directory": "ro/ro_RO/mihai/medium",
+    "sample": "Bună! Selectează un text și îl voi citi cu voce tare.",
+    "phoneme_type": "espeak",
+    "license_note": "CC0",
+    "files": [
+      [
+        "ro_RO-mihai-medium.onnx",
+        63201294,
+        "e0608bbbd53c80267c09ece681b09f5199f54e792356684c8073738e5f15d29f"
+      ],
+      [
+        "ro_RO-mihai-medium.onnx.json",
+        4877,
+        "8cc0c9f077dc0cec3c25a6a055ec8046db8e40a2510591582f2c9c869f4bc47e"
+      ],
+      [
+        "MODEL_CARD",
+        278,
+        "e06fb69411b3614636fdec4af646ac74548c6c323a8ac4030e34cb54e99016a1"
+      ]
+    ]
+  },
+  {
+    "id": "ru_RU-denis-medium",
+    "name": "Denis · Russian",
+    "locale": "ru-RU",
+    "language": "ru",
+    "espeak": "ru",
+    "directory": "ru/ru_RU/denis/medium",
+    "sample": "Здравствуйте! Выберите текст, и я прочитаю его вслух.",
+    "phoneme_type": "espeak",
+    "license_note": "CC0",
+    "files": [
+      [
+        "ru_RU-denis-medium.onnx",
+        63201294,
+        "15fab56e11a097858ee115545d0f697fc2a316c41a291a5362349fb870411b0a"
+      ],
+      [
+        "ru_RU-denis-medium.onnx.json",
+        4823,
+        "831c860dac0b5073eaa81610a0a638ec23d90a6cf8e5f871b4485c2cec3767c8"
+      ],
+      [
+        "MODEL_CARD",
+        276,
+        "8b5d685dd80f8ad3f8dbbe1c56b16bb0809f00c144af3642dbcf3b707eb89c12"
+      ]
+    ]
+  },
+  {
+    "id": "es_ES-davefx-medium",
+    "name": "Davefx · Spanish (Spain)",
+    "locale": "es-ES",
+    "language": "es",
+    "espeak": "es",
+    "directory": "es/es_ES/davefx/medium",
+    "sample": "¡Hola! Selecciona un texto y lo leeré en voz alta.",
+    "phoneme_type": "espeak",
+    "license_note": "CC0",
+    "files": [
+      [
+        "es_ES-davefx-medium.onnx",
+        63201294,
+        "6658b03b1a6c316ee4c265a9896abc1393353c2d9e1bca7d66c2c442e222a917"
+      ],
+      [
+        "es_ES-davefx-medium.onnx.json",
+        4817,
+        "0e0dda87c732f6f38771ff274a6380d9252f327dca77aa2963d5fbdf9ec54842"
+      ],
+      [
+        "MODEL_CARD",
+        276,
+        "420703b5d8ea239b729f13d83f31eea9bae5fcb89447de23ebc94aa8a4768f95"
+      ]
+    ]
+  },
+  {
+    "id": "sv_SE-nst-medium",
+    "name": "Nst · Swedish",
+    "locale": "sv-SE",
+    "language": "sv",
+    "espeak": "sv",
+    "directory": "sv/sv_SE/nst/medium",
+    "sample": "Hej! Välj en text så läser jag den högt.",
+    "phoneme_type": "espeak",
+    "license_note": "CC0",
+    "files": [
+      [
+        "sv_SE-nst-medium.onnx",
+        63104526,
+        "df011f56825a59dd1efc080c38a65a1ef70407e60f63050e9246f43a3d7e471e"
+      ],
+      [
+        "sv_SE-nst-medium.onnx.json",
+        4157,
+        "d45dd74cbb4eca58694bf04a97e243044092476f28a55ae26424f0653086980a"
+      ],
+      [
+        "MODEL_CARD",
+        306,
+        "c85d3e26e47d93e9d9b8572d3c89537c3f8ff212595cb9a3fbd2e07c19432317"
+      ]
+    ]
+  },
+  {
+    "id": "tr_TR-dfki-medium",
+    "name": "Dfki · Turkish",
+    "locale": "tr-TR",
+    "language": "tr",
+    "espeak": "tr",
+    "directory": "tr/tr_TR/dfki/medium",
+    "sample": "Merhaba! Bir metin seçin, sesli okuyayım.",
+    "phoneme_type": "espeak",
+    "license_note": "CC BY-NC-SA 4.0 (non-commercial)",
+    "files": [
+      [
+        "tr_TR-dfki-medium.onnx",
+        63201294,
+        "2844717f524ab965d3fe86e60562cbb601d3e456836efcc2196cc3a14112a8fb"
+      ],
+      [
+        "tr_TR-dfki-medium.onnx.json",
+        4960,
+        "13ebd7810f1b61b5027583cf3131a0a233b6ea81c38f2200ebc4ff41c3cca039"
+      ],
+      [
+        "MODEL_CARD",
+        319,
+        "a3e08c57b9c6d428f8e4fb146512c8b1fb96a68c99d43820ed1dfea6d39cb35f"
+      ]
+    ]
+  },
+  {
+    "id": "uk_UA-mykyta-high",
+    "name": "Mykyta · Ukrainian",
+    "locale": "uk-UA",
+    "language": "uk",
+    "espeak": "uk",
+    "directory": "uk/uk_UA/mykyta/high",
+    "sample": "Вітаю! Виберіть текст, і я прочитаю його вголос.",
+    "phoneme_type": "espeak",
+    "license_note": "Apache 2.0",
+    "files": [
+      [
+        "uk_UA-mykyta-high.onnx",
+        114204024,
+        "081d253cd246d7d4d698c6dd147b74cad498dafd213527887a3a490519138243"
+      ],
+      [
+        "uk_UA-mykyta-high.onnx.json",
+        4904,
+        "b5db6b4efb02d4a0e8f128253fd64e82dfa72d1105e9060b0c6fd9610eec6a4f"
+      ],
+      [
+        "MODEL_CARD",
+        292,
+        "2fb2c84c0e89b91f3e69bdc94dedc07c60f2b95d51ae6e4245942c65d4c06b61"
+      ]
+    ]
+  },
+  {
+    "id": "zh_CN-huayan-medium",
+    "name": "Huayan · Mandarin Chinese",
+    "locale": "zh-CN",
+    "language": "zh",
+    "espeak": "cmn",
+    "directory": "zh/zh_CN/huayan/medium",
+    "sample": "你好！请选择一段文字，我会大声朗读。",
+    "phoneme_type": "espeak",
+    "license_note": "Unknown",
+    "files": [
+      [
+        "zh_CN-huayan-medium.onnx",
+        63201294,
+        "9929917bf8cabb26fd528ea44d3a6699c11e87317a14765312420be230be0f3d"
+      ],
+      [
+        "zh_CN-huayan-medium.onnx.json",
+        4822,
+        "d521dc45504a8ccc99e325822b35946dd701840bfb07e3dbb31a40929ed6a82b"
+      ],
+      [
+        "MODEL_CARD",
+        276,
+        "25d7d8f7a03e9382e629c5c4f074176e7ca84e08be12a873022e91fcac98c2c7"
+      ]
+    ]
+  },
+  {
+    "id": "it_IT-serena-medium",
+    "name": "Serena · Italian",
+    "locale": "it-IT",
+    "language": "it",
+    "espeak": "it",
+    "directory": "it/it_IT/serena/medium",
+    "sample": "Ciao! Seleziona un testo e lo leggerò ad alta voce.",
+    "phoneme_type": "espeak",
+    "license_note": "CC-BY-4.0",
+    "files": [
+      [
+        "it_IT-serena-medium.onnx",
+        63516051,
+        "fe4e26b2c1236e2a44d2e295cad564d94a0d8b0a9fca1ccdfd70dd4af3116eb5"
+      ],
+      [
+        "it_IT-serena-medium.onnx.json",
+        5254,
+        "14cb4995874138b2792ae07753b5540942124761af9ae6609f9b520f28837881"
+      ],
+      [
+        "MODEL_CARD",
+        266,
+        "1d0dbdc0182d19f6510fd3dcd2893587912a65f8cafe6da57754863f168bbe7e"
+      ]
+    ]
+  }
+]

@@ -3,6 +3,7 @@ from __future__ import annotations
 import ctypes
 from ctypes import wintypes
 import sys
+import re
 from threading import Event, Thread
 from collections.abc import Callable
 
@@ -16,38 +17,68 @@ WM_HOTKEY = 0x0312
 WM_QUIT = 0x0012
 HOTKEY_ID = 0x474C
 
+NAMED_KEYS = {
+    "space": 0x20, "tab": 0x09, "backspace": 0x08, "enter": 0x0D,
+    "escape": 0x1B, "insert": 0x2D, "delete": 0x2E, "home": 0x24,
+    "end": 0x23, "pageup": 0x21, "pagedown": 0x22, "left": 0x25,
+    "up": 0x26, "right": 0x27, "down": 0x28, "pause": 0x13,
+}
+MODIFIERS = {"ctrl": MOD_CONTROL, "alt": MOD_ALT, "shift": MOD_SHIFT}
+ALIASES = {"control": "ctrl", "return": "enter", "esc": "escape", "pgup": "pageup", "pgdown": "pagedown"}
+
+
+def normalize_hotkey(value: str) -> str:
+    """Validate one chord, accepting both saved legacy tokens and Qt portable text."""
+    if not isinstance(value, str) or not value.strip() or len(value) > 128:
+        raise ValueError("Press a key or a key combination to choose a capture shortcut.")
+    tokens = value.split("+")
+    modifiers, keys = set(), []
+    for raw in tokens:
+        token = raw.strip().lower()
+        if token.startswith("<") and token.endswith(">"):
+            token = token[1:-1]
+        token = ALIASES.get(token, token)
+        if token in {"win", "meta", "cmd"}:
+            raise ValueError("Windows-key shortcuts are reserved by Windows. Choose Ctrl, Alt or Shift instead.")
+        if token in MODIFIERS:
+            if token in modifiers:
+                raise ValueError("Use each modifier only once.")
+            modifiers.add(token)
+        elif re.fullmatch(r"[a-z0-9]", token) or token in NAMED_KEYS:
+            keys.append(token)
+        elif re.fullmatch(r"f(?:[1-9]|1[0-9]|2[0-4])", token):
+            if token == "f12":
+                raise ValueError("F12 is reserved by Windows for debuggers. Choose another key.")
+            keys.append(token)
+        else:
+            raise ValueError("Use a letter (A–Z), number (0–9), F1–F24 except F12, or a navigation key, with optional Ctrl, Alt or Shift.")
+    if len(keys) != 1:
+        raise ValueError("Choose exactly one key, optionally combined with Ctrl, Alt or Shift; not a sequence of shortcuts.")
+    key = keys[0]
+    if (key == "tab" and "alt" in modifiers) or (key == "delete" and {"ctrl", "alt"} <= modifiers):
+        raise ValueError("That combination is reserved by Windows. Choose another shortcut.")
+    return "+".join([f"<{name}>" for name in MODIFIERS if name in modifiers]
+                    + [key if len(key) == 1 else f"<{key}>"])
+
+
+def display_hotkey(value: str) -> str:
+    names = {"ctrl": "Ctrl", "alt": "Alt", "shift": "Shift", "pageup": "PgUp", "pagedown": "PgDown"}
+    return "+".join(names.get(token.strip("<>"), token.strip("<>").capitalize())
+                    for token in normalize_hotkey(value).split("+"))
+
 
 def parse_hotkey(value: str) -> tuple[int, int]:
-    tokens = [token.strip().lower() for token in value.split("+") if token.strip()]
+    tokens = normalize_hotkey(value).split("+")
     modifiers = MOD_NOREPEAT
-    key_token: str | None = None
-    for token in tokens:
-        if token in {"<ctrl>", "<control>"}:
-            modifiers |= MOD_CONTROL
-        elif token == "<shift>":
-            modifiers |= MOD_SHIFT
-        elif token == "<alt>":
-            modifiers |= MOD_ALT
-        elif token in {"<win>", "<cmd>"}:
-            modifiers |= MOD_WIN
-        else:
-            if key_token is not None:
-                raise ValueError(f"Hotkey has more than one non-modifier key: {value}")
-            key_token = token
-
-    if key_token is None:
-        raise ValueError(f"Hotkey has no key: {value}")
+    for token in tokens[:-1]:
+        modifiers |= MODIFIERS[token.strip("<>")]
+    key_token = tokens[-1].strip("<>")
     if len(key_token) == 1:
         virtual_key = ord(key_token.upper())
-    elif key_token == "<space>":
-        virtual_key = 0x20
-    elif key_token.startswith("<f") and key_token.endswith(">"):
-        number = int(key_token[2:-1])
-        if not 1 <= number <= 24:
-            raise ValueError(f"Unsupported function key: {key_token}")
-        virtual_key = 0x70 + number - 1
+    elif key_token in NAMED_KEYS:
+        virtual_key = NAMED_KEYS[key_token]
     else:
-        raise ValueError(f"Unsupported hotkey key: {key_token}")
+        virtual_key = 0x70 + int(key_token[1:]) - 1  # validated function key
     return modifiers, virtual_key
 
 
@@ -57,7 +88,7 @@ class WindowsHotkeyListener:
     def __init__(self, hotkey: str, callback: Callable[[], None]) -> None:
         if sys.platform != "win32":
             raise RuntimeError("Global hotkeys are currently implemented for Windows only.")
-        self.hotkey = hotkey
+        self.hotkey = normalize_hotkey(hotkey)
         self.callback = callback
         self._thread: Thread | None = None
         self._thread_id: int | None = None
@@ -89,16 +120,19 @@ class WindowsHotkeyListener:
         kernel32 = ctypes.WinDLL("kernel32", use_last_error=True)
         modifiers, virtual_key = parse_hotkey(self.hotkey)
         self._thread_id = int(kernel32.GetCurrentThreadId())
+        # Ensure PostThreadMessage can stop us even immediately after start().
+        # RegisterHotKey does not guarantee this thread already has a queue.
+        message = wintypes.MSG()
+        user32.PeekMessageW(ctypes.byref(message), None, 0, 0, 0)
         if not user32.RegisterHotKey(None, HOTKEY_ID, modifiers, virtual_key):
             code = ctypes.get_last_error()
             self._error = (
-                f"Windows could not register {self.hotkey} (error {code}). "
-                "Another application may already use it; choose a different hotkey."
+                f"Windows could not register {display_hotkey(self.hotkey)} (error {code}). "
+                "Another application or Windows may already use it; choose a different 'Capture hotkey'."
             )
             self._ready.set()
             return
         self._ready.set()
-        message = wintypes.MSG()
         try:
             while user32.GetMessageW(ctypes.byref(message), None, 0, 0) > 0:
                 if message.message == WM_HOTKEY and int(message.wParam) == HOTKEY_ID:

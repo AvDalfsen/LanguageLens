@@ -3,6 +3,7 @@ from __future__ import annotations
 from collections.abc import Callable
 from functools import lru_cache
 import math
+import os
 from threading import RLock
 import unicodedata
 
@@ -19,6 +20,34 @@ class TranslationUnavailable(RuntimeError):
     pass
 
 
+class ModelRouteUnavailable(TranslationUnavailable):
+    pass
+
+
+def selection_results(translator, text, words, source, target, report, cancelled=lambda: False):
+    """Yield the sentence once, then one word delta per completed lookup.
+
+    None means the sentence is unchanged; an empty string means it failed.
+    Consumers merge word deltas, keeping IPC and GUI work linear in word count.
+    """
+    if cancelled():
+        return
+    try:
+        sentence = translator.translate(text, source, target)
+    except Exception:
+        sentence = ""
+        report("Whole-selection translation failed. Word lookups remain available; choose 'Retry translation' to try again.")
+    yield sentence, {}
+    for word in dict.fromkeys(words):
+        if cancelled():
+            return
+        try:
+            translation = translator.word_candidates(word, source, target)
+        except Exception:
+            translation = WordTranslation((), "Word translation unavailable. Choose 'Retry translation' to try again.")
+        yield None, {word: translation}
+
+
 class ArgosTranslator:
     """Local translator backed by installed Argos model packages."""
 
@@ -27,25 +56,58 @@ class ArgosTranslator:
 
     @staticmethod
     def _modules():
+        # Ignore inherited Argos cloud-provider preferences. Lens is local-only.
+        os.environ["ARGOS_MODEL_PROVIDER"] = "OPENNMT"
+        os.environ["ARGOS_CHUNK_TYPE"] = "ARGOSTRANSLATE"
+        os.environ["ARGOS_DEBUG"] = "0"
         try:
             import argostranslate.package as package
             import argostranslate.translate as translate
+            from argostranslate import settings
+            if settings.model_provider != settings.ModelProvider.OPENNMT:
+                settings.model_provider = settings.ModelProvider.OPENNMT
+                translate.get_installed_languages.cache_clear()
+            settings.debug = False
+            settings.chunk_type = settings.ChunkType.ARGOSTRANSLATE
+            settings.device = "cpu"
+            settings.intra_threads = 2
+            settings.inter_threads = 1
         except ImportError as exc:  # pragma: no cover - exercised in installed app
             raise TranslationUnavailable(
                 "Argos Translate is not installed. Run the setup command from README.md."
             ) from exc
         return package, translate
 
+    def route(self, source: str, target: str) -> list:
+        if source == target:
+            return []
+        _, backend = self._modules()
+        languages = {language.code: language for language in backend.get_installed_languages()}
+        try:
+            translation = languages[source].get_translation(languages[target])
+        except KeyError as exc:
+            raise TranslationUnavailable(f"No installed local route for {source} → {target}.") from exc
+        def packages(item):
+            if hasattr(item, "underlying"):
+                return packages(item.underlying)
+            if hasattr(item, "t1"):
+                return packages(item.t1) + packages(item.t2)
+            return [item.pkg] if hasattr(item, "pkg") else []
+        if translation is None:
+            raise TranslationUnavailable(f"No installed local route for {source} → {target}.")
+        return packages(translation)
+
     def is_pair_installed(self, source: str, target: str) -> bool:
         if source == target:
             return True
         _, translate = self._modules()
-        try:
-            installed = {language.code: language for language in translate.get_installed_languages()}
-            translation = installed[source].get_translation(installed[target])
-            return translation is not None
-        except (KeyError, AttributeError, StopIteration):
+        # Missing languages are normal; enumeration/backend failures are not.
+        # Propagate those failures so Settings reports an unknown status rather
+        # than encouraging downloads for a model that may already be installed.
+        installed = {language.code: language for language in translate.get_installed_languages()}
+        if source not in installed or target not in installed:
             return False
+        return installed[source].get_translation(installed[target]) is not None
 
     def install_pair(
         self,
@@ -53,6 +115,7 @@ class ArgosTranslator:
         target: str,
         progress: Callable[[str], None] | None = None,
         download_progress: Callable[[DownloadProgress], None] | None = None,
+        *, staged: bool = False, force: bool = False,
     ) -> None:
         """Install a direct model, or two models routed through English."""
         if source == target:
@@ -82,22 +145,38 @@ class ArgosTranslator:
             legs = [leg for leg in legs if leg[0] != leg[1]]
             route = [find(*leg) for leg in legs]
             if any(model is None for model in route):
-                raise TranslationUnavailable(
+                raise ModelRouteUnavailable(
                     f"No Argos model route is available for {source} -> {target}."
                 )
 
         pending = [model for model in route
-                   if not self.is_pair_installed(model.from_code, model.to_code)]
+                   if force or not self.is_pair_installed(model.from_code, model.to_code)]
         for index, model in enumerate(pending, 1):
             label = f"{model.from_name} → {model.to_name}"
             if len(pending) > 1:
                 label += f" · model {index} of {len(pending)}"
             model_path = download_model(model, package, label, report, download_progress)
             report(f"Installing {label}…")
-            package.install_from_path(model_path)
+            if staged:
+                from language_lens.services.model_management import install_archive, InvalidModelArchive
+                try:
+                    install_archive(model_path, package, expected=(model.from_code, model.to_code))
+                except InvalidModelArchive:
+                    # A ZIP can pass CRC verification but contain unusable weights.
+                    # Do not reuse that managed download on every subsequent retry.
+                    from pathlib import Path
+                    if (hasattr(package.settings, "language_lens_download_scratch")
+                            and Path(model_path).resolve().parent == Path(package.settings.downloads_dir).resolve()):
+                        Path(model_path).unlink(missing_ok=True)
+                    raise
+            else:
+                package.install_from_path(model_path)
             cache_clear = getattr(translate.get_installed_languages, "cache_clear", None)
             if cache_clear is not None:
                 cache_clear()
+            cached = getattr(translate, "installed_translates", None)
+            if cached is not None:
+                cached.clear()
         self.translate.cache_clear()
         self.word_candidates.cache_clear()
         report("Local translation model ready.")
@@ -163,7 +242,7 @@ class ArgosTranslator:
                 result = translate.translate(text, source, target)
             except Exception as exc:  # Argos raises several backend-specific errors
                 raise TranslationUnavailable(
-                    f"The local {source} -> {target} model is not installed."
+                    f"Local translation failed for {source} → {target}. Use 'Check required files' or 'Reinstall translation model' in 'Settings'."
                 ) from exc
         return result.strip() or text
 

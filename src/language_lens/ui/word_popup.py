@@ -14,10 +14,12 @@ class WordPopup(QFrame):
     play_requested = Signal()
     retry_requested = Signal()
     more_requested = Signal()
+    search_requested = Signal()
 
     def __init__(self, parent=None) -> None:
         super().__init__(parent)
         self.setObjectName("wordPopup")
+        self.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
         self.setFixedWidth(330)
         self._available_height = 560
         self.setStyleSheet("""
@@ -72,15 +74,24 @@ class WordPopup(QFrame):
         self.ipa.setToolTip("Estimated pronunciation with display-only stress formatting; not a measurement of the voice's audio.")
         self.detail = self._label("popupDetail")
         self.voice = self._label("popupVoice")
+        for label, name in ((self.word, "Selected source word"), (self.translation, "Best word translation"),
+                            (self.alternatives, "Other translation candidates"), (self.ipa, "Estimated pronunciation"),
+                            (self.detail, "Pronunciation context"), (self.voice, "Pronunciation voice")):
+            label.setAccessibleName(name)
         self.more = QPushButton("More candidates")
         self.more.clicked.connect(self.more_requested)
+        self.search = QPushButton("Search for more candidates")
+        self.search.clicked.connect(self.search_requested)
+        self.search.setToolTip(f"Request a wider search of {EXPANDED_HYPOTHESES} model guesses. "
+            "Suggestions are neither dictionary senses nor calibrated probabilities. This can change the best match.")
         self.more.setToolTip(
-            f"Ask the local model for {EXPANDED_HYPOTHESES} guesses for this word. "
-            "The wider search may change their order. This is not an exhaustive dictionary."
+            "Show or hide alternatives already found for this word; no new search or download is needed. "
+            "'Show best match only' collapses the list. Use 'Search for more candidates' for a separate, "
+            "wider model search. These suggestions are not an exhaustive dictionary."
         )
         self.search_status = self._label("popupSearchStatus")
         for widget in (self.translation_order, self.translation, self.alternatives,
-                       self.more, self.search_status, self.translation_note, self.ipa, self.detail, self.voice):
+                       self.more, self.search, self.search_status, self.translation_note, self.ipa, self.detail, self.voice):
             self._body_layout.addWidget(widget)
         buttons = QHBoxLayout()
         self.play = QPushButton("Pronounce word")
@@ -121,20 +132,21 @@ class WordPopup(QFrame):
     def set_expansion_state(self, *, available: bool, loading: bool = False,
                             showing: bool = False, searched: bool = False,
                             count: int | None = None, error: str = "") -> None:
-        self.more.setVisible(available)
-        self.more.setEnabled(not loading)
+        self.more.setVisible(available and (count or 0) > 1)
+        self.more.setEnabled(True)
+        self.search.setVisible(available and not searched)
+        self.search.setEnabled(not loading)
+        self.search.setText("Finding more…" if loading else "Retry wider search" if error else "Search for more candidates")
         others = max(0, (count or 0) - 1)
         self.more.setText(
-            "Finding more…" if loading else "Retry more candidates" if error else
-            "Show best match only" if showing and searched else
-            "Search for more candidates" if showing or not others else
+            "Show best match only" if showing else
             f"Show {others} other {'candidate' if others == 1 else 'candidates'}"
         )
         self.search_status.setText(
             "Searching locally…" if loading else error or
             (f"{count} distinct {'candidate' if count == 1 else 'candidates'} from "
              f"{EXPANDED_HYPOTHESES} model guesses" if searched and count is not None else
-             f"{count} {'candidate' if count == 1 else 'candidates'} found · "
+             f"{count} model {'suggestion' if count == 1 else 'suggestions'} available · "
              f"{'showing all' if showing else 'showing best match'}" if count is not None else "")
         )
         self.search_status.setVisible(bool(self.search_status.text()))

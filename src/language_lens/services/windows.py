@@ -6,32 +6,39 @@ import sys
 
 
 SW_RESTORE = 9
-VK_ESCAPE = 0x1B
-KEYEVENTF_KEYUP = 0x0002
+
+
+def _user32():
+    """Declare HWND-sized arguments/results rather than ctypes' default int."""
+    user32 = ctypes.windll.user32
+    user32.GetForegroundWindow.argtypes = []
+    user32.GetForegroundWindow.restype = wintypes.HWND
+    for name in ("IsWindow", "IsIconic", "SetForegroundWindow"):
+        function = getattr(user32, name)
+        function.argtypes = [wintypes.HWND]
+        function.restype = wintypes.BOOL
+    user32.ShowWindow.argtypes = [wintypes.HWND, ctypes.c_int]
+    user32.ShowWindow.restype = wintypes.BOOL
+    return user32
 
 
 def foreground_window() -> int | None:
     if sys.platform != "win32":
         return None
-    handle = ctypes.windll.user32.GetForegroundWindow()
+    handle = _user32().GetForegroundWindow()
     return int(handle) if handle else None
-
-
-def press_escape() -> None:
-    if sys.platform != "win32":
-        return
-    user32 = ctypes.windll.user32
-    user32.keybd_event(VK_ESCAPE, 0, 0, 0)
-    user32.keybd_event(VK_ESCAPE, 0, KEYEVENTF_KEYUP, 0)
 
 
 def restore_foreground(handle: int | None) -> bool:
     """Best-effort restoration of the window active before capture."""
     if sys.platform != "win32" or not handle:
         return False
-    user32 = ctypes.windll.user32
-    if not user32.IsWindow(wintypes.HWND(handle)):
+    user32 = _user32()
+    window = wintypes.HWND(handle)
+    if not user32.IsWindow(window):
         return False
-    user32.ShowWindow(wintypes.HWND(handle), SW_RESTORE)
-    return bool(user32.SetForegroundWindow(wintypes.HWND(handle)))
+    # SW_RESTORE also unmaximizes a visible window. Use it only if minimized.
+    if user32.IsIconic(window):
+        user32.ShowWindow(window, SW_RESTORE)
+    return bool(user32.SetForegroundWindow(window))
 

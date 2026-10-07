@@ -3,6 +3,8 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 import hashlib
+import json
+from importlib.resources import files as resource_files
 from importlib.metadata import PackageNotFoundError, version
 from pathlib import Path
 from urllib.parse import quote
@@ -26,6 +28,8 @@ class Voice:
     sample: str
     # Filename, exact bytes, SHA-256 of the pinned upstream artifact.
     files: tuple[tuple[str, int, str], ...]
+    phoneme_type: str = "espeak"
+    license_note: str = "See upstream model card; redistribution review required."
 
     @property
     def total_bytes(self) -> int:
@@ -68,12 +72,18 @@ VOICES = (
            279, "01f1a5bcfd0538782726059ae407eae9c2dd1b5b35f7298fd53a68de91afe563"),
 )
 
+# Metadata only: models stay opt-in downloads, never part of the application.
+VOICES += tuple(
+    Voice(**{**item, "files": tuple(tuple(file) for file in item["files"])})
+    for item in json.loads(resource_files("language_lens").joinpath("data/voices.json").read_text(encoding="utf-8"))
+)
+
 
 def voice_by_id(voice_id: str) -> Voice:
     for voice in VOICES:
         if voice.id == voice_id:
             return voice
-    raise ValueError("Choose an available pronunciation voice in Settings.")
+    raise ValueError("Choose an available pronunciation voice in 'Settings'.")
 
 
 def voices_for(language: str) -> tuple[Voice, ...]:
@@ -95,6 +105,17 @@ def runtime_ready() -> bool:
         return version("piper-tts") == PIPER_VERSION
     except PackageNotFoundError:
         return False
+
+
+def voice_runtime_ready(voice: Voice) -> bool:
+    if not runtime_ready():
+        return False
+    if voice.phoneme_type == "japanese":
+        try:
+            return version("pyopenjtalk-plus") == "0.4.1.post9"
+        except PackageNotFoundError:
+            return False
+    return True
 
 
 def voice_present(voice: Voice, root: Path | None = None) -> bool:
@@ -123,5 +144,5 @@ def verified_model(voice: Voice, root: Path) -> Path:
     directory = root / voice.id
     if not all(valid_file(directory / name, size, checksum)
                for name, size, checksum in voice.files):
-        raise ValueError("Voice files are missing or damaged. Use Download / repair voice in Settings.")
+        raise ValueError("Voice files are missing or damaged. Use 'Download voice' or 'Check voice files' in 'Settings'.")
     return directory / (voice.id + ".onnx")
