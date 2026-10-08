@@ -10,8 +10,10 @@ from PySide6.QtWidgets import (
 from language_lens.config import Settings
 from language_lens.services.speech import SpeechJob, SpeechPlayer
 from language_lens.services.voices import runtime_ready, voice_runtime_ready, selected_voice, voice_present, voices_for
+from language_lens.runtime import recovery_instruction
 from language_lens.ui.style import set_help
 from language_lens.ui.progress import TransferMetrics
+from language_lens.services import language_packs as packs
 
 
 class PronunciationSettings(QFrame):
@@ -178,20 +180,33 @@ class PronunciationSettings(QFrame):
         self.voices.setEnabled((enabled or self.show_ipa.isChecked()) and voice is not None and not self._maintenance_blocked)
         self.progress.setVisible(self.download.active)
         self.download_details.setVisible(self.download.active)
-        self.install.setEnabled(self.download.active or (enabled and voice is not None and not self._maintenance_blocked))
+        japanese = voice is not None and voice.phoneme_type == "japanese"
+        pronunciation_only = not enabled and self.show_ipa.isChecked() and japanese
+        pack_missing = japanese and not packs.ready("ja-speech")
+        self.install.setEnabled(self.download.active or ((enabled or pronunciation_only) and voice is not None and not self._maintenance_blocked))
         ready = voice is not None and voice_present(voice)
         self.preview.setEnabled(enabled and ready and runtime_ready() and voice_runtime_ready(voice)
                                 and not self.download.active and not self._maintenance_blocked)
         self.preview.setText("Hear sample")
-        self.install.setText("Cancel download" if self.download.active else
-                             "Check voice files" if ready else
-                             f"Download voice · {voice.total_bytes / 1_000_000:.0f} MB" if voice else "No voice available")
+        size = (voice.total_bytes if voice and not ready and not pronunciation_only else 0)
+        size += packs.download_bytes("ja-speech") if pack_missing else 0
+        if self.download.active:
+            action = "Cancel download"
+        elif pronunciation_only:
+            action = f"Download pronunciation · {size / 1_000_000:.0f} MB" if pack_missing else "Check pronunciation files"
+        elif ready and not pack_missing:
+            action = "Check voice files"
+        else:
+            action = f"Download voice · {size / 1_000_000:.0f} MB" if voice else "No voice available"
+        self.install.setText(action)
         if not enabled and not self.show_ipa.isChecked():
             message = "Pronunciation is turned off."
         elif voice is None:
             message = "No voice is available for this language."
+        elif pack_missing:
+            message = "Download the Japanese pronunciation pack to enable speech and phonetic notation. The audio voice is a separate file."
         elif not runtime_ready() or not voice_runtime_ready(voice):
-            message = "Restart with 'Start Language Lens.bat' to install the speech components."
+            message = "Speech components could not be loaded. " + recovery_instruction()
         elif not enabled:
             message = "Audio is turned off."
         elif self.download.active:
@@ -225,7 +240,7 @@ class PronunciationSettings(QFrame):
             return
         self.player.stop()
         self._download_stage_changed("checking")
-        self.download.start("download", self.voice)
+        self.download.start("download" if self.enabled.isChecked() else "download-pronunciation", self.voice)
         if self.download.active:
             self.refresh()
 

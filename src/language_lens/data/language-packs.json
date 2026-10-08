@@ -1,0 +1,101 @@
+{
+  "schema": 1,
+  "artifacts": {
+    "janome-any": {
+      "distribution": "janome",
+      "version": "0.5.0",
+      "filename": "Janome-0.5.0-py2.py3-none-any.whl",
+      "url": "https://files.pythonhosted.org/packages/73/7d/70f4069f4bbf0fca023e82a1fbbade6f5216365d4fe259fee1950723eca5/Janome-0.5.0-py2.py3-none-any.whl",
+      "bytes": 19654103,
+      "sha256": "d098670394a77881ce2f6b7d696c0ea5ff74c0c8cf74a8a882159ec82c0e6dc7",
+      "format": "wheel"
+    },
+    "jieba-any": {
+      "distribution": "jieba",
+      "version": "0.42.1",
+      "filename": "jieba-0.42.1.tar.gz",
+      "url": "https://files.pythonhosted.org/packages/c6/cb/18eeb235f833b726522d7ebed54f2278ce28ba9438e3135ab0278d9792a2/jieba-0.42.1.tar.gz",
+      "bytes": 19214172,
+      "sha256": "055ca12f62674fafed09427f176506079bc135638a14e23e25be909131928db2",
+      "format": "sdist"
+    },
+    "pyopenjtalk-plus-cp310": {
+      "distribution": "pyopenjtalk-plus",
+      "version": "0.4.1.post9",
+      "filename": "pyopenjtalk_plus-0.4.1.post9-cp310-cp310-win_amd64.whl",
+      "url": "https://files.pythonhosted.org/packages/40/02/939abaa07066337ce1a9e405159f186b2b383fd4ab89754c68af6af29026/pyopenjtalk_plus-0.4.1.post9-cp310-cp310-win_amd64.whl",
+      "bytes": 25064332,
+      "sha256": "c2624815bef0528628bbdc52dec298b0eb577df261f19088b7bb5018c5ca0b51",
+      "format": "wheel"
+    },
+    "pyopenjtalk-plus-cp311": {
+      "distribution": "pyopenjtalk-plus",
+      "version": "0.4.1.post9",
+      "filename": "pyopenjtalk_plus-0.4.1.post9-cp311-cp311-win_amd64.whl",
+      "url": "https://files.pythonhosted.org/packages/18/df/50e8185a5a5d441e404af7c0407491bc92ca76d44ceaf8cd086066365184/pyopenjtalk_plus-0.4.1.post9-cp311-cp311-win_amd64.whl",
+      "bytes": 25065816,
+      "sha256": "58cda3998e1c8f4d820e07757803e8cd9ad324c359af59f398c30ba38fb88865",
+      "format": "wheel"
+    },
+    "pyopenjtalk-plus-cp312": {
+      "distribution": "pyopenjtalk-plus",
+      "version": "0.4.1.post9",
+      "filename": "pyopenjtalk_plus-0.4.1.post9-cp312-cp312-win_amd64.whl",
+      "url": "https://files.pythonhosted.org/packages/9c/f3/bf7c62d0c0e8543a6b93d18df4527a0f060b5a21dd7e64408fa16e98ebad/pyopenjtalk_plus-0.4.1.post9-cp312-cp312-win_amd64.whl",
+      "bytes": 25059224,
+      "sha256": "7c13d8370d82e625c3ac0712d813da498c8f145f6ff246aec482753db952a5a9",
+      "format": "wheel"
+    },
+    "sudachipy-any": {
+      "distribution": "sudachipy",
+      "version": "0.7.0",
+      "filename": "sudachipy-0.7.0-cp310-abi3-win_amd64.whl",
+      "url": "https://files.pythonhosted.org/packages/e9/a1/03e40b0eadbdd48ed47aef7aaf27d4703f5cc225750872af1a26de08ec2b/sudachipy-0.7.0-cp310-abi3-win_amd64.whl",
+      "bytes": 1515929,
+      "sha256": "8d0429db2d02d408daa7dccd062a6d8c2984a07f8e448b49a3ea694377617658",
+      "format": "wheel"
+    },
+    "sudachidict-core-any": {
+      "distribution": "sudachidict-core",
+      "version": "20260723.1",
+      "filename": "sudachidict_core-20260723.1-py3-none-any.whl",
+      "url": "https://files.pythonhosted.org/packages/85/af/ba8419f684865b8cca587e01cedb41ba83fbdc985d75ab9e6ff38fdedf1a/sudachidict_core-20260723.1-py3-none-any.whl",
+      "bytes": 76938227,
+      "sha256": "2b711055dca03423869e491eca0ddbe3e17c4d7418ed738fd7c75d4e0eb9e4b1",
+      "format": "wheel"
+    }
+  },
+  "packs": {
+    "ja-text": {
+      "name": "Japanese word lookup",
+      "artifacts": [
+        "janome-any"
+      ],
+      "modules": [
+        "janome"
+      ]
+    },
+    "zh-text": {
+      "name": "Chinese word lookup",
+      "artifacts": [
+        "jieba-any"
+      ],
+      "modules": [
+        "jieba"
+      ]
+    },
+    "ja-speech": {
+      "name": "Japanese pronunciation",
+      "artifacts": [
+        "pyopenjtalk-plus-{python}",
+        "sudachipy-any",
+        "sudachidict-core-any"
+      ],
+      "modules": [
+        "pyopenjtalk",
+        "sudachipy",
+        "sudachidict_core"
+      ]
+    }
+  }
+}

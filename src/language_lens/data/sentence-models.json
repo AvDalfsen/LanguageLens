@@ -1,0 +1,153 @@
+{
+  "schema": 1,
+  "release": "v0.0.1",
+  "languages": {
+    "ar": "ar",
+    "zh": "zh-hans",
+    "cs": "cs",
+    "da": "da",
+    "nl": "nl",
+    "en": "en",
+    "fi": "fi",
+    "fr": "fr",
+    "de": "de",
+    "el": "el",
+    "hi": "hi",
+    "hu": "hu",
+    "it": "it",
+    "ja": "ja",
+    "ko": "ko",
+    "nb": "nb",
+    "pl": "pl",
+    "pt": "pt",
+    "pb": "pt",
+    "ro": "ro",
+    "ru": "ru",
+    "es": "es",
+    "sv": "sv",
+    "tr": "tr",
+    "uk": "uk"
+  },
+  "models": {
+    "ar": {
+      "url": "https://github.com/LibreTranslate/MiniSBD/releases/download/v0.0.1/ar.onnx",
+      "bytes": 181459,
+      "sha256": "44a1847101e1adf667d4b9e1c7a0178d0af016ce33d8e5fc58aea1340c26835f"
+    },
+    "cs": {
+      "url": "https://github.com/LibreTranslate/MiniSBD/releases/download/v0.0.1/cs.onnx",
+      "bytes": 183759,
+      "sha256": "e7f118124fed59b3d07203c030dc3b3ff676882531a633364da22fbf78c95f10"
+    },
+    "da": {
+      "url": "https://github.com/LibreTranslate/MiniSBD/releases/download/v0.0.1/da.onnx",
+      "bytes": 178110,
+      "sha256": "3a7593d774f854900248ddd65468b95f0fc8244d6484648546057cd3e3da87b0"
+    },
+    "de": {
+      "url": "https://github.com/LibreTranslate/MiniSBD/releases/download/v0.0.1/de.onnx",
+      "bytes": 189791,
+      "sha256": "00320fe47a79269bf4a85b4e3aa9a4b367fcc2528af23aa41cbad0203b35d1e7"
+    },
+    "el": {
+      "url": "https://github.com/LibreTranslate/MiniSBD/releases/download/v0.0.1/el.onnx",
+      "bytes": 183945,
+      "sha256": "1039c155b3bed5efb9824a28ffbf297dfe2d81135508172c4a50fe3bf696e97f"
+    },
+    "en": {
+      "url": "https://github.com/LibreTranslate/MiniSBD/releases/download/v0.0.1/en.onnx",
+      "bytes": 188043,
+      "sha256": "6fa9f3a3b201687bd43e329b2b0736789efc97b37883b5b759b31988dca9f353"
+    },
+    "es": {
+      "url": "https://github.com/LibreTranslate/MiniSBD/releases/download/v0.0.1/es.onnx",
+      "bytes": 193234,
+      "sha256": "9774dd5ed1bd2d0566fa8d12ee59fd1d2c57b97127d004e03aa2b7b1cc6b2652"
+    },
+    "fi": {
+      "url": "https://github.com/LibreTranslate/MiniSBD/releases/download/v0.0.1/fi.onnx",
+      "bytes": 189321,
+      "sha256": "cf273a1395d7e60a00d0ce4a3fe2d403fe424ab0a0f56866b97f24dc8154a35d"
+    },
+    "fr": {
+      "url": "https://github.com/LibreTranslate/MiniSBD/releases/download/v0.0.1/fr.onnx",
+      "bytes": 193461,
+      "sha256": "f9392ffd67104d9d633c9254e5095048ce64da6a04212d3dc02940425f8c3af4"
+    },
+    "hi": {
+      "url": "https://github.com/LibreTranslate/MiniSBD/releases/download/v0.0.1/hi.onnx",
+      "bytes": 178129,
+      "sha256": "16924ea9912aec3d6759dbf0652a82508a8e3ec840b20941b30d264eba1798d1"
+    },
+    "hu": {
+      "url": "https://github.com/LibreTranslate/MiniSBD/releases/download/v0.0.1/hu.onnx",
+      "bytes": 177603,
+      "sha256": "bb654e8c296c820b11add875f69e240a8e2b3024a201cf7194089d78e9618c28"
+    },
+    "it": {
+      "url": "https://github.com/LibreTranslate/MiniSBD/releases/download/v0.0.1/it.onnx",
+      "bytes": 182756,
+      "sha256": "ada440b5097f2099a6e9cf0673674805f8f95236a02910466c54f6afd8dd218f"
+    },
+    "ja": {
+      "url": "https://github.com/LibreTranslate/MiniSBD/releases/download/v0.0.1/ja.onnx",
+      "bytes": 698618,
+      "sha256": "5ef874606b0afe24cc799b737ba1d9c09259e80ddee7646fc557a8f9e0e1017c"
+    },
+    "ko": {
+      "url": "https://github.com/LibreTranslate/MiniSBD/releases/download/v0.0.1/ko.onnx",
+      "bytes": 305683,
+      "sha256": "a8b8789c7056d535d276489dcda539f313069ed37d7b2779ee9f9e43db842adb"
+    },
+    "nb": {
+      "url": "https://github.com/LibreTranslate/MiniSBD/releases/download/v0.0.1/nb.onnx",
+      "bytes": 178634,
+      "sha256": "e2e7a8936d6890567378d1ead9c4b1ba48bb0b84fda07569de19b39e3a02ca82"
+    },
+    "nl": {
+      "url": "https://github.com/LibreTranslate/MiniSBD/releases/download/v0.0.1/nl.onnx",
+      "bytes": 181569,
+      "sha256": "b04ea4f625abd5ee3097f1a54490dc95bca0a6ef1920c38c1239784e6892aaf7"
+    },
+    "pl": {
+      "url": "https://github.com/LibreTranslate/MiniSBD/releases/download/v0.0.1/pl.onnx",
+      "bytes": 183035,
+      "sha256": "884e77a008668f67df61e44836ade2ef16764a0ff922d3b7b30c3249c5896fcc"
+    },
+    "pt": {
+      "url": "https://github.com/LibreTranslate/MiniSBD/releases/download/v0.0.1/pt.onnx",
+      "bytes": 182290,
+      "sha256": "db0a8c8f273fde33b902aa660356549986de7b83f881e8538c49dceb1feb1f2f"
+    },
+    "ro": {
+      "url": "https://github.com/LibreTranslate/MiniSBD/releases/download/v0.0.1/ro.onnx",
+      "bytes": 180275,
+      "sha256": "c7fdd00e0d663134fcfc768f7664407c4c775ebf04b33f7fe1b0431be5e14ca0"
+    },
+    "ru": {
+      "url": "https://github.com/LibreTranslate/MiniSBD/releases/download/v0.0.1/ru.onnx",
+      "bytes": 181514,
+      "sha256": "53c65ef031698d99fd0c736275eeb3c37f4694613c5c0d4423745741b0843138"
+    },
+    "sv": {
+      "url": "https://github.com/LibreTranslate/MiniSBD/releases/download/v0.0.1/sv.onnx",
+      "bytes": 176889,
+      "sha256": "d71e501161222d5908900798962a82228224e4c5e8b40fd2b3418280fa6accf9"
+    },
+    "tr": {
+      "url": "https://github.com/LibreTranslate/MiniSBD/releases/download/v0.0.1/tr.onnx",
+      "bytes": 180717,
+      "sha256": "d569f9893e2d13f4950fc0faa4393a8ffa80c3b7838fbaf789e3f0b14ebc36cc"
+    },
+    "uk": {
+      "url": "https://github.com/LibreTranslate/MiniSBD/releases/download/v0.0.1/uk.onnx",
+      "bytes": 186172,
+      "sha256": "e4ef6e40816766834f7a7f39b068e733fe842e70babfdab699950ef01131a158"
+    },
+    "zh-hans": {
+      "url": "https://github.com/LibreTranslate/MiniSBD/releases/download/v0.0.1/zh-hans.onnx",
+      "bytes": 616442,
+      "sha256": "b2a6e45ebb43df44ac3c8e4100ea1cb30ec8319c5698b678ed3f203e5edc5d0e"
+    }
+  }
+}

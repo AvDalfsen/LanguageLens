@@ -65,7 +65,10 @@ def test_offline_readiness_invalidates_changed_or_missing_assets(monkeypatch, tm
     model.write_bytes(b"verified model")
     stat = model.stat()
     marker = offline.marker_path("ja", "es")
-    marker.write_text(json.dumps({"version": 2, "runtime": offline.runtime_identity(), "files": [[str(model), stat.st_size, stat.st_mtime_ns]]}))
+    from language_lens.services import language_packs as packs
+    monkeypatch.setattr(packs, "ready", lambda _pack: True)
+    marker.write_text(json.dumps({"version": 2, "runtime": offline.runtime_identity(), "sentence_models": {},
+        "language_pack": packs.identity("ja-text"), "files": [[str(model), stat.st_size, stat.st_mtime_ns]]}))
     assert offline.offline_ready("ja", "es")
     model.write_bytes(b"changed")
     assert not offline.offline_ready("ja", "es")
@@ -354,7 +357,7 @@ def test_offline_readiness_invalidates_runtime_change(monkeypatch, tmp_path):
     model = tmp_path / "model.onnx"
     model.write_bytes(b"model")
     details = model.stat()
-    marker.write_text(json.dumps({"version": 2, "runtime": offline.runtime_identity(),
+    marker.write_text(json.dumps({"version": 2, "runtime": offline.runtime_identity(), "sentence_models": {},
         "files": [[str(model), details.st_size, details.st_mtime_ns]]}))
     assert offline.offline_ready("en", "nl")
     monkeypatch.setattr(offline, "runtime_identity", lambda: {"rapidocr": "different"})

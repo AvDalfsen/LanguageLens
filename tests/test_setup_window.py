@@ -227,7 +227,8 @@ def test_missing_pair_has_one_setup_action_and_uses_full_preparation(window_fact
     assert "missing for this language pair" in window.model_status.text()
     assert not hasattr(window, "install_button")
     downloads = [button for button in window.findChildren(QPushButton)
-                 if button.text().startswith("Download") and button is not window.pronunciation.install]
+                 if button.text().startswith("Download") and button is not window.pronunciation.install
+                 and not window.maintenance.isAncestorOf(button)]
     assert downloads == [window.prepare_button]
     assert window.prepare_button.isEnabled()
     assert not window.repair_button.isEnabled()

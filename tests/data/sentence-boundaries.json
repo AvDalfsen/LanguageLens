@@ -1,0 +1,284 @@
+[
+  {
+    "language": "ar",
+    "sentences": [
+      "افتح الباب.",
+      "المفتاح على الطاولة."
+    ],
+    "baseline": [
+      "افتح الباب. المفتاح على الطاولة."
+    ],
+    "baseline_note": "Same boundary merge in Stanza 1.10.1 default tokenizer and MiniSBD 0.9.5."
+  },
+  {
+    "language": "zh",
+    "separator": "",
+    "sentences": [
+      "请打开门。",
+      "钥匙在桌子上。"
+    ],
+    "baseline": [
+      "请打开门。钥匙在桌子上。"
+    ],
+    "baseline_note": "Same boundary merge in Stanza 1.10.1 default tokenizer and MiniSBD 0.9.5."
+  },
+  {
+    "language": "cs",
+    "sentences": [
+      "Otevři dveře.",
+      "Klíč je na stole."
+    ]
+  },
+  {
+    "language": "da",
+    "sentences": [
+      "Åbn døren.",
+      "Nøglen ligger på bordet."
+    ]
+  },
+  {
+    "language": "nl",
+    "sentences": [
+      "Open de deur.",
+      "De sleutel ligt op tafel."
+    ]
+  },
+  {
+    "language": "en",
+    "sentences": [
+      "Open the door.",
+      "The key is on the table."
+    ]
+  },
+  {
+    "language": "fi",
+    "sentences": [
+      "Avaa ovi.",
+      "Avain on pöydällä."
+    ]
+  },
+  {
+    "language": "fr",
+    "sentences": [
+      "Ouvre la porte.",
+      "La clé est sur la table."
+    ]
+  },
+  {
+    "language": "de",
+    "sentences": [
+      "Öffne die Tür.",
+      "Der Schlüssel liegt auf dem Tisch."
+    ]
+  },
+  {
+    "language": "el",
+    "sentences": [
+      "Άνοιξε την πόρτα.",
+      "Το κλειδί είναι στο τραπέζι."
+    ]
+  },
+  {
+    "language": "hi",
+    "sentences": [
+      "दरवाज़ा खोलो।",
+      "चाबी मेज़ पर है।"
+    ]
+  },
+  {
+    "language": "hu",
+    "sentences": [
+      "Nyisd ki az ajtót.",
+      "A kulcs az asztalon van."
+    ]
+  },
+  {
+    "language": "it",
+    "sentences": [
+      "Apri la porta.",
+      "La chiave è sul tavolo."
+    ]
+  },
+  {
+    "language": "ja",
+    "separator": "",
+    "sentences": [
+      "ドアを開けてください。",
+      "鍵は机の上にあります。"
+    ]
+  },
+  {
+    "language": "ko",
+    "sentences": [
+      "문을 열어 주세요.",
+      "열쇠는 탁자 위에 있습니다."
+    ]
+  },
+  {
+    "language": "nb",
+    "sentences": [
+      "Åpne døren.",
+      "Nøkkelen ligger på bordet."
+    ]
+  },
+  {
+    "language": "pl",
+    "sentences": [
+      "Otwórz drzwi.",
+      "Klucz leży na stole."
+    ]
+  },
+  {
+    "language": "pt",
+    "sentences": [
+      "Abre a porta.",
+      "A chave está na mesa."
+    ]
+  },
+  {
+    "language": "pb",
+    "sentences": [
+      "Abra a porta.",
+      "A chave está na mesa."
+    ]
+  },
+  {
+    "language": "ro",
+    "sentences": [
+      "Deschide ușa.",
+      "Cheia este pe masă."
+    ]
+  },
+  {
+    "language": "ru",
+    "sentences": [
+      "Открой дверь.",
+      "Ключ лежит на столе."
+    ]
+  },
+  {
+    "language": "es",
+    "sentences": [
+      "Abre la puerta.",
+      "La llave está sobre la mesa."
+    ]
+  },
+  {
+    "language": "sv",
+    "sentences": [
+      "Öppna dörren.",
+      "Nyckeln ligger på bordet."
+    ]
+  },
+  {
+    "language": "tr",
+    "sentences": [
+      "Kapıyı aç.",
+      "Anahtar masanın üzerinde."
+    ]
+  },
+  {
+    "language": "uk",
+    "sentences": [
+      "Відкрий двері.",
+      "Ключ лежить на столі."
+    ]
+  },
+  {
+    "language": "en",
+    "sentences": [
+      "Dr. Smith found 3.14 gold coins.",
+      "Is that enough?"
+    ]
+  },
+  {
+    "language": "en",
+    "sentences": [
+      "Visit example.com for version 1.2.3.",
+      "Then return to camp."
+    ]
+  },
+  {
+    "language": "en",
+    "sentences": [
+      "“Wait!” she shouted.",
+      "The guard stopped."
+    ]
+  },
+  {
+    "language": "pt",
+    "sentences": [
+      "O Sr. Silva chegou às 10:30.",
+      "A porta estava aberta."
+    ]
+  },
+  {
+    "language": "pt",
+    "sentences": [
+      "Custa 3,50 euros.",
+      "Queres comprar?"
+    ]
+  },
+  {
+    "language": "pt",
+    "sentences": [
+      "Mestre bruxo!",
+      "Tem um cemitério élfico nas cavernas próximas de Centrobosque."
+    ]
+  },
+  {
+    "language": "nl",
+    "sentences": [
+      "Dr. Jansen wacht bij de poort.",
+      "Ga naar hem toe."
+    ]
+  },
+  {
+    "language": "nl",
+    "sentences": [
+      "Dit kost 3,50 euro.",
+      "Heb je genoeg geld?"
+    ]
+  },
+  {
+    "language": "es",
+    "sentences": [
+      "¿Dónde está la llave?",
+      "¡Abre la puerta!"
+    ]
+  },
+  {
+    "language": "fr",
+    "sentences": [
+      "Le prix est de 3,50 euros.",
+      "Tu veux acheter cette épée ?"
+    ]
+  },
+  {
+    "language": "de",
+    "sentences": [
+      "Das kostet 3,50 Euro.",
+      "Hast du genug Gold?"
+    ]
+  },
+  {
+    "language": "ja",
+    "separator": "",
+    "sentences": [
+      "鍵はどこですか？",
+      "ここにあります！"
+    ],
+    "baseline": [
+      "鍵はどこですか？ここにあります！"
+    ],
+    "baseline_note": "Same boundary merge in Stanza 1.10.1 default tokenizer and MiniSBD 0.9.5."
+  },
+  {
+    "language": "zh",
+    "separator": "",
+    "sentences": [
+      "钥匙在哪里？",
+      "它在这里！"
+    ]
+  }
+]

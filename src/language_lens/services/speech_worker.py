@@ -9,6 +9,7 @@ import sys
 import unicodedata
 from urllib.request import urlopen
 import wave
+from language_lens.runtime import recovery_instruction
 
 from language_lens.services.voices import (
     MAX_TEXT_LENGTH, Voice, voice_runtime_ready, valid_file, verified_model, voice_by_id,
@@ -73,7 +74,11 @@ def synthesize(voice: Voice, root: Path, text: str, output: Path,
                 or not 0 < sum(map(len, phonemes)) <= 16000):
             raise ValueError("Invalid prepared pronunciation.")
     if not voice_runtime_ready(voice):
-        raise RuntimeError("Speech components need updating. Close the app and run 'Start Language Lens.bat'.")
+        raise RuntimeError("Speech components are missing. Download the pronunciation pack in Settings." if voice.phoneme_type == "japanese"
+                           else "Speech components need updating. " + recovery_instruction())
+    if voice.phoneme_type == "japanese":
+        from language_lens.services.language_packs import activate
+        activate("ja-speech")
     model = verified_model(voice, root)
     import numpy as np
     import onnxruntime
@@ -123,7 +128,7 @@ def synthesize(voice: Voice, root: Path, text: str, output: Path,
 
 def main() -> int:
     parser = argparse.ArgumentParser()
-    parser.add_argument("command", choices=("download", "synthesize", "pronunciation", "phonemes"))
+    parser.add_argument("command", choices=("download", "download-pronunciation", "synthesize", "pronunciation", "phonemes"))
     parser.add_argument("--voice", required=True)
     parser.add_argument("--root", type=Path, required=True)
     parser.add_argument("--scratch", type=Path, required=True)
@@ -135,8 +140,13 @@ def main() -> int:
         from language_lens.services.diagnostics import initialize
         initialize(f"speech-{args.command}")
         voice = voice_by_id(args.voice)
-        if args.command == "download":
-            download(voice, args.root, args.scratch)
+        if args.command in ("download", "download-pronunciation"):
+            if voice.phoneme_type == "japanese":
+                from language_lens.services.language_packs import install
+                install("ja-speech", lambda _message: emit(stage="verifying"),
+                        lambda item: emit(stage="downloading", done=item.received, total=item.total))
+            if args.command == "download":
+                download(voice, args.root, args.scratch)
         else:
             from language_lens.services.offline import no_network
             with no_network():
@@ -162,7 +172,8 @@ def main() -> int:
     except Exception as exc:
         from language_lens.services.diagnostics import record_failure
         record_failure(f"speech-{args.command}", exc)
-        emit(error=str(exc))
+        from language_lens.services.errors import KnownTaskError, MESSAGES
+        emit(error=MESSAGES.get(exc.code, str(exc)) if isinstance(exc, KnownTaskError) else str(exc))
         return 1
 
 

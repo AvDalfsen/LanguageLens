@@ -31,20 +31,6 @@ def no_network():
         socket.socket.connect, socket.socket.connect_ex, socket.create_connection = connect, connect_ex, create
 
 
-@contextmanager
-def local_sentencizers():
-    import stanza
-    pipeline = stanza.Pipeline
-    def local_pipeline(*args, **kwargs):
-        kwargs["download_method"] = stanza.DownloadMethod.NONE
-        return pipeline(*args, **kwargs)
-    stanza.Pipeline = local_pipeline
-    try:
-        yield
-    finally:
-        stanza.Pipeline = pipeline
-
-
 def ocr_parameters(language: str) -> dict:
     from rapidocr import LangRec, ModelType, OCRVersion
     from language_lens.services.ocr import SCRIPT_BY_LANGUAGE
@@ -101,17 +87,28 @@ def marker_path(source: str, target: str) -> Path:
 def runtime_identity() -> dict:
     identity = {}
     for name in ("rapidocr", "onnxruntime", "argostranslate", "ctranslate2", "sentencepiece", "sacremoses",
-                 "stanza", "minisbd", "janome", "jieba", "regex"):
+                 "minisbd", "regex"):
         try:
             identity[name] = version(name)
         except PackageNotFoundError:
             identity[name] = "missing"
+    from language_lens.services.sentence_models import BACKEND_ID
+    identity["sentence_backend"] = BACKEND_ID
     return identity
 
 
 def offline_ready(source: str, target: str) -> bool:
+    from language_lens.services import language_packs as packs
+    required = packs.text_pack(source)
+    if required and not packs.ready(required):
+        return False
     try:
         records = json.loads(marker_path(source, target).read_text(encoding="utf-8"))
+        from language_lens.services import sentence_models
+        if not sentence_models.compatible(records["sentence_models"]):
+            return False
+        if required and records.get("language_pack") != packs.identity(required):
+            return False
         if records["version"] != 2 or records["runtime"] != runtime_identity() or not records["files"]:
             return False
         for name, size, modified in records["files"]:
@@ -124,6 +121,11 @@ def offline_ready(source: str, target: str) -> bool:
 
 
 def prepare(source: str, target: str, report, progress) -> None:
+    from language_lens.services import language_packs as packs
+    required = packs.text_pack(source)
+    if required:
+        packs.install(required, report, progress)
+        packs.activate(required)
     from language_lens.services.translation import ArgosTranslator
     from language_lens.services.model_download import DownloadProgress
     translator = ArgosTranslator()
@@ -153,19 +155,20 @@ def prepare(source: str, target: str, report, progress) -> None:
             finally:
                 temporary.unlink(missing_ok=True)
         paths.append(path)
-    # Warm up the actual installed route, including every auxiliary sentencizer.
-    # This is a fixed sample, never screenshot text, even while downloads are allowed.
-    report("Preparing sentence models and checking local translation…")
+    from language_lens.services import sentence_models
+    sentence_languages = [item.from_code for item in translator.route(source, target)]
+    paths.extend(sentence_models.prepare(sentence_languages, report, progress))
+    # All inference, including the fixed warmup sample, is now offline.
     from language_lens.services.voices import selected_voice
     voice = selected_voice(source, {})
     sample = voice.sample if voice else "Hello."
-    translator.translate.cache_clear()
-    translator.translate(sample, source, target)
     report("Verifying OCR and translation with networking disabled…")
     _package, backend = translator._modules()
     backend.get_installed_languages.cache_clear()
     backend.installed_translates.clear()
-    with no_network(), local_sentencizers():
+    with no_network():
+        from language_lens.text import word_spans
+        list(word_spans(sample, source))
         from language_lens.services.ocr import RapidOcrEngine
         import numpy as np
         engine = RapidOcrEngine(source, params=local_ocr_parameters(source))
@@ -174,11 +177,13 @@ def prepare(source: str, target: str, report, progress) -> None:
         translator.translate(sample, source, target)
         translator.word_candidates(sample.split()[0], source, target)
     for package in translator.route(source, target):
-        paths.extend(path for path in package.package_path.rglob("*") if path.is_file())
-    from argostranslate import settings as argos_settings
-    paths.extend(path for path in (argos_settings.data_dir / "minisbd").glob("*.onnx"))
-    records = {"version": 2, "runtime": runtime_identity(), "files": [(str(path), path.stat().st_size, path.stat().st_mtime_ns)
+        paths.extend(path for path in package.package_path.rglob("*") if path.is_file()
+                     and path.relative_to(package.package_path).parts[0] not in ("stanza", "minisbd"))
+    records = {"version": 2, "runtime": runtime_identity(), "sentence_models": sentence_models.identities(sentence_languages),
+               "files": [(str(path), path.stat().st_size, path.stat().st_mtime_ns)
                                        for path in sorted(set(paths))]}
+    if required:
+        records["language_pack"] = packs.identity(required)
     marker = marker_path(source, target)
     marker.parent.mkdir(parents=True, exist_ok=True)
     temporary = marker.with_suffix(".tmp")

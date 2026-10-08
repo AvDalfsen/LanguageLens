@@ -111,10 +111,8 @@ def voice_runtime_ready(voice: Voice) -> bool:
     if not runtime_ready():
         return False
     if voice.phoneme_type == "japanese":
-        try:
-            return version("pyopenjtalk-plus") == "0.4.1.post9"
-        except PackageNotFoundError:
-            return False
+        from language_lens.services.language_packs import ready
+        return ready("ja-speech")
     return True
 
 

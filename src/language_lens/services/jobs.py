@@ -38,7 +38,7 @@ class ServiceJob(ProcessJob):
         self._scratch = value
 
     def start(self, command: str, payload: dict, images: dict | None = None) -> None:
-        timeout = 300000 if command in ("install", "prepare", "repair", "remove") else 120000
+        timeout = 300000 if command in ("install", "prepare", "repair", "remove", "pack-install", "pack-remove") else 120000
         if command == "status":
             timeout = 30000
         self._start("language_lens.services.task_worker", command, payload,

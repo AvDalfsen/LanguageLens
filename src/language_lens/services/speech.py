@@ -8,6 +8,7 @@ from PySide6.QtCore import QByteArray, QBuffer, QIODevice, QObject, QTimer, QUrl
 from PySide6.QtMultimedia import QAudioOutput, QMediaDevices, QMediaPlayer
 
 from language_lens.services.process_job import ProcessJob
+from language_lens.runtime import recovery_instruction
 from language_lens.services.voices import Voice, runtime_ready, voice_runtime_ready, voice_present, voices_root
 
 
@@ -16,7 +17,7 @@ class SpeechJob(ProcessJob):
     stage_changed = Signal(str)
     succeeded = Signal(object)
 
-    start_failure = "Could not start local speech. Restart using 'Start Language Lens.bat'."
+    start_failure = "Could not start local speech. " + recovery_instruction()
     scratch_failure = "Could not create speech files. Check disk space and directory permissions."
     overflow_failure = "The speech task returned too much data. Try a shorter selection."
     stopped_failure = "The local speech process stopped unexpectedly. Please retry."
@@ -26,15 +27,18 @@ class SpeechJob(ProcessJob):
         self.root = root or voices_root()
 
     def start(self, command: str, voice: Voice, text: str = "", **data) -> None:
+        self._reported_stage = None
         self._start("language_lens.services.speech_worker", command, {"text": text, **data},
-                    self.root, 60000 if command in ("download", "pronunciation") else 180000,
+                    self.root, 300000 if command in ("download", "download-pronunciation") else 180000,
                     ["--voice", voice.id, "--root", str(self.root)])
 
     def _handle_message(self, message, process):
         stage = message.get("stage")
         if isinstance(stage, str) and stage in {"checking", "downloading", "verifying"}:
             self._touch(60000)
-            self.stage_changed.emit(stage)
+            if stage != getattr(self, "_reported_stage", None):
+                self._reported_stage = stage
+                self.stage_changed.emit(stage)
             if self._process is not process or self._cancelled:
                 return
         if "done" in message and "total" in message:
@@ -43,7 +47,7 @@ class SpeechJob(ProcessJob):
 
     def _timeout_message(self):
         return ("The voice download stopped making progress. Check your connection and retry."
-                if self._command == "download" else
+                if self._command in ("download", "download-pronunciation") else
                 "Local speech timed out. Try again, or select a shorter passage.")
 
     def _succeeded(self, scratch):
@@ -93,7 +97,8 @@ class SpeechPlayer(QObject):
         if self.busy or self.job.active:
             return
         if not runtime_ready() or not voice_runtime_ready(voice):
-            self._failed("Restart using 'Start Language Lens.bat' to install the speech components.")
+            self._failed("Download the Japanese pronunciation pack in 'Settings'." if voice.phoneme_type == "japanese" else
+                         "Speech components could not be loaded. " + recovery_instruction())
             return
         if not voice_present(voice, self.job.root):
             self._failed("Use 'Download voice' in 'Settings' first.")

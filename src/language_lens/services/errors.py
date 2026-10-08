@@ -2,6 +2,7 @@
 from dataclasses import asdict, dataclass
 import errno
 from urllib.error import HTTPError, URLError
+from language_lens.runtime import recovery_instruction
 
 
 class KnownTaskError(RuntimeError):
@@ -21,6 +22,11 @@ class Failure:
 
 
 MESSAGES = {
+    "sentence_language": "A translation route needs an unsupported sentence language. Choose another route or update Language Lens.",
+    "sentence_split": "The sentence splitter could not preserve this selection. Try a shorter passage and check required files in Settings.",
+    "missing_pack": "A language pack is missing or changed. Open Settings and download the required language pack under 'Manage local files'.",
+    "pack_restart": "A language pack changed while it was in use. Restart Language Lens to use the updated pack.",
+    "pack_platform": "This language pack needs Windows x64 and a supported Python runtime. Use the Windows portable release.",
     "disk_full": "There is not enough disk space for the local files. Free some space, then retry.",
     "permission": "Windows denied access to the local files. Check folder permissions and whether another program is locking them, then retry.",
     "network": "The download server could not be reached or the connection failed. Check your connection and retry the download. Existing installed files are retained.",
@@ -28,7 +34,7 @@ MESSAGES = {
     "route_unavailable": "No downloadable translation route is available for this language pair. Choose another 'Text language'/'Translate into' combination and try again later.",
     "missing_assets": "Required local files are missing or changed. Use 'Download required files' or 'Check required files' in 'Settings', then retry.",
     "integrity": "The downloaded files failed verification. Retry the download; existing installed models are retained.",
-    "runtime": "A required local component could not be loaded. Restart using 'Start Language Lens.bat' to check or repair the installation.",
+    "runtime": "A required local component could not be loaded. " + recovery_instruction(),
     "inspection": "The local models could not be checked. Click 'Retry file check'. Their installation status is unknown; no files have been removed.",
     "execution": "The local task could not complete. Retry the task; if it fails again, use 'Check required files' in 'Settings' and open the diagnostics folder.",
 }

@@ -137,7 +137,7 @@ def test_readiness_tracks_translation_runtime_versions(monkeypatch, tmp_path, ru
     info = model.stat()
     versions = offline.runtime_identity()
     assert runtime in versions
-    offline.marker_path("en", "nl").write_text(json.dumps({"version": 2, "runtime": versions,
+    offline.marker_path("en", "nl").write_text(json.dumps({"version": 2, "runtime": versions, "sentence_models": {},
         "files": [[str(model), info.st_size, info.st_mtime_ns]]}))
     assert offline.offline_ready("en", "nl")
     monkeypatch.setattr(offline, "runtime_identity", lambda: {**versions, runtime: "changed"})

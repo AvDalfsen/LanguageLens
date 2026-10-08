@@ -8,6 +8,7 @@ from threading import RLock
 import unicodedata
 
 from language_lens.domain import WordTranslation
+from language_lens.runtime import recovery_instruction
 from language_lens.services.model_download import DownloadProgress, download_model
 
 
@@ -58,23 +59,26 @@ class ArgosTranslator:
     def _modules():
         # Ignore inherited Argos cloud-provider preferences. Lens is local-only.
         os.environ["ARGOS_MODEL_PROVIDER"] = "OPENNMT"
-        os.environ["ARGOS_CHUNK_TYPE"] = "ARGOSTRANSLATE"
+        os.environ["ARGOS_CHUNK_TYPE"] = "MINISBD"
         os.environ["ARGOS_DEBUG"] = "0"
         try:
+            from language_lens.services.argos_sentences import install
+            install()
             import argostranslate.package as package
             import argostranslate.translate as translate
             from argostranslate import settings
-            if settings.model_provider != settings.ModelProvider.OPENNMT:
+            if settings.model_provider != settings.ModelProvider.OPENNMT or settings.chunk_type != settings.ChunkType.MINISBD:
                 settings.model_provider = settings.ModelProvider.OPENNMT
                 translate.get_installed_languages.cache_clear()
+                translate.installed_translates.clear()
             settings.debug = False
-            settings.chunk_type = settings.ChunkType.ARGOSTRANSLATE
+            settings.chunk_type = settings.ChunkType.MINISBD
             settings.device = "cpu"
             settings.intra_threads = 2
             settings.inter_threads = 1
         except ImportError as exc:  # pragma: no cover - exercised in installed app
             raise TranslationUnavailable(
-                "Argos Translate is not installed. Run the setup command from README.md."
+                "Argos Translate could not be loaded. " + recovery_instruction()
             ) from exc
         return package, translate
 

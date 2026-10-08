@@ -35,7 +35,7 @@ function Test-LensEnvironment([string]$ProjectRoot) {
     $Python = Join-Path $ProjectRoot ".venv\Scripts\python.exe"
     if (-not (Test-Path -LiteralPath (Join-Path $ProjectRoot ".venv\Scripts\pythonw.exe"))) { return $false }
     if (-not (Test-LensPython $Python -RequirePip)) { return $false }
-    $Health = "import ctypes; ctypes.windll.kernel32.SetErrorMode(3); import language_lens, PySide6, rapidocr, onnxruntime, argostranslate, ctranslate2, regex, janome, jieba, filelock; from language_lens.services.voices import VOICES, voice_runtime_ready; assert all(voice_runtime_ready(v) for v in VOICES)"
+    $Health = "import ctypes; ctypes.windll.kernel32.SetErrorMode(3); import language_lens, PySide6, rapidocr, onnxruntime, argostranslate, ctranslate2, regex, filelock; from language_lens.services.voices import runtime_ready; assert runtime_ready()"
     try {
         & $Python -I -c $Health 2>$null | Out-Null
         return $LASTEXITCODE -eq 0

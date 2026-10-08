@@ -238,6 +238,23 @@ class SetupWindow(QMainWindow):
         self._maintenance_layout.setContentsMargins(0, 0, 0, 0)
         self._maintenance_layout.addWidget(self.repair_button, 1, 0)
         self._maintenance_layout.addWidget(self.remove_button, 1, 1)
+        from language_lens.services import language_packs as packs
+        self.pack_choice = QComboBox()
+        self.pack_choice.setAccessibleName("Optional language pack")
+        for key, item in packs.catalog()["packs"].items():
+            self.pack_choice.addItem(item["name"], key)
+        self.pack_status = QLabel()
+        self.pack_status.setWordWrap(True)
+        self.pack_install = QPushButton("Download pack")
+        self.pack_remove = QPushButton("Remove pack")
+        self._pack_inventory = []
+        self._maintenance_layout.addWidget(self.pack_choice, 2, 0, 1, 2)
+        self._maintenance_layout.addWidget(self.pack_status, 3, 0, 1, 2)
+        self._maintenance_layout.addWidget(self.pack_install, 4, 0)
+        self._maintenance_layout.addWidget(self.pack_remove, 4, 1)
+        self.pack_choice.currentIndexChanged.connect(self._refresh_packs)
+        self.pack_install.clicked.connect(lambda: self._start_model_job("pack-install", pack=self.pack_choice.currentData()))
+        self.pack_remove.clicked.connect(self._remove_pack)
         self._required_actions = QHBoxLayout()
         self._required_actions.addWidget(self.prepare_button)
         self._required_actions.addWidget(self.cancel_button)
@@ -303,6 +320,7 @@ class SetupWindow(QMainWindow):
         body.addWidget(self.technical_details)
         self.pronunciation = PronunciationSettings(settings)
         self.pronunciation.activity_changed.connect(self._refresh_availability)
+        self.pronunciation.download.succeeded.connect(lambda _path: self.refresh_model_status())
         self.pronunciation.preferences_changed.connect(self.preferences_changed)
         body.addWidget(self.pronunciation)
         body.addWidget(note)
@@ -339,7 +357,7 @@ class SetupWindow(QMainWindow):
         order.extend((self.cancel_button, self.diagnostics_button, self.maintenance.toggle))
         if optional:
             order.append(self.prepare_button)
-        order.extend((self.repair_button, self.remove_button, self.technical_details.toggle,
+        order.extend((self.repair_button, self.remove_button, self.pack_choice, self.pack_install, self.pack_remove, self.technical_details.toggle,
                       self.pronunciation.enabled, self.pronunciation.show_ipa, self.pronunciation.voices,
                       self.pronunciation.install, self.pronunciation.preview, self.pronunciation.details,
                       self.try_button, self.start_button))
@@ -579,6 +597,8 @@ class SetupWindow(QMainWindow):
             self._start_model_job("prepare")
 
     def _apply_model_status(self, result) -> None:
+        self._pack_inventory = result.get("packs", [])
+        self.pronunciation.refresh()
         self._status_check_failed = False
         self.diagnostics_button.setVisible(bool(self._model_task_error))
         ready = self._translation_ready = result["ready"]
@@ -598,6 +618,11 @@ class SetupWindow(QMainWindow):
         self.repair_button.setEnabled(ready and self.source.currentData() != self.target.currentData())
         self.remove_button.setEnabled(self.repair_button.isEnabled())
         source = self.source.currentData()
+        from language_lens.services import language_packs as packs
+        required = packs.text_pack(source)
+        if required and any(item["id"] == required and not item["ready"] for item in self._pack_inventory):
+            self.model_status.setText(self.model_status.text() +
+                f" {packs.definition(required)['name']} adds a {packs.download_bytes(required) / 1_000_000:.1f} MB download.")
         segmentation = "Offline dictionary segmentation" if source in {"ja", "zh"} else "Unicode word boundaries; not a morphological parser"
         route_text = " → ".join(result["route"]) if result["route"] else "Same language" if ready else "Missing"
         notation = "Audited estimated IPA" if source in {"en", "pt", "pb"} else "Engine phonetic notation (not conventionally formatted IPA)"
@@ -608,6 +633,29 @@ class SetupWindow(QMainWindow):
         self.style().polish(self.model_status)
         self._show_model_task_error()
         self.set_capture_busy(self._capture_busy)
+
+    def _refresh_packs(self) -> None:
+        from language_lens.services import language_packs as packs
+        key = self.pack_choice.currentData()
+        item = next((item for item in self._pack_inventory if item["id"] == key), {})
+        installed = item.get("ready", False)
+        self.pack_status.setText(("Installed" if installed else "Not installed or needs updating")
+            + f" · Download: {packs.download_bytes(key) / 1_000_000:.1f} MB. Shared by all language pairs.")
+        self.pack_install.setText("Check pack files" if installed else "Download pack")
+        allowed = self.availability.maintenance_enabled
+        self.pack_choice.setEnabled(allowed)
+        self.pack_install.setEnabled(allowed)
+        self.pack_remove.setEnabled(allowed and item.get("managed", False))
+
+    def _remove_pack(self) -> None:
+        if not self.availability.maintenance_enabled:
+            return
+        answer = QMessageBox.question(self, "Remove language pack",
+            "Remove this optional pack for all language pairs? Its word lookup or pronunciation will need a new download. "
+            "Translation models and voices are kept. Files currently in use may be freed after restarting and removing again.",
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
+        if answer == QMessageBox.StandardButton.Yes:
+            self._start_model_job("pack-remove", pack=self.pack_choice.currentData())
 
     def _manage_model(self, command: str) -> None:
         if not self.availability.maintenance_enabled:
@@ -621,7 +669,7 @@ class SetupWindow(QMainWindow):
         if answer == QMessageBox.StandardButton.Yes:
             self._start_model_job(command)
 
-    def _start_model_job(self, command: str) -> None:
+    def _start_model_job(self, command: str, **extra) -> None:
         if not self.availability.maintenance_enabled:
             return
         self._installing = True
@@ -641,7 +689,7 @@ class SetupWindow(QMainWindow):
         self.model_details.show()
         self._model_stage_changed("Preparing download…")
         self._progress_timer.start()
-        self.model_job.start(command, {"settings": asdict(self.current_settings())})
+        self.model_job.start(command, {"settings": asdict(self.current_settings()), **extra})
 
     def _model_event(self, message) -> None:
         if "progress" in message:
@@ -760,6 +808,7 @@ class SetupWindow(QMainWindow):
         self.repair_button.setEnabled(state.maintenance_enabled and managed)
         self.remove_button.setEnabled(state.maintenance_enabled and managed)
         self.pronunciation.set_maintenance_blocked(state.capture_busy or state.model_busy or state.shutting_down)
+        self._refresh_packs()
         self._refresh_listening()
         if state != self._last_availability:
             self._last_availability = state

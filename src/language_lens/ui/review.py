@@ -34,6 +34,7 @@ from PySide6.QtWidgets import (
 )
 
 from language_lens.config import Settings
+from language_lens.runtime import recovery_instruction
 from language_lens.domain import OcrLine, Rect, WordHit, WordTranslation, build_word_hits
 from language_lens.services.capture import DesktopCapture
 from language_lens.services.ocr import RapidOcrEngine
@@ -42,7 +43,7 @@ from language_lens.services.speech import SpeechJob, SpeechPlayer
 from language_lens.services.jobs import TaskPool as QThreadPool
 # Domain tasks retain their testable QRunnable interface; this dispatcher starts
 # isolated QProcess workers, not Qt worker threads or native engines in the GUI.
-from language_lens.services.voices import MAX_TEXT_LENGTH, runtime_ready, selected_voice, voice_present
+from language_lens.services.voices import MAX_TEXT_LENGTH, runtime_ready, voice_runtime_ready, selected_voice, voice_present
 from language_lens.ui.word_popup import WordPopup
 from language_lens.ui.style import set_help
 from language_lens.ui.sections import ExpandableSection, make_copyable
@@ -1024,7 +1025,9 @@ class ReviewWindow(QWidget):
         elif self._voice is None:
             message = "No pronunciation voice is available for this text language yet."
         elif not runtime_ready():
-            message = "Restart with 'Start Language Lens.bat' to install speech components."
+            message = "Speech components could not be loaded. " + recovery_instruction()
+        elif not voice_runtime_ready(self._voice):
+            message = "Download the Japanese pronunciation pack in 'Settings' to read this text aloud."
         elif not voice_present(self._voice):
             message = "Use 'Download voice' in 'Settings' to read this text aloud."
         elif len(self._speech_text) > MAX_TEXT_LENGTH:
@@ -1068,7 +1071,6 @@ class ReviewWindow(QWidget):
     def _prepare_pronunciation(self) -> None:
         if self._closed or self.pronunciation_job.active:
             return
-        from language_lens.services.voices import voice_runtime_ready
         has_runtime = runtime_ready() and bool(self._voice and voice_runtime_ready(self._voice))
         audio_available = bool(self.settings.speech_enabled and has_runtime and self._voice
                                and voice_present(self._voice))
@@ -1081,7 +1083,10 @@ class ReviewWindow(QWidget):
             self._update_canvases("set_pronunciations", [], "IPA is not available for this text language yet.")
             return
         if not has_runtime:
-            self._update_canvases("set_pronunciations", [], "Restart with 'Start Language Lens.bat' to install pronunciation components.")
+            message = ("Download the Japanese pronunciation pack in 'Settings' to enable phonetic notation."
+                       if self._voice.phoneme_type == "japanese" else
+                       "Pronunciation components could not be loaded. " + recovery_instruction())
+            self._update_canvases("set_pronunciations", [], message)
             return
         if not self._speech_text.strip() or len(self._speech_text) > MAX_TEXT_LENGTH:
             self._update_canvases("set_pronunciations", [], "IPA needs a selection of up to 2,000 characters.")

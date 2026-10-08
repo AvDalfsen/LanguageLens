@@ -3,11 +3,11 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
-import sys
 from threading import Event
 
 from PySide6.QtCore import QCoreApplication, QObject, QProcess, QTemporaryDir, QThread, QTimer, Signal, Slot
 from PySide6.QtGui import QImage
+from language_lens.runtime import recovery_instruction, worker_command
 
 
 # A window can disappear while PNG encoding is finishing. Keep the unparented
@@ -62,7 +62,7 @@ class ProcessJob(QObject):
     cancelled = Signal()
     activity_changed = Signal(bool)
 
-    start_failure = "Could not start the local task. Restart with 'Start Language Lens.bat'."
+    start_failure = "Could not start the local task. " + recovery_instruction()
     scratch_failure = "Could not create local task files. Check disk space and directory permissions."
     overflow_failure = "The local task returned too much data. Try a smaller selection."
     stopped_failure = "The local task stopped unexpectedly. Please retry."
@@ -100,11 +100,9 @@ class ProcessJob(QObject):
             return
         process = QProcess(self)
         self._process = process
-        python = Path(sys.executable)
-        if python.name.lower() == "pythonw.exe":
-            python = python.with_name("python.exe")
-        process.setProgram(str(python))
-        process.setArguments(["-m", module, command, *arguments, "--scratch", self._scratch.path()])
+        program, prefix = worker_command(module)
+        process.setProgram(program)
+        process.setArguments([*prefix, command, *arguments, "--scratch", self._scratch.path()])
         process.readyReadStandardOutput.connect(self._read)
         process.readyReadStandardError.connect(lambda: process.readAllStandardError())
         process.errorOccurred.connect(self._process_error)

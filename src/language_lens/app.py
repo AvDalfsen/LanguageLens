@@ -21,6 +21,7 @@ from language_lens.services.diagnostics import initialize, record_failure
 from language_lens.services.instance import SingleInstance
 from language_lens.services.offline import offline_ready
 from language_lens.services.startup import report_startup
+from language_lens.runtime import recovery_instruction
 
 
 def persist(settings, parent=None, *, notify=True) -> bool:
@@ -554,9 +555,10 @@ def main() -> int:
         if instance is not None:
             instance.close()
         record_failure("startup", exc)
-        report_startup("error", "Startup failed. Check '%LOCALAPPDATA%/LanguageLens/logs' and run 'Start Language Lens.bat' again.")
+        message = "Startup failed. Diagnostic files are in '%LOCALAPPDATA%/LanguageLens/logs'. " + recovery_instruction()
+        report_startup("error", message)
         if not os.environ.get("LANGUAGE_LENS_STARTUP_FILE"):
-            QMessageBox.critical(None, "Language Lens could not start", "Startup failed. Restart with 'Start Language Lens.bat'. Diagnostic files are in '%LOCALAPPDATA%/LanguageLens/logs'; they do not include selected text.")
+            QMessageBox.critical(None, "Language Lens could not start", message)
         return 1
     instance.reopen.connect(controller.show_settings)
     controller.show()

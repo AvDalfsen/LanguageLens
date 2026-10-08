@@ -96,6 +96,8 @@ def prepare_japanese(text: str, spans: list) -> Pronunciation:
     Pitch cues belong to engine notation. Do not claim contextual word alignment
     until a verified source-to-OpenJTalk alignment has been implemented.
     """
+    from language_lens.services.language_packs import activate
+    activate("ja-speech")
     from piper.phonemize_japanese import JapanesePhonemizer
     validate_spans(text, spans)
     engine = JapanesePhonemizer()

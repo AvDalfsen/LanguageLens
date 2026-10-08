@@ -1,5 +1,12 @@
 # Language Lens
 
+Windows portable release tooling is available for a local executable preview.
+See [building and verifying a release](docs/release-building.md). The preview
+uses ONNX sentence splitting without bundled PyTorch/Stanza and downloads
+Japanese/Chinese components as optional language packs. See
+[language packs and updates](docs/language-packs.md) and
+[sentence models and validation](docs/sentence-splitting.md).
+
 Language Lens is a Windows-first, local screen translator for language learning. Press a global hotkey from any application, drag around text in a frozen screenshot, and inspect it without sending the image anywhere. OCR outlines the words; hovering over one shows its translation, while a contextual translation of the whole selection stays visible below.
 
 Screenshots and recognized text remain on the computer. The app uses [RapidOCR](https://github.com/RapidAI/RapidOCR) for OCR and [Argos Translate](https://github.com/argosopentech/argos-translate) for translation. Both need one-time model downloads, but neither needs a cloud API during play.
@@ -52,7 +59,7 @@ OCR input is converted directly from Qt images to owned, contiguous BGR pixel ar
 
 Hovering over a word shows only the model's 'Best match' by default, along with the number of distinct candidates found. The app requests five Argos hypotheses, ranks them by model score, removes terminal-punctuation duplicates, and retains up to four candidates. Capitalization is preserved because it can distinguish meanings. Click 'Show N other candidates' when the best match does not fit the sentence; the already-found alternatives then appear numbered **best → worst**. A candidate may contain several target-language words. Results appear progressively, with the whole-selection translation available first.
 
-Word lookup preserves capitalization and combining marks, including Hindi vowel marks and Arabic diacritics. Japanese and Chinese use offline dictionary tokenizers selected by 'Text language', independently of the target language. Their dictionaries are installed with the app; no additional download is needed during capture. Segmentation remains an estimate, especially for names and unfamiliar compounds. OCR character coordinates are retained where the recognizer supplies usable alignment; otherwise outlines use an estimate that respects text direction, proportional font shaping and vertical text. The screenshot's exact font is unknown, so fallback outlines can still be imperfect. Whole-selection translation and pronunciation retain the original text and occurrence offsets.
+Word lookup preserves capitalization and combining marks, including Hindi vowel marks and Arabic diacritics. Japanese and Chinese use offline dictionary tokenizers selected by 'Text language', independently of the target language. Their dictionaries are optional packs installed by Download required files for those source languages; capture never downloads them. Segmentation remains an estimate, especially for names and unfamiliar compounds. OCR character coordinates are retained where the recognizer supplies usable alignment; otherwise outlines use an estimate that respects text direction, proportional font shaping and vertical text. The screenshot's exact font is unknown, so fallback outlines can still be imperfect. Whole-selection translation and pronunciation retain the original text and occurrence offsets.
 
 Word candidates use the word **in isolation**, so the first choice can still have the wrong meaning in context. These are model suggestions, not an exhaustive dictionary of senses, and their ranking is not a percentage confidence. Use the whole-selection translation alongside them. If a model provides only one distinct result, the popup says so; if alternatives fail but the usual translation works, it explicitly shows a single-translation fallback.
 
@@ -63,7 +70,7 @@ Click 'Search for more candidates' directly in the word popup to request a wider
 1. Restart using 'Start Language Lens.bat'. It installs the pinned speech runtime if missing.
 2. In 'Settings', find 'Enable functionality to read selected text aloud', beneath the translation-model controls. Scroll down on smaller screens.
 3. Choose a voice for the 'Text language' and click 'Download voice'. 'Settings' shows its download size (roughly 63–114 MB); progress includes percentage, transferred bytes, speed, elapsed time, an estimated remaining time and waiting-for-data feedback. Checking and verification use separate stages, so reaching 100% transferred does not claim the voice is ready before verification completes. The download can be cancelled and retried.
-4. Use 'Hear sample' to preview it. All 25 text-language choices have a local voice, with 26 voices including US/UK English. Portuguese (Portugal) and Portuguese (Brazil) each have a matching voice. The app remembers your choice for each language. Japanese uses a separate OpenJTalk frontend installed during setup; no Windows voice pack is required.
+4. Use 'Hear sample' to preview it. All 25 text-language choices have a local voice, with 26 voices including US/UK English. Portuguese (Portugal) and Portuguese (Brazil) each have a matching voice. The app remembers your choice for each language. Japanese also downloads its optional pronunciation pack; no Windows voice pack is required.
 5. Capture some text and click 'Read selection' in the review panel. This reads the original OCR text, not the translation, and is available before translation finishes. 'Cancel audio' stops preparation; 'Stop audio' stops playback. Closing the screenshot also stops speech.
 
 The 'Pronunciation speed' slider in the review panel ranges from 0.5× to 1.5×. It changes synthesis duration, not playback pitch, and applies to samples, words and sentences; the choice is remembered. When focused, the slider's left and right arrow keys adjust speed instead of browsing words. The first playback prepares audio locally; replaying the same text, voice and speed within that window reuses it. Nothing plays automatically. There is a 2,000-character limit per selection. OCR errors and ambiguous words can still cause pronunciation errors, so treat the voice as a learning aid rather than an authoritative pronunciation guide. Technical synthesis checks are not native-speaker listening validation.
@@ -74,7 +81,7 @@ Voices live in `%LOCALAPPDATA%\LanguageLens\voices`, independently of translatio
 
 ## Word pronunciation and optional IPA
 
-In Settings, enable 'Show IPA in word popups' to display optional phonetic details. It is off by default and independent of the audio checkbox. Notation uses the selected voice's accent and works without downloading that voice's audio model; it uses the pronunciation components already installed with the app. Audited IPA display conventions cover US/UK English and Portuguese from Portugal/Brazil. Other languages preserve the frontend output and explicitly label it 'Engine notation'; English stress/syllabification rules are not imposed on them. Japanese word readings are isolated, and its engine pitch cues are not advertised as conventional IPA or reliable contextual pitch accent.
+In Settings, enable 'Show IPA in word popups' to display optional phonetic details. It is off by default and independent of the audio checkbox. Notation uses the selected voice's accent and works without downloading that voice's audio model; it uses local pronunciation components, including the optional Japanese pronunciation pack when Japanese is selected. Audited IPA display conventions cover US/UK English and Portuguese from Portugal/Brazil. Other languages preserve the frontend output and explicitly label it 'Engine notation'; English stress/syllabification rules are not imposed on them. Japanese word readings are isolated, and its engine pitch cues are not advertised as conventional IPA or reliable contextual pitch accent.
 
 Hover over a word to see its translation, IPA (when enabled), accent and 'Pronounce word' button (when audio is enabled and the voice is installed). Move onto the popup to use its controls, or click the highlighted word to keep the popup open. Click another word to switch; click outside or use '×' to dismiss it. IPA can be selected and copied. Escape still closes the entire screenshot, including when a popup button has focus.
 
@@ -86,7 +93,7 @@ Generated IPA is shown in square brackets and labelled 'Estimated IPA', not as a
 
 Mapping from sentence context does not guarantee linguistic correctness. In particular, the tested engine can give the same pronunciation to present and past-tense English *read*, and names, code-switching and OCR mistakes remain difficult. The [IPA audit](docs/ipa-audit.md) records conventions, safeguards, tests and remaining limitations.
 
-Pronunciation preparation and playback are cancelled when the screenshot closes. No audio plays on hover, and there is no added download, cloud service or Windows voice-pack requirement for IPA.
+Pronunciation preparation and playback are cancelled when the screenshot closes. No audio plays on hover. Japanese phonetic notation needs its optional pronunciation pack, which can be downloaded with audio turned off. Other languages use the bundled pronunciation runtime; no cloud service or Windows voice pack is required.
 
 Lens does not pause or resume other applications and never sends them synthetic keystrokes. Pause a game manually before capturing if needed; otherwise it continues running behind the frozen screenshot. Escape closes Lens's screenshot only. Closing the selector (including Alt+F4) cancels capture and leaves Lens ready for the next capture.
 
@@ -108,7 +115,7 @@ cd "C:\Users\Fillask\Desktop\GitHub repos\LanguageLens"
 
 `run.ps1` launches with `pythonw.exe` and exits immediately, so it does not leave a PowerShell window open.
 
-The first setup is large because the local OCR and translation runtimes include neural-network dependencies and Japanese pronunciation dictionaries. Capture does not download assets: use 'Download required files' for each source/target pair first. This single setup action handles missing translation, OCR and sentence-boundary files; uncommon pairs are routed through English when both legs are available. An installed translation route is not the same as complete offline readiness.
+The source setup remains large because local OCR and translation include neural-network dependencies. The portable preview trims that runtime; Japanese/Chinese dictionaries and Japanese pronunciation are optional packs. Capture does not download assets: use 'Download required files' for each source/target pair first. This single setup action handles missing translation, OCR and sentence-boundary files; uncommon pairs are routed through English when both legs are available. An installed translation route is not the same as complete offline readiness.
 
 Translation-model downloads show a byte-based progress bar, percentage, transferred/total size, recent download speed, and estimated time remaining. If the server does not provide a total size, the app shows transferred bytes and speed without inventing a percentage. A waiting-for-data message flags stalled transfers; connection/read timeouts trigger visible retries. Checking the model archive and installing it are separate stages with elapsed time. Routes needing two models show progress for each model separately, and complete cached downloads are verified and reused.
 
@@ -136,6 +143,10 @@ Configuration writes are atomic and malformed values fall back to defaults. Rota
 
 ## Tests
 
+For the complete multilingual source suite, install the developer and optional
+language dependencies first (`pip install -e ".[dev,language-packs]"`). The normal
+launcher installs the core; it does not install optional language packs for tests.
+
 ```powershell
 .\.venv\Scripts\python.exe -m pytest
 ```
@@ -146,7 +157,7 @@ Translation-model tests cover streamed byte progress, missing file sizes, trunca
 
 Technical repair regressions cover staged model inference, atomic version replacement and crash recovery, duplicate removal, archive collisions, persistent downloads, runtime readiness changes, incremental translation, OCR worker geometry, background crop staging, cancellation and window destruction. `scripts/verify-model-replacement.py --model PATH` checks real staged inference, rejected broken replacements, version selection and recoverable removal using isolated copies of an existing Argos package. See [technical repair results](docs/technical-repairs-2026-10-06.md).
 
-The tested Windows x64/Python 3.10 dependency snapshot is in `constraints/windows-python310.txt`. To recreate those installed runtime/dev versions, use `python -m pip install -c constraints/windows-python310.txt -e ".[dev]"` in a Python 3.10 environment. This snapshot is not a cross-platform lockfile; the usual setup remains available for other supported Python versions.
+The tested Windows x64/Python 3.10 dependency snapshot is in `constraints/windows-python310.txt`. To recreate those installed runtime/dev versions, use `python -m pip install -c constraints/windows-python310.txt -e ".[dev,language-packs]"` in a Python 3.10 environment. This snapshot is not a cross-platform lockfile; the usual setup remains available for other supported Python versions.
 
 OCR colour tests cover screenshot pixel formats, padded image rows, grayscale, buffer ownership, and the installed RapidOCR image loader on normal/native scans and retries.
 

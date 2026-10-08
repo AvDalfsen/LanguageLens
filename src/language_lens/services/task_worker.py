@@ -10,16 +10,24 @@ from pathlib import Path
 import sys
 
 from language_lens.config import validate_settings
-from language_lens.services.offline import no_network, local_sentencizers, prepare
+from language_lens.services.offline import no_network, prepare
 
 
 def execute(command, payload, scratch, emit):
     settings = validate_settings(payload["settings"])
     source, target = settings.source_language, settings.target_language
-    from language_lens.services.translation import ArgosTranslator
-    translator = ArgosTranslator()
+    from language_lens.services import language_packs as packs
     report = lambda text: emit({"progress": text})
     progress = lambda item: emit({"download": asdict(item)})
+    if command in ("pack-install", "pack-remove"):
+        pack = payload["pack"]
+        if command == "pack-install":
+            packs.install(pack, report, progress)
+        else:
+            packs.remove(pack)
+        return
+    from language_lens.services.translation import ArgosTranslator
+    translator = ArgosTranslator()
     if command == "status":
         from language_lens.services.offline import offline_ready
         ready, route = False, []
@@ -28,7 +36,7 @@ def execute(command, payload, scratch, emit):
             packages = translator.route(source, target)
             route = [packages[0].from_code, *(item.to_code for item in packages)] if packages else [source]
         emit({"result": {"source": source, "target": target, "ready": ready,
-                          "route": route, "prepared": offline_ready(source, target)}})
+                          "route": route, "prepared": offline_ready(source, target), "packs": packs.inventory()}})
         return
     if command in ("install", "repair", "remove", "prepare"):
         package, _backend = translator._modules()
@@ -78,7 +86,7 @@ def execute(command, payload, scratch, emit):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("command", choices=("status", "ocr", "translate", "more", "install", "prepare", "repair", "remove"))
+    parser.add_argument("command", choices=("status", "ocr", "translate", "more", "install", "prepare", "repair", "remove", "pack-install", "pack-remove"))
     parser.add_argument("--scratch", type=Path, required=True)
     args = parser.parse_args()
     output = sys.stdout
@@ -93,10 +101,9 @@ def main():
             with redirect_stdout(discard), redirect_stderr(discard):
                 from language_lens.services.diagnostics import initialize
                 initialize(f"worker-{args.command}")
-                online = args.command in ("install", "prepare", "repair", "remove")
+                online = args.command in ("install", "prepare", "repair", "remove", "pack-install", "pack-remove")
                 with nullcontext() if online else no_network():
-                    with nullcontext() if online or args.command in ("ocr", "status") else local_sentencizers():
-                        execute(args.command, payload, args.scratch, emit)
+                    execute(args.command, payload, args.scratch, emit)
             emit({"ok": True})
             return 0
         except Exception as exc:
