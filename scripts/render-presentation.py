@@ -47,23 +47,24 @@ def main():
     icon.save(source.with_suffix(".ico"), sizes=[(16, 16), (24, 24), (32, 32), (48, 48), (64, 64), (128, 128), (256, 256)])
 
     # The source content and translations are deliberately supplied demo fixtures.
-    width, height = 1280, 760
+    # Frame the demonstration around the 620px review panel rather than a desktop.
+    width, height = 700, 720
     page = QPixmap(width, height)
     page.fill(QColor("#182638"))
     painter = QPainter(page)
     painter.setRenderHint(QPainter.RenderHint.Antialiasing)
     painter.setPen(Qt.PenStyle.NoPen)
     painter.setBrush(QColor("#22384c"))
-    painter.drawRoundedRect(52, 52, 1176, 656, 24, 24)
+    painter.drawRoundedRect(22, 22, width - 44, height - 44, 24, 24)
     painter.setPen(QColor("#5eead4"))
     painter.setFont(QFont("Segoe UI", 12, QFont.Weight.DemiBold))
-    painter.drawText(86, 100, "READING PRACTICE  /  PORTUGUESE")
+    painter.drawText(54, 100, "READING PRACTICE  /  PORTUGUESE")
     painter.setPen(QColor("#e8eef8"))
     painter.setFont(QFont("Segoe UI", 27, QFont.Weight.DemiBold))
-    painter.drawText(86, 169, "A story in a few words")
+    painter.drawText(54, 169, "A story in a few words")
     painter.setPen(QColor("#bacbda"))
     painter.setFont(QFont("Segoe UI", 14))
-    painter.drawText(86, 215, "Explore unfamiliar text without leaving the sentence behind.")
+    painter.drawText(54, 215, "Explore words with the whole sentence in view.")
     text = "Estas palavras contam uma história."
     font = QFont("Segoe UI")
     font.setPixelSize(30)
@@ -71,13 +72,13 @@ def main():
     painter.setPen(QColor("#ffffff"))
     metrics = QFontMetrics(font)
     text_width = metrics.horizontalAdvance(text)
-    painter.drawText(88, 302, text)
+    painter.drawText(56, 302, text)
     painter.setFont(QFont("Segoe UI", 11))
     painter.setPen(QColor("#bacbda"))
-    painter.drawText(86, 663, "Language Lens  ·  Illustrated example")
+    painter.drawText(54, 663, "Language Lens  ·  Illustrated example")
     painter.end()
     frames = [image_copy(page)]
-    selection = QRect(80, 268, text_width + 18, 45)
+    selection = QRect(48, 268, text_width + 18, 45)
     selecting = page.copy()
     painter = QPainter(selecting)
     painter.fillRect(selecting.rect(), QColor(0, 0, 0, 55))
