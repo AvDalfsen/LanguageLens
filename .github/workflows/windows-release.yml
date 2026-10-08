@@ -42,7 +42,7 @@ jobs:
           .\.release-env\Scripts\python.exe -m pip install `
             --no-build-isolation `
             -c .\constraints\windows-python310.txt `
-            -e ".[dev]"
+            -e ".[dev,language-packs]"
 
       - name: Run source tests
         shell: pwsh
