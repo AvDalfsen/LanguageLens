@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: "Release version, for example 0.1.1"
+        description: "Version to build and release, for example 0.1.1"
         required: true
         type: string
 
@@ -39,38 +39,38 @@ jobs:
           .\.release-env\Scripts\python.exe -m pip install `
             -r .\packaging\requirements-build.txt
 
+      - name: Determine application version
+        shell: pwsh
+        env:
+          REQUESTED_VERSION: ${{ inputs.version }}
+        run: |
+          $versionArguments = @()
+          if ($env:GITHUB_EVENT_NAME -eq "workflow_dispatch") {
+            $versionArguments = @("--version", $env:REQUESTED_VERSION)
+          }
+
+          $version = & .\.release-env\Scripts\python.exe `
+            .\scripts\set-release-version.py @versionArguments
+
+          if ($LASTEXITCODE -ne 0) {
+            throw "Could not set the application version."
+          }
+
+          "RELEASE_VERSION=$version" |
+            Out-File $env:GITHUB_ENV -Encoding utf8 -Append
+
+      - name: Install application and test dependencies
+        shell: pwsh
+        run: |
           .\.release-env\Scripts\python.exe -m pip install `
             --no-build-isolation `
             -c .\constraints\windows-python310.txt `
-            -e ".[dev]"
+            -e ".[dev,language-packs]"
 
       - name: Run source tests
         shell: pwsh
         run: |
           .\.release-env\Scripts\python.exe -m pytest -q
-
-      - name: Determine application version
-        shell: pwsh
-        run: |
-          $line = Get-Content .\pyproject.toml |
-            Where-Object { $_ -match '^version = "([^"]+)"$' } |
-            Select-Object -First 1
-
-          if (-not $line -or $line -notmatch '^version = "([^"]+)"$') {
-            throw "Could not read the version from pyproject.toml."
-          }
-
-          $version = $Matches[1]
-
-          if (
-            "${{ github.event_name }}" -eq "workflow_dispatch" -and
-            "${{ inputs.version }}" -ne $version
-          ) {
-            throw "Requested version ${{ inputs.version }} does not match pyproject.toml version $version."
-          }
-
-          "RELEASE_VERSION=$version" |
-            Out-File $env:GITHUB_ENV -Encoding utf8 -Append
 
       - name: Build portable package
         shell: pwsh
@@ -113,7 +113,7 @@ jobs:
 
           gh release view $tag 2>$null
           if ($LASTEXITCODE -eq 0) {
-            throw "Release $tag already exists. Increase the version in pyproject.toml."
+            throw "Release $tag already exists. Run the workflow with an unused version."
           }
 
           $zip = Get-ChildItem "$env:RUN_ROOT\*.zip" |

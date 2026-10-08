@@ -39,6 +39,25 @@ a prepared environment with `-Python <build-env>\Scripts\python.exe
 versions. Reuse refreshes the application package and catalogs without reinstalling
 third-party dependencies. The default remains a fresh environment.
 
+## GitHub builds and releases
+
+Pushes to `main` run the source tests and build a portable ZIP, available as a
+workflow artifact. These builds use the version in `pyproject.toml`.
+
+For a draft release, open **Actions → Build Windows release → Run workflow**,
+select the branch, and enter a version such as `0.1.1`. The workflow stamps
+that version into `pyproject.toml` and `src/language_lens/__init__.py` in the
+CI checkout before installing the application. Package metadata, the ZIP
+filename, reports, and the draft release tag (`v0.1.1`) use that version.
+The input accepts Python package versions, including prereleases such as
+`0.1.1rc1`; invalid input stops the build.
+
+Version stamping applies to that build. It does not commit a version bump back
+to the repository. To change the default version for subsequent push or local
+builds, update the source version declarations and commit them. Choose an unused
+version for each manual release. After reviewing the draft and its assets,
+publish it from the repository's Releases page.
+
 ## Packaging decisions
 
 The PyInstaller spec creates a windowed GUI and a console helper. The helper
