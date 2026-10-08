@@ -78,9 +78,12 @@ cancellation, timeouts and scratch cleanup retain their existing supervision.
 
 The windowed uninstaller validates a fixed release marker and expected executable
 layout, refuses to run while the app owns its instance lock, and schedules
-deletion from Windows PowerShell after its own process exits. Paths cross that
-process boundary as base64-encoded JSON rather than executable text. Application
-data is removed by default. Shared Argos translation data has a separate warning
+deletion from a hidden Windows PowerShell process after its own process exits.
+The helper must acknowledge startup before the final dialog appears. It retries
+briefly locked files and records remaining paths and errors in a temporary
+`LanguageLens-uninstall-*` diagnostic directory; a failed deletion also displays
+an error. Paths cross that process boundary as base64-encoded JSON rather than
+executable text. Application data is removed by default. Shared Argos translation data has a separate warning
 and choice because another Argos-based application may use it.
 
 The spec collects only the imported Qt modules and required native dependencies.

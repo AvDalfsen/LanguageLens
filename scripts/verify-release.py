@@ -70,8 +70,9 @@ def main():
                                          creationflags=subprocess.CREATE_NO_WINDOW)
             result["uninstaller_exit_code"] = uninstaller.returncode
             if uninstaller.returncode:
-                raise RuntimeError("Bundled uninstaller safety check failed")
+                raise RuntimeError("Bundled uninstaller cleanup check failed")
             result["uninstaller"] = True
+            result["uninstaller_cleanup"] = True
             if args.language_packs:
                 # Delete only this verifier's private copies through the real
                 # maintenance protocol; prove that the core still operates.
