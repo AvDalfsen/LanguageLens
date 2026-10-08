@@ -6,8 +6,8 @@ import os
 import sys
 
 from PySide6.QtCore import QObject, QTimer, Signal
-from PySide6.QtGui import QAction, QCursor, QIcon
-from PySide6.QtWidgets import QApplication, QMenu, QMessageBox, QStyle, QSystemTrayIcon
+from PySide6.QtGui import QAction, QCursor
+from PySide6.QtWidgets import QApplication, QMenu, QMessageBox, QSystemTrayIcon
 
 from language_lens.config import Settings, load_settings, save_settings
 from language_lens.services.capture import capture_desktop
@@ -17,6 +17,7 @@ from language_lens.ui.review import ReviewWindow
 from language_lens.ui.selection import SelectionOverlay
 from language_lens.ui.setup import SetupWindow
 from language_lens.ui.style import LensStyle
+from language_lens.ui.identity import app_icon
 from language_lens.services.diagnostics import initialize, record_failure
 from language_lens.services.instance import SingleInstance
 from language_lens.services.offline import offline_ready
@@ -94,6 +95,8 @@ QPushButton {
     padding: 9px 15px;
 }
 QPushButton:hover { background: #2a3d59; }
+QPushButton#secondaryButton { background: #111e32; color: #b8c6da; border-color: #233651; }
+QPushButton#secondaryButton:hover { background: #21314a; color: #e8eef8; }
 QPushButton:disabled { color: #6f7b8d; background: #152136; }
 QPushButton#primaryButton {
     background: #0f9f94;
@@ -181,7 +184,8 @@ class LensController(QObject):
         self.setup.closed_to_tray.connect(self._closed_to_tray)
         self.setup.visibility_changed.connect(self._settings_visibility_changed)
 
-        icon = self.setup.style().standardIcon(QStyle.StandardPixmap.SP_ComputerIcon)
+        icon = app_icon()
+        self.app.setWindowIcon(icon)
         self.setup.setWindowIcon(icon)
         self.tray = QSystemTrayIcon(icon, self)
         self.tray.setToolTip("Language Lens")
@@ -199,6 +203,9 @@ class LensController(QObject):
         menu.addAction(capture_action)
         menu.addAction(settings_action)
         menu.addAction(self._listening_action)
+        help_action = QAction("Help and about", menu)
+        help_action.triggered.connect(self.show_help)
+        menu.addAction(help_action)
         menu.addSeparator()
         menu.addAction(quit_action)
         self.tray.setContextMenu(menu)
@@ -217,6 +224,10 @@ class LensController(QObject):
         self.setup.show()
         self.setup.raise_()
         self.setup.activateWindow()
+
+    def show_help(self) -> None:
+        self.show_settings()
+        self.setup.show_help()
 
     def _save_window_preferences(self) -> None:
         current = self.setup.current_settings()

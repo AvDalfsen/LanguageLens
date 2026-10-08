@@ -1,0 +1,12 @@
+{
+  "description": "Offline screen translator for language learning on Windows. Explore words, sentence translations, and pronunciation from a screenshot.",
+  "homepage": "https://github.com/AvDalfsen/LanguageLens/blob/main/docs/README.md",
+  "topics": [
+    "language-learning",
+    "ocr",
+    "screen-translator",
+    "offline",
+    "windows",
+    "translation"
+  ]
+}

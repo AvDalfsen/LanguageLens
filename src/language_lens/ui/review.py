@@ -704,8 +704,11 @@ class ReviewWindow(QWidget):
         self.collapse_translation.clicked.connect(self._toggle_translation)
         self.collapse_translation.setEnabled(False)
         self._translation_hidden = False
-        self._action_buttons = (self.retry_ocr, self.reselect, self.copy_button,
-                self.read_button, self.retry_translation, self.collapse_translation)
+        self.read_button.setObjectName("primaryButton")
+        for button in (self.collapse_translation, self.retry_ocr, self.retry_translation):
+            button.setObjectName("secondaryButton")
+        self._action_buttons = (self.read_button, self.copy_button, self.reselect,
+                self.collapse_translation, self.retry_ocr, self.retry_translation)
         self._button_grid = button_row
         self._action_columns = 3
         self._close_button = close_button

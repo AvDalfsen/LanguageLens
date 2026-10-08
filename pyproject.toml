@@ -34,7 +34,7 @@ language-lens = "language_lens.app:main"
 where = ["src"]
 
 [tool.setuptools.package-data]
-language_lens = ["data/*.json"]
+language_lens = ["data/*.json", "assets/*.svg", "assets/*.ico"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

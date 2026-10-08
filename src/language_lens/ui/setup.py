@@ -32,6 +32,8 @@ from language_lens.services.availability import Availability
 from language_lens.services.diagnostics import open_folder
 from language_lens.ui.pronunciation import PronunciationSettings
 from language_lens.ui.style import set_help
+from language_lens.ui.help import HelpDialog
+from language_lens.ui.identity import app_icon
 from language_lens.ui.hotkey import CaptureHotkeyEdit
 from language_lens.ui.progress import TransferMetrics
 from language_lens.ui.sections import ExpandableSection
@@ -52,6 +54,8 @@ class SetupWindow(QMainWindow):
     def __init__(self, settings: Settings) -> None:
         super().__init__()
         self.setWindowTitle("Language Lens")
+        self.setWindowIcon(app_icon())
+        self._help_dialog = None
         self._size_initialized = False
         self._auto_sizing = False
         size = settings.settings_window_size
@@ -99,8 +103,8 @@ class SetupWindow(QMainWindow):
         title = QLabel("Language Lens")
         title.setObjectName("title")
         intro = QLabel(
-            "Take a screenshot, read it with local OCR, and hover over words to see "
-            "their translations. No screenshot or text is sent to a server."
+            "Explore the text on your screen, one word or a whole sentence at a time. "
+            "Everything is processed on your computer."
         )
         intro.setWordWrap(True)
         intro.setObjectName("intro")
@@ -277,7 +281,10 @@ class SetupWindow(QMainWindow):
             "Closing or cancelling the screenshot returns to 'Settings'."
         )
 
+        self.help_button = QPushButton("Help and about")
+        self.help_button.clicked.connect(self.show_help)
         button_row = QHBoxLayout()
+        button_row.addWidget(self.help_button)
         button_row.addWidget(self.try_button)
         button_row.addStretch()
         button_row.addWidget(self.start_button)
@@ -286,11 +293,8 @@ class SetupWindow(QMainWindow):
         buttons.setLayout(button_row)
 
         note = QLabel(
-            "Lens always runs OCR and translation locally. Use 'Download required files' before your first capture. "
-            "Downloads occur only when requested; "
-            "capture never downloads assets. Voices are separate downloads. Lens does not pause other applications; "
-            "pause manually before capturing if needed. Borderless-windowed games "
-            "are the most reliable."
+            "Pause games manually before capturing. Borderless-windowed apps work best. "
+            "Closing 'Settings' keeps Lens running in the tray."
         )
         note.setWordWrap(True)
         note.setObjectName("note")
@@ -342,6 +346,12 @@ class SetupWindow(QMainWindow):
 
     def _place_file_check(self, optional: bool) -> None:
         """Only a needed next action belongs outside optional maintenance."""
+        self.prepare_button.setObjectName("" if optional else "primaryButton")
+        self.start_button.setObjectName("primaryButton" if optional else "")
+        for button in (self.prepare_button, self.start_button):
+            button.style().unpolish(button)
+            button.style().polish(button)
+            button.update()
         self._required_actions.removeWidget(self.prepare_button)
         self._maintenance_layout.removeWidget(self.prepare_button)
         if optional:
@@ -360,9 +370,15 @@ class SetupWindow(QMainWindow):
         order.extend((self.repair_button, self.remove_button, self.pack_choice, self.pack_install, self.pack_remove, self.technical_details.toggle,
                       self.pronunciation.enabled, self.pronunciation.show_ipa, self.pronunciation.voices,
                       self.pronunciation.install, self.pronunciation.preview, self.pronunciation.details,
-                      self.try_button, self.start_button))
+                      self.help_button, self.try_button, self.start_button))
         for before, after in zip(order, order[1:]):
             QWidget.setTabOrder(before, after)
+
+    def show_help(self) -> None:
+        if self._help_dialog is None:
+            self._help_dialog = HelpDialog(self)
+        self._help_dialog.open()
+        self._help_dialog.raise_()
 
     @staticmethod
     def _select_data(combo: QComboBox, value: str) -> None:
@@ -456,9 +472,9 @@ class SetupWindow(QMainWindow):
         row_margins = self._button_row.contentsMargins()
         horizontal_minimum = (
             sum(max(button.minimumWidth(), button.minimumSizeHint().width())
-                for button in (self.try_button, self.start_button))
+                for button in (self.help_button, self.try_button, self.start_button))
             + row_margins.left() + row_margins.right()
-            + max(0, self._button_row.spacing()) * 2
+            + max(0, self._button_row.spacing()) * 3
         )
         self._button_row.setDirection(
             QBoxLayout.Direction.TopToBottom if inner_width < horizontal_minimum

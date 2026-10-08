@@ -8,6 +8,12 @@ from PyInstaller.config import CONF
 
 root = Path(SPECPATH).parent
 datas = collect_data_files("language_lens")
+datas += [(str(root / "docs"), "language_lens/help/docs"),
+          (str(root / "README.md"), "language_lens/help"),
+          (str(root / "CONTRIBUTING.md"), "language_lens/help"),
+          (str(root / "prototypes" / "pronunciation" / "README.md"), "language_lens/help/prototypes/pronunciation"),
+          (str(root / "LICENSE"), "language_lens/help"),
+          (str(root / "THIRD_PARTY_SPEECH.md"), "language_lens/help")]
 datas += [(str(root / "packaging" / "portable-release.json"), ".")]
 for package in ("piper", "minisbd"):
     datas += collect_data_files(package)
@@ -44,9 +50,11 @@ for destination, source, kind in a.binaries:
 pyz = PYZ(a.pure)
 options = [("X utf8", None, "OPTION")]
 gui = EXE(pyz, a.scripts, options, exclude_binaries=True, name="LanguageLens",
-          console=False, debug=False, strip=False, upx=False)
+          console=False, debug=False, strip=False, upx=False,
+          icon=str(root / "src" / "language_lens" / "assets" / "language-lens.ico"))
 worker = EXE(pyz, a.scripts, options, exclude_binaries=True, name="LanguageLensWorker",
              console=True, debug=False, strip=False, upx=False)
 uninstaller = EXE(pyz, a.scripts, options, exclude_binaries=True, name="LanguageLensUninstall",
-                  console=False, debug=False, strip=False, upx=False)
+                  console=False, debug=False, strip=False, upx=False,
+                  icon=str(root / "src" / "language_lens" / "assets" / "language-lens.ico"))
 COLLECT(gui, worker, uninstaller, a.binaries, a.datas, name="LanguageLens", strip=False, upx=False)

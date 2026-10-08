@@ -132,7 +132,24 @@ jobs:
           $previousRelease = $publishedJson | ConvertFrom-Json | Select-Object -First 1
           $repositoryUrl = "$env:GITHUB_SERVER_URL/$env:GITHUB_REPOSITORY"
           $range = $env:GITHUB_SHA
-          $notes = @("## Commits", "")
+          $notes = @(
+            "## Windows x64 portable preview",
+            "",
+            "Download **$($zip.Name)**, extract the complete folder, and open **LanguageLens.exe**. No Python, Git, or administrator access is required.",
+            "",
+            "Choose your languages and use **Download required files** once. Voices are separate optional downloads; capture, translation, and speech then run locally.",
+            "",
+            "**Update:** Quit Lens from the tray and extract a new complete folder. Existing per-user settings and downloads are retained. Do not mix files from different releases.",
+            "",
+            "**Known limits:** This preview is unsigned; clean-machine Windows validation remains pending. Desktop and borderless-windowed capture work best. Lens does not pause other apps.",
+            "",
+            "[Getting started]($repositoryUrl/blob/$tag/docs/getting-started.md) · [Language support]($repositoryUrl/blob/$tag/docs/languages.md) · [Troubleshooting]($repositoryUrl/blob/$tag/docs/troubleshooting.md)",
+            "",
+            "## Changes",
+            "",
+            "<!-- Before publishing, replace this comment with a short user-facing summary. -->",
+            ""
+          )
 
           if ($previousRelease) {
             $previousTag = $previousRelease.tagName

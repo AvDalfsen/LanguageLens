@@ -35,7 +35,7 @@ class PronunciationSettings(QFrame):
         self._progress_timer = QTimer(self)
         self._progress_timer.setInterval(250)
         self._progress_timer.timeout.connect(self._update_download_metrics)
-        self.enabled = QCheckBox("Enable functionality to read selected text aloud")
+        self.enabled = QCheckBox("Enable read aloud")
         self.enabled.setChecked(settings.speech_enabled)
         set_help(self.enabled,
             "Enable buttons to read the original selected text and individual words aloud, not "
@@ -43,7 +43,7 @@ class PronunciationSettings(QFrame):
             "plays automatically when you hover. Download a matching voice once for offline "
             "playback; disabling audio does not disable translation or the optional IPA display."
         )
-        self.show_ipa = QCheckBox("Show IPA in word popups")
+        self.show_ipa = QCheckBox("Show pronunciation notation (IPA)")
         self.show_ipa.setChecked(settings.show_ipa)
         set_help(self.show_ipa,
             "Show estimated International Phonetic Alphabet transcriptions for the selected accent. "

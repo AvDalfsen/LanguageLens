@@ -1,0 +1,41 @@
+name: Report a problem
+description: Help reproduce a capture, translation, pronunciation, or setup problem.
+title: "[Bug]: "
+labels: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Check the [troubleshooting guide](https://github.com/AvDalfsen/LanguageLens/blob/main/docs/troubleshooting.md) first. Please omit private screenshots and temporary image jobs; sanitized logs are useful.
+  - type: input
+    id: version
+    attributes:
+      label: App version and build
+      description: Include portable or source; the next build shows the version in Help and about.
+      placeholder: "v0.1.2 portable"
+    validations:
+      required: true
+  - type: input
+    id: system
+    attributes:
+      label: Windows version
+      placeholder: "Windows 11 x64; two monitors at 100% and 150% scaling"
+    validations:
+      required: true
+  - type: input
+    id: languages
+    attributes:
+      label: Language pair
+      placeholder: "Portuguese (Portugal) → English"
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: Include what you expected and what happened.
+    validations:
+      required: true
+  - type: textarea
+    id: diagnostics
+    attributes:
+      label: Sanitized diagnostics or other details
+      description: Logs omit captured text and images. Do not attach jobs folders; a screenshot is optional.
