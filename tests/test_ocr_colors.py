@@ -8,6 +8,7 @@ from PySide6.QtCore import QPoint, QRect, QSize
 from PySide6.QtGui import QColor, QImage, QPixmap
 
 from language_lens.config import Settings
+from language_lens.services import tasks as domain_tasks
 from language_lens.services.capture import DesktopCapture, ScreenCapture
 from language_lens.ui.review import NativeOcrTask, OcrTask, qimage_to_bgr_array
 
@@ -64,7 +65,8 @@ def test_null_image_has_a_clear_error():
 
 @pytest.mark.parametrize("native", [False, True])
 @pytest.mark.parametrize("retry", [False, True])
-def test_ocr_boundary_gets_correct_bgr_on_normal_native_and_retry_paths(monkeypatch, qapp, native, retry):
+def test_ocr_boundary_gets_correct_bgr_on_normal_native_and_retry_paths(
+        monkeypatch, qapp, tmp_path, native, retry):
     calls = []
 
     def backend(image, **kwargs):
@@ -79,6 +81,10 @@ def test_ocr_boundary_gets_correct_bgr_on_normal_native_and_retry_paths(monkeypa
             txts=["colour"] if found else [], scores=[.99] if found else [],
         )
 
+    # This test exercises the image boundary with a fake OCR backend. Keep it
+    # independent of any models downloaded into the developer's app-data folder.
+    monkeypatch.setenv("LOCALAPPDATA", str(tmp_path))
+    monkeypatch.setattr(domain_tasks, "local_ocr_parameters", lambda _language: {})
     monkeypatch.setattr(rapidocr, "RapidOCR", lambda **kwargs: backend)
     image = QImage(80, 60, QImage.Format.Format_ARGB32_Premultiplied)
     image.fill(QColor(241, 17, 83))
