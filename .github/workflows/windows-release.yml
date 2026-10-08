@@ -22,6 +22,8 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
 
       - name: Install Python
         uses: actions/setup-python@v7
@@ -120,11 +122,65 @@ jobs:
             Select-Object -First 1
           $checksum = Get-Item "$($zip.FullName).sha256"
 
+          $publishedJson = gh release list `
+            --exclude-drafts --exclude-pre-releases --limit 1 --json tagName
+
+          if ($LASTEXITCODE -ne 0) {
+            throw "Could not determine the previous published release."
+          }
+
+          $previousRelease = $publishedJson | ConvertFrom-Json | Select-Object -First 1
+          $repositoryUrl = "$env:GITHUB_SERVER_URL/$env:GITHUB_REPOSITORY"
+          $range = $env:GITHUB_SHA
+          $notes = @("## Commits", "")
+
+          if ($previousRelease) {
+            $previousTag = $previousRelease.tagName
+            git merge-base --is-ancestor "refs/tags/$previousTag" $env:GITHUB_SHA
+            if ($LASTEXITCODE -ne 0) {
+              throw "The build commit must include the previous published release $previousTag."
+            }
+            $range = "refs/tags/$previousTag..$env:GITHUB_SHA"
+            $notes += "Changes since $previousTag."
+          } else {
+            $notes += "Initial release."
+          }
+
+          $notes += ""
+          $commits = @(git -c i18n.logOutputEncoding=utf-8 log `
+            --reverse --format="%H%x09%s" $range)
+          if ($LASTEXITCODE -ne 0) {
+            throw "Could not read commits for the release."
+          }
+
+          foreach ($commit in $commits) {
+            $sha, $subject = $commit -split "`t", 2
+            $subject = [System.Net.WebUtility]::HtmlEncode($subject)
+            $subject = $subject -replace '([\\`*_\[\]])', '\$1'
+            $shortSha = $sha.Substring(0, 7)
+            $notes += "- $subject ([$shortSha]($repositoryUrl/commit/$sha))"
+          }
+
+          if ($commits.Count -eq 0) {
+            $notes += "No new commits since the previous published release."
+          }
+
+          $notes += ""
+          if ($previousRelease) {
+            $encodedTag = [uri]::EscapeDataString($previousRelease.tagName)
+            $notes += "**Full changelog:** $repositoryUrl/compare/$encodedTag...$env:GITHUB_SHA"
+          } else {
+            $notes += "**Full changelog:** $repositoryUrl/commits/$env:GITHUB_SHA"
+          }
+
+          $notesPath = Join-Path $env:RUN_ROOT "release-notes.md"
+          $notes | Set-Content -LiteralPath $notesPath -Encoding utf8
+
           gh release create $tag `
             $zip.FullName `
             $checksum.FullName `
             --target $env:GITHUB_SHA `
-            --generate-notes `
+            --notes-file $notesPath `
             --draft `
             --title "Language Lens $tag"
 

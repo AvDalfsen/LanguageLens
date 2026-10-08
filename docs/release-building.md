@@ -58,6 +58,17 @@ builds, update the source version declarations and commit them. Choose an unused
 version for each manual release. After reviewing the draft and its assets,
 publish it from the repository's Releases page.
 
+Draft release notes list commit subjects with links, covering the commits after
+the most recent published stable release's tag up to the exact build commit.
+The first release includes the full reachable history. Drafts and prereleases
+are excluded when choosing the baseline. Use descriptive commit subjects, such
+as `Fix Japanese word selection`, because those subjects become the changelog
+entries. The draft notes remain editable before publication.
+
+To add commit notes to an existing release, edit its description and save it.
+The workflow generates notes for new releases; it does not rewrite published
+release descriptions.
+
 ## Packaging decisions
 
 The PyInstaller spec creates a windowed GUI and a console helper. The helper
