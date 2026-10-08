@@ -1,0 +1,133 @@
+name: Build Windows release
+
+on:
+  push:
+    branches:
+      - main
+
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Release version, for example 0.1.1"
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: windows-2022
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+
+      - name: Install Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.10.6"
+          architecture: "x64"
+
+      - name: Prepare build environment
+        shell: pwsh
+        run: |
+          python -m venv .release-env
+
+          .\.release-env\Scripts\python.exe -m pip install "pip==26.2.1"
+
+          .\.release-env\Scripts\python.exe -m pip install `
+            -r .\packaging\requirements-build.txt
+
+          .\.release-env\Scripts\python.exe -m pip install `
+            --no-build-isolation `
+            -c .\constraints\windows-python310.txt `
+            -e ".[dev]"
+
+      - name: Run source tests
+        shell: pwsh
+        run: |
+          .\.release-env\Scripts\python.exe -m pytest -q
+
+      - name: Determine application version
+        shell: pwsh
+        run: |
+          $line = Get-Content .\pyproject.toml |
+            Where-Object { $_ -match '^version = "([^"]+)"$' } |
+            Select-Object -First 1
+
+          if (-not $line -or $line -notmatch '^version = "([^"]+)"$') {
+            throw "Could not read the version from pyproject.toml."
+          }
+
+          $version = $Matches[1]
+
+          if (
+            "${{ github.event_name }}" -eq "workflow_dispatch" -and
+            "${{ inputs.version }}" -ne $version
+          ) {
+            throw "Requested version ${{ inputs.version }} does not match pyproject.toml version $version."
+          }
+
+          "RELEASE_VERSION=$version" |
+            Out-File $env:GITHUB_ENV -Encoding utf8 -Append
+
+      - name: Build portable package
+        shell: pwsh
+        run: |
+          powershell -NoProfile -ExecutionPolicy Bypass `
+            -File .\scripts\build-release.ps1 `
+            -Python .\.release-env\Scripts\python.exe `
+            -UseExistingEnvironment
+
+          $run = Get-ChildItem .\artifacts\releases -Directory |
+            Sort-Object LastWriteTime -Descending |
+            Select-Object -First 1
+
+          if (-not $run) {
+            throw "The release build did not produce an output directory."
+          }
+
+          "RUN_ROOT=$($run.FullName)" |
+            Out-File $env:GITHUB_ENV -Encoding utf8 -Append
+
+      - name: Save build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: LanguageLens-Windows-${{ github.run_number }}
+          retention-days: 14
+          path: |
+            ${{ env.RUN_ROOT }}/*.zip
+            ${{ env.RUN_ROOT }}/*.sha256
+            ${{ env.RUN_ROOT }}/verification.json
+            ${{ env.RUN_ROOT }}/size-report.md
+            ${{ env.RUN_ROOT }}/build.log
+
+      - name: Create draft GitHub release
+        if: github.event_name == 'workflow_dispatch'
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          $tag = "v$env:RELEASE_VERSION"
+
+          gh release view $tag 2>$null
+          if ($LASTEXITCODE -eq 0) {
+            throw "Release $tag already exists. Increase the version in pyproject.toml."
+          }
+
+          $zip = Get-ChildItem "$env:RUN_ROOT\*.zip" |
+            Select-Object -First 1
+          $checksum = Get-Item "$($zip.FullName).sha256"
+
+          gh release create $tag `
+            $zip.FullName `
+            $checksum.FullName `
+            --target $env:GITHUB_SHA `
+            --generate-notes `
+            --draft `
+            --title "Language Lens $tag"
+
+          if ($LASTEXITCODE -ne 0) {
+            throw "GitHub could not create the release."
+          }
