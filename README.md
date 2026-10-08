@@ -8,7 +8,7 @@
 
 Windows x64 · Portable preview · Offline after setup
 
-<p align="center">![Language Lens showing Portuguese text, its English translation, and a pinned word popup](docs/assets/review.png)</p>
+![Language Lens showing Portuguese text, its English translation, and a pinned word popup](docs/assets/review.png)
 
 *Illustrated example using sample text and supplied translations in the actual app interface. [Watch the short workflow demo](docs/assets/workflow.gif).*
 
