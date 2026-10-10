@@ -7,9 +7,10 @@ import sys
 
 from PySide6.QtCore import QObject, QTimer, Signal
 from PySide6.QtGui import QAction, QCursor
-from PySide6.QtWidgets import QApplication, QMenu, QMessageBox, QSystemTrayIcon
+from PySide6.QtWidgets import QApplication, QMenu, QSystemTrayIcon
 
 from language_lens.config import Settings, load_settings, save_settings
+from language_lens.i18n import tr, tr_message, translate_ui, MessageBox as QMessageBox
 from language_lens.services.capture import capture_desktop
 from language_lens.services.hotkey import WindowsHotkeyListener
 from language_lens.services.windows import foreground_window, restore_foreground
@@ -32,7 +33,7 @@ def persist(settings, parent=None, *, notify=True) -> bool:
     except (OSError, ValueError) as exc:
         record_failure("settings-save", exc)
         if notify:
-            QMessageBox.warning(parent, "Settings not saved", "Lens can continue, but your settings could not be saved. Check disk space and directory permissions.")
+            QMessageBox.warning(parent, tr("Settings not saved"), tr("Lens can continue, but your settings could not be saved. Check disk space and directory permissions."))
         return False
 
 
@@ -63,6 +64,7 @@ QComboBox, QKeySequenceEdit QLineEdit {
     padding: 8px 12px;
 }
 QComboBox { min-width: 250px; }
+QComboBox#uiLanguage { min-width: 140px; padding: 5px 10px; font-size: 12px; }
 QKeySequenceEdit QLineEdit { min-width: 140px; }
 QComboBox:disabled, QKeySequenceEdit QLineEdit:disabled { color: #6f7b8d; }
 QComboBox::drop-down { border: 0; width: 28px; }
@@ -95,6 +97,24 @@ QPushButton {
     padding: 9px 15px;
 }
 QPushButton:hover { background: #2a3d59; }
+QPushButton#captureButton {
+    background: #244f86;
+    border-color: #4c82bb;
+    color: #ffffff;
+}
+QPushButton#captureButton:hover { background: #2d609f; }
+QPushButton#captureButton:disabled { color: #6f7b8d; background: #152136; border-color: #314865; }
+QPushButton#helpButton {
+    background: transparent;
+    border-color: transparent;
+    color: #a9b8ce;
+    font-size: 12px;
+    padding: 8px 10px;
+}
+QPushButton#helpButton:hover { background: #111e32; color: #e8eef8; border-color: #233651; }
+QPushButton#captureButton:focus:enabled, QPushButton#helpButton:focus:enabled {
+    border: 2px solid #5eead4;
+}
 QPushButton#secondaryButton { background: #111e32; color: #b8c6da; border-color: #233651; }
 QPushButton#secondaryButton:hover { background: #21314a; color: #e8eef8; }
 QPushButton:disabled { color: #6f7b8d; background: #152136; }
@@ -190,25 +210,27 @@ class LensController(QObject):
         self.tray = QSystemTrayIcon(icon, self)
         self.tray.setToolTip("Language Lens")
         menu = QMenu()
-        capture_action = QAction("Capture now", menu)
+        capture_action = QAction(tr("Capture now"), menu)
         capture_action.setEnabled(False)
         self._capture_action = capture_action
         capture_action.triggered.connect(lambda: self.begin_capture(from_external_app=True))
-        settings_action = QAction("Settings", menu)
+        settings_action = QAction(tr("Settings"), menu)
         settings_action.triggered.connect(self.show_settings)
-        self._listening_action = QAction("Start listening", menu)
+        self._listening_action = QAction(tr("Start listening"), menu)
         self._listening_action.triggered.connect(self._toggle_tray_listening)
-        quit_action = QAction("Quit", menu)
+        quit_action = QAction(tr("Quit"), menu)
         quit_action.triggered.connect(self.quit)
         menu.addAction(capture_action)
         menu.addAction(settings_action)
         menu.addAction(self._listening_action)
-        help_action = QAction("Help and about", menu)
+        help_action = QAction(tr("Help and about"), menu)
         help_action.triggered.connect(self.show_help)
         menu.addAction(help_action)
         menu.addSeparator()
         menu.addAction(quit_action)
         self.tray.setContextMenu(menu)
+        translate_ui(menu)
+        self.setup.ui_language_changed.connect(lambda previous: translate_ui(menu, previous))
         menu.aboutToShow.connect(self._refresh_tray_listening)
         self.tray.activated.connect(self._tray_activated)
         self.tray.show()
@@ -254,8 +276,8 @@ class LensController(QObject):
 
     def _closed_to_tray(self) -> None:
         if not self._shutting_down:
-            self.tray.showMessage("Language Lens is still running",
-                "Closing 'Settings' leaves Lens in the tray. Reopen 'Settings' there, or choose 'Quit' to close Lens.",
+            self.tray.showMessage(tr("Language Lens is still running"),
+                tr("Closing 'Settings' leaves Lens in the tray. Reopen 'Settings' there, or choose 'Quit' to close Lens."),
                 QSystemTrayIcon.MessageIcon.Information, 5000)
 
     def _tray_activated(self, reason) -> None:
@@ -284,15 +306,15 @@ class LensController(QObject):
             self._desired_hotkey = None
             self.setup.set_listening(None)
             self._refresh_tray_listening()
-            QMessageBox.critical(self.setup, "Hotkey error", str(exc))
+            QMessageBox.critical(self.setup, tr("Hotkey error"), tr_message(str(exc)))
             return
         self._desired_hotkey = settings.hotkey
         self.setup.set_listening(settings.hotkey)
         self._refresh_tray_listening()
         self.setup.hide()
         self.tray.showMessage(
-            "Language Lens is ready",
-            "Press the configured hotkey anywhere, then drag around some text.",
+            tr("Language Lens is ready"),
+            tr("Press the configured hotkey anywhere, then drag around some text."),
             QSystemTrayIcon.MessageIcon.Information,
             3500,
         )
@@ -309,11 +331,11 @@ class LensController(QObject):
         listening = self._desired_hotkey is not None
         state = self.setup.availability
         self._capture_action.setEnabled(state.capture_enabled and not self._busy and not self._shutting_down)
-        self._capture_action.setToolTip(state.reason or "Take a screenshot using the selected capture area.")
-        self._listening_action.setText("Pause listening" if listening else "Start listening")
+        self._capture_action.setToolTip(tr(state.reason) if state.reason else tr("Pause games manually. The capture hotkey takes a screenshot; Escape closes it."))
+        self._listening_action.setText(tr("Pause listening") if listening else tr("Start listening"))
         self._listening_action.setEnabled(listening or (
             state.listening_enabled and not self._busy and not self._shutting_down))
-        detail = "shortcut temporarily suspended" if listening and self._listener is None else "listening" if listening else "hotkey inactive"
+        detail = tr("shortcut temporarily suspended") if listening and self._listener is None else tr("listening") if listening else tr("hotkey inactive")
         self.tray.setToolTip(f"Language Lens · {detail}")
 
     def _sync_listener(self) -> None:
@@ -340,9 +362,9 @@ class LensController(QObject):
                     self._desired_hotkey = None
                     record_failure("hotkey-restore", exc)
                     self.show_settings()
-                    QMessageBox.warning(self.setup, "Capture hotkey could not resume",
-                        "Another application may now be using the shortcut. Choose a different 'Capture hotkey', "
-                        "or click 'Start listening' to retry. 'Try a capture now' remains available.")
+                    QMessageBox.warning(self.setup, tr("Capture hotkey could not resume"),
+                        tr("Another application may now be using the shortcut. Choose a different 'Capture hotkey', "
+                        "or click 'Start listening' to retry. 'Try a capture now' remains available."))
                 else:
                     self._listener = listener
             self.setup.set_listening(self._desired_hotkey,
@@ -384,7 +406,7 @@ class LensController(QObject):
                 self._take_screenshot()
         except Exception as exc:
             self._session_finished()
-            QMessageBox.critical(self.setup, "Capture failed", str(exc))
+            QMessageBox.critical(self.setup, tr("Capture failed"), tr_message(str(exc)))
 
     def _take_screenshot(self) -> None:
         if not self._busy or self._shutting_down or self._selector or self._review:
@@ -407,7 +429,7 @@ class LensController(QObject):
         except Exception as exc:
             self._session_finished(session_id=session_id)
             self.show_settings()
-            QMessageBox.critical(self.setup, "Capture failed", str(exc))
+            QMessageBox.critical(self.setup, tr("Capture failed"), tr_message(str(exc)))
 
     def _selection_finished(self, capture, selection, session_id: int | None = None) -> None:
         if not self._busy or self._shutting_down or self._review is not None:
@@ -428,8 +450,8 @@ class LensController(QObject):
             self._session_finished()
             QMessageBox.critical(
                 self.setup,
-                "Could not open capture",
-                f"The captured image could not be opened for review.\n\n{exc}",
+                tr("Could not open capture"),
+                tr("The captured image could not be opened for review.\n\n{error}", error=exc),
             )
             return
 
@@ -559,17 +581,17 @@ def main() -> int:
             if instance.notified:
                 report_startup("ready")
                 return 0
-            report_startup("error", "Lens is already running but could not reopen 'Settings'. Use the existing tray icon, or close that instance and retry.")
+            report_startup("error", tr("Lens is already running but could not reopen 'Settings'. Use the existing tray icon, or close that instance and retry."))
             return 1
         controller = LensController(app)
     except Exception as exc:
         if instance is not None:
             instance.close()
         record_failure("startup", exc)
-        message = "Startup failed. Diagnostic files are in '%LOCALAPPDATA%/LanguageLens/logs'. " + recovery_instruction()
+        message = tr("Startup failed. Diagnostic files are in '%LOCALAPPDATA%/LanguageLens/logs'. ") + recovery_instruction()
         report_startup("error", message)
         if not os.environ.get("LANGUAGE_LENS_STARTUP_FILE"):
-            QMessageBox.critical(None, "Language Lens could not start", message)
+            QMessageBox.critical(None, tr("Language Lens could not start"), message)
         return 1
     instance.reopen.connect(controller.show_settings)
     controller.show()

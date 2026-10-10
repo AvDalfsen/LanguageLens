@@ -9,6 +9,7 @@ from PySide6.QtWidgets import (
 )
 
 from language_lens import __version__
+from language_lens.i18n import tr, translate_ui
 from language_lens.services.diagnostics import open_folder
 from language_lens.ui.identity import app_icon
 
@@ -33,7 +34,7 @@ class HelpDialog(QDialog):
     def __init__(self, parent=None, *, root: Path | None = None):
         super().__init__(parent)
         self.root = (root or documentation_root()).resolve()
-        self.setWindowTitle("Help and about — Language Lens")
+        self.setWindowTitle(tr("Help and about — Language Lens"))
         self.setWindowIcon(app_icon())
         self.setWindowModality(Qt.WindowModality.WindowModal)
         self.resize(800, 680)
@@ -53,12 +54,12 @@ class HelpDialog(QDialog):
         heading.addStretch()
         layout.addLayout(heading)
         self.topics = QComboBox()
-        self.topics.setAccessibleName("Help topic")
+        self.topics.setAccessibleName(tr("Help topic"))
         for title, name in TOPICS:
-            self.topics.addItem(title, name)
+            self.topics.addItem(tr(title), name)
         layout.addWidget(self.topics)
         self.browser = QTextBrowser()
-        self.browser.setAccessibleName("User guide")
+        self.browser.setAccessibleName(tr("User guide"))
         self.browser.setOpenLinks(False)
         self.browser.setOpenExternalLinks(False)
         option = self.browser.document().defaultTextOption()
@@ -69,15 +70,17 @@ class HelpDialog(QDialog):
         self.browser.anchorClicked.connect(self._open_link)
         layout.addWidget(self.browser, 1)
         row = QHBoxLayout()
-        diagnostics = QPushButton("Open diagnostics folder")
+        diagnostics = QPushButton(tr("Open diagnostics folder"))
         diagnostics.clicked.connect(open_folder)
         row.addWidget(diagnostics)
         buttons = QDialogButtonBox(QDialogButtonBox.StandardButton.Close)
+        buttons.button(QDialogButtonBox.StandardButton.Close).setText(tr("Close"))
         buttons.rejected.connect(self.reject)
         row.addWidget(buttons)
         layout.addLayout(row)
         self.topics.currentIndexChanged.connect(self._topic_changed)
         self._topic_changed()
+        translate_ui(self)
 
     def _topic_changed(self, *_args):
         self._load(self.root / "docs" / self.topics.currentData())

@@ -10,6 +10,10 @@
 
 The portable preview needs Windows x64; it does not need Python, Git, or administrator access. It is unsigned. Windows 10 22H2 has been exercised during development; Windows 11 is the intended primary target. Clean-machine validation remains pending.
 
+## Choose the interface language
+
+In the source app and next portable build, use **UI language** at the top right of Settings. All 25 choices are listed in their native names. The change takes effect immediately, works offline, and is saved automatically. It keeps your text language, translation target and voice settings. The longer help guides remain in English.
+
 ## Prepare your languages
 
 In Settings, choose the language written on screen under **Text language**, and the language you want to read under **Translate into**.

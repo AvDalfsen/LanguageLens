@@ -38,6 +38,14 @@ Both render offscreen examples without capturing the desktop. Presentation image
 
 Use opt-in verification scripts for real local inference and existing development fixtures. [Release verification](docs/release-building.md), [sentence splitting](docs/sentence-splitting.md), and [historical validation](docs/archive/README.md) record results and their limits. Do not use selected private text/images as committed fixtures.
 
+## Interface translations
+
+`src/language_lens/data/ui-translations.json` contains the bundled UI catalog. `english` defines messages, `sources` maps original text to message keys, and `languages` supplies every supported locale (the app uses `pb` for Brazilian Portuguese). Keep each locale complete and preserve named placeholders such as `{count}` and `{error}`. Each distinct English message must have its own key. Translate the complete meaning of tooltips, including conditions, keyboard limits, and recovery steps. Quoted control names must match their localized captions. Never map detailed help to a generic summary. The full English guides remain bundled.
+
+Use natural UI wording and a consistent form of address within each locale. Review terms in their application context: local playback runs on the user's computer, voice previews are heard, and recognition means detecting text. Keep previously reviewed wording when updating other catalog entries. The UI language dropdown sorts its native labels with a fixed Unicode collation order, so changing the interface language does not rearrange it.
+
+Native-speaker corrections are welcome. Run `tests/test_i18n.py` and relevant UI tests after edits; they check coverage, placeholders, saved preferences and live switching without changing the text-processing pair. Run `scripts/preview-ui.py` to inspect layout. Add new static captions to the catalog and use `tr()` for dynamic UI text; leave recognized text and model results untouched.
+
 ## Send a change
 
 Explain the concrete behavior changed, why it helps, and relevant validation. Keep user instructions in task-based guides and technical evidence in developer references.

@@ -14,5 +14,7 @@ def set_help(widget, text: str) -> None:
     """Use readable rich-text wrapping and enough time to read detailed help."""
     from html import escape
 
-    widget.setToolTip(f'<div style="max-width: 420px">{escape(text)}</div>')
+    from language_lens.i18n import tr
+    widget._lens_help_source = text
+    widget.setToolTip(f'<div style="max-width: 420px">{escape(tr(text))}</div>')
     widget.setToolTipDuration(30_000)

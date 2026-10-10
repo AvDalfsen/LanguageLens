@@ -51,6 +51,7 @@ class Settings:
     settings_window_maximized: bool = False
     speech_speed: float = 1.0
     tray_close_notice_shown: bool = False
+    ui_language: str = "en"
 
 
 def settings_path() -> Path:
@@ -83,7 +84,7 @@ def validate_settings(raw: object) -> Settings:
         return defaults
     values = {key: value for key, value in raw.items() if key in Settings.__dataclass_fields__}
     languages = {code for _name, code in LANGUAGES}
-    for key in ("source_language", "target_language"):
+    for key in ("source_language", "target_language", "ui_language"):
         if not isinstance(values.get(key), str) or values[key] not in languages:
             values[key] = getattr(defaults, key)
     try:

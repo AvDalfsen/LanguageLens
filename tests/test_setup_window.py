@@ -202,7 +202,7 @@ def test_option_help_covers_behaviour_and_tradeoffs(window_factory):
     assert all(control.toolTipDuration() == 30_000 for control in controls)
     assert "less memory" in window.capture_scope.toolTip()
     assert "other monitors uncovered" in window.capture_scope.toolTip()
-    assert "does not improve translation accuracy" in window.capture_scope.toolTip()
+    assert "reduces screenshot/rendering work" in window.capture_scope.toolTip()
 
 
 def test_local_file_and_maintenance_labels_do_not_imply_online_mode_or_detected_fault(window_factory):

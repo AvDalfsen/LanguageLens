@@ -5,6 +5,7 @@ from PySide6.QtGui import QCloseEvent, QColor, QKeyEvent, QMouseEvent, QPainter,
 from PySide6.QtWidgets import QWidget
 
 from language_lens.services.capture import DesktopCapture
+from language_lens.i18n import tr
 
 
 class SelectionOverlay(QWidget):
@@ -17,7 +18,7 @@ class SelectionOverlay(QWidget):
         self._start: QPoint | None = None
         self._end: QPoint | None = None
         self._finished = False
-        self._hint = "Drag around the text • Esc cancels"
+        self._hint = tr("Drag around the text • Esc cancels")
         rectangles = capture.monitor_rects or (capture.rect,)
         self._viewport = QRect(rectangles[0])
         self._tiles: list[_SelectionTile] = []
@@ -102,7 +103,7 @@ class SelectionOverlay(QWidget):
         monitors = self._capture.monitor_rects
         on_monitor = not monitors or any(selection.intersects(rect) for rect in monitors)
         if not on_monitor:
-            self._hint = "Select text on a monitor, not in the desktop gap • Esc cancels"
+            self._hint = tr("Select text on a monitor, not in the desktop gap • Esc cancels")
         if on_monitor and selection.width() >= 12 and selection.height() >= 12:
             # Mark success before closing so closeEvent cannot also cancel it.
             self._finished = True

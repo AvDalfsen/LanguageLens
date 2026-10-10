@@ -4,7 +4,11 @@
 
 ## Language choices
 
-Choose the language written on screen under **Text language**, and the language you know under **Translate into**. The UI currently uses English; these choices control text processing, not the interface language.
+Choose the language written on screen under **Text language**, and the language you know under **Translate into**. These choices control text processing. **UI language**, in the top right of Settings, independently changes the interface language in the source app and next portable build.
+
+The interface offers the same 25 choices, including both Portuguese variants. Languages appear under their own names, such as Nederlands, 日本語 and العربية. English is the default; changes apply immediately and are saved automatically. Arabic uses a right-to-left layout, with the selector still in the top right. No model or voice download is needed for UI translation.
+
+Controls, status messages and tooltips are translated using the complete English messages as the reference. The longer user guides remain in English, as do upstream model/voice names, licence notices and some technical diagnostics. These are initial translations; native-speaker corrections are welcome.
 
 | | | |
 | --- | --- | --- |

@@ -1,5 +1,6 @@
 """Shared transfer feedback; callers provide monotonic times for easy testing."""
 from collections import deque
+from language_lens.i18n import tr, language
 
 
 def size_label(size: float) -> str:
@@ -36,7 +37,7 @@ class TransferMetrics:
 
     def text(self, now: float) -> str:
         if self.received is None:
-            return f"{duration_label(now - self.started)} elapsed"
+            return f"{duration_label(now - self.started)} {tr('elapsed')}"
         self.samples.append((now, self.received))
         while len(self.samples) > 2 and self.samples[1][0] <= now - 3:
             self.samples.popleft()
@@ -44,11 +45,11 @@ class TransferMetrics:
         rate = max(0, self.received - self.samples[0][1]) / elapsed if elapsed > .1 else 0
         amount = (f"{min(100, self.received * 100 / self.total):.1f}% · "
                   f"{size_label(self.received)} / {size_label(self.total)}" if self.total else
-                  f"{size_label(self.received)} downloaded · total size unavailable")
-        details = f"{amount} · {size_label(rate)}/s · {duration_label(now - self.started)} elapsed"
+                  f"{size_label(self.received)} {'downloaded · ' if language() == 'en' else '· '}{tr('total size unavailable')}")
+        details = f"{amount} · {size_label(rate)}/s · {duration_label(now - self.started)} {tr('elapsed')}"
         idle = now - self.last_byte
         if idle >= 3:
-            details += f" · Waiting for data ({duration_label(idle)})"
+            details += f" · {tr('Waiting for data')} ({duration_label(idle)})"
         elif self.total and rate > 0 and self.received < self.total:
-            details += f" · ~{duration_label((self.total - self.received) / rate)} remaining"
+            details += f" · ~{duration_label((self.total - self.received) / rate)} {tr('remaining')}"
         return details

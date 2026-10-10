@@ -22,7 +22,8 @@ class CaptureHotkeyEdit(QKeySequenceEdit):
                 self._previous_sequence = QKeySequence(sequence)
             # Change display text only. The saved sequence remains intact until
             # Qt records an actual key; focusing must not clear user settings.
-            self._line_edit.setText(self.PROMPT)
+            from language_lens.i18n import tr
+            self._line_edit.setText(tr(self.PROMPT))
 
     def _remember_sequence(self, sequence: QKeySequence) -> None:
         if not sequence.isEmpty():

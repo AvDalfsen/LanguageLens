@@ -1,3 +1,5 @@
+
+from language_lens.i18n import tr
 """Small keyboard-operable disclosures and read-only text inspection helpers."""
 from PySide6.QtCore import Qt, Signal
 from PySide6.QtWidgets import QApplication, QLabel, QMenu, QToolButton, QVBoxLayout, QWidget
@@ -31,10 +33,10 @@ class ExpandableSection(QWidget):
 
 def copy_menu(label: QLabel, text) -> QMenu:
     menu = QMenu(label)
-    selection = menu.addAction("Copy selection")
+    selection = menu.addAction(tr("Copy selection"))
     selection.setEnabled(bool(label.selectedText()))
     selection.triggered.connect(lambda: QApplication.clipboard().setText(label.selectedText()))
-    whole = menu.addAction("Copy all")
+    whole = menu.addAction(tr("Copy all"))
     whole.setEnabled(bool(text()))
     whole.triggered.connect(lambda: QApplication.clipboard().setText(text()))
     return menu
@@ -46,7 +48,7 @@ def make_copyable(label: QLabel, name: str, text) -> None:
                                   Qt.TextInteractionFlag.TextSelectableByKeyboard)
     label.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
     label.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
-    label.setAccessibleDescription("Read-only text. Select and copy with the keyboard or use the context menu to copy all.")
+    label.setAccessibleDescription(tr("Read-only text. Select and copy with the keyboard or use the context menu to copy all."))
 
     def show_menu(point):
         menu = copy_menu(label, text)
