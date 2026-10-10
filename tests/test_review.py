@@ -98,7 +98,7 @@ def test_native_retry_maps_fractional_crop_padding_and_word_boxes(monkeypatch, q
 
 def test_review_uses_per_monitor_windows_and_controls_on_selected_monitor(monkeypatch, qapp):
     tasks = []
-    monkeypatch.setattr(review_module, "QThreadPool", type("Pool", (), {
+    monkeypatch.setattr(review_module, "TaskPool", type("Pool", (), {
         "globalInstance": staticmethod(lambda: type("Instance", (), {"start": lambda self, task: tasks.append(task)})()),
     }))
     capture = native_capture((QRect(-1000, -200, 1000, 800), 1.25), (QRect(300, 0, 800, 600), 2))
@@ -134,7 +134,7 @@ def test_review_uses_per_monitor_windows_and_controls_on_selected_monitor(monkey
 
 
 def test_current_monitor_review_retains_negative_origin(monkeypatch, qapp):
-    monkeypatch.setattr(review_module, "QThreadPool", IdleThreadPool)
+    monkeypatch.setattr(review_module, "TaskPool", IdleThreadPool)
     capture = native_capture((QRect(-800, -100, 800, 900), 1.5))
     window = ReviewWindow(capture, QRect(100, 100, 200, 30), Settings(speech_enabled=False))
     window.show()
@@ -150,7 +150,7 @@ def test_secondary_review_window_exit_closes_all_windows_once(monkeypatch, qapp,
     from PySide6.QtCore import Qt
     from PySide6.QtTest import QTest
 
-    monkeypatch.setattr(review_module, "QThreadPool", IdleThreadPool)
+    monkeypatch.setattr(review_module, "TaskPool", IdleThreadPool)
     capture = native_capture((QRect(0, 0, 800, 600), 1.25), (QRect(800, -100, 1000, 800), 2))
     window = ReviewWindow(capture, QRect(100, 100, 200, 40), Settings(speech_enabled=False))
     finished = []
@@ -191,7 +191,7 @@ class IdleThreadPool:
 def test_click_on_secondary_monitor_synchronizes_navigation_across_monitors(monkeypatch, qapp):
     from PySide6.QtCore import Qt
     from PySide6.QtTest import QTest
-    monkeypatch.setattr(review_module, "QThreadPool", IdleThreadPool)
+    monkeypatch.setattr(review_module, "TaskPool", IdleThreadPool)
     capture = native_capture((QRect(0, 0, 800, 600), 1.25), (QRect(800, 0, 800, 600), 2))
     window = ReviewWindow(capture, QRect(650, 100, 400, 40), Settings(speech_enabled=False))
     window._ocr_finished([
@@ -236,7 +236,7 @@ def test_enlarged_retry_transforms_native_boxes_without_changing_word_offsets():
 
 
 def test_review_retains_ocr_word_boxes_when_moving_back_to_screenshot(monkeypatch, qapp):
-    monkeypatch.setattr(review_module, "QThreadPool", IdleThreadPool)
+    monkeypatch.setattr(review_module, "TaskPool", IdleThreadPool)
     window = ReviewWindow(QPixmap(800, 600), QRect(100, 200, 400, 40), Settings(speech_enabled=False))
     source = OcrLine("cat", .99, ((0, 0), (100, 0), (100, 20), (0, 20)), (
         OcrSpanBox(0, 3, ((10, 0), (70, 0), (70, 20), (10, 20))),
@@ -249,7 +249,7 @@ def test_review_retains_ocr_word_boxes_when_moving_back_to_screenshot(monkeypatc
 
 @pytest.mark.parametrize("target", ["es", "nl", "en"])
 def test_review_segments_japanese_independently_of_translation_target(monkeypatch, qapp, target):
-    monkeypatch.setattr(review_module, "QThreadPool", IdleThreadPool)
+    monkeypatch.setattr(review_module, "TaskPool", IdleThreadPool)
     window = ReviewWindow(QPixmap(800, 600), QRect(100, 200, 400, 40),
                           Settings(source_language="ja", target_language=target))
     source = OcrLine("私は本を読みます。", .99, ((0, 0), (400, 0), (400, 20), (0, 20)))
@@ -335,7 +335,7 @@ def test_ocr_task_does_not_retry_after_a_successful_first_scan(monkeypatch, qapp
 
 
 def test_review_window_tracks_the_full_capture_size(monkeypatch, qapp):
-    monkeypatch.setattr(review_module, "QThreadPool", IdleThreadPool)
+    monkeypatch.setattr(review_module, "TaskPool", IdleThreadPool)
     pixmap = QPixmap(800, 600)
 
     window = ReviewWindow(pixmap, QRect(100, 120, 300, 80), Settings())
@@ -349,7 +349,7 @@ def test_review_window_tracks_the_full_capture_size(monkeypatch, qapp):
 
 
 def test_control_panel_is_anchored_below_an_upper_selection(monkeypatch, qapp):
-    monkeypatch.setattr(review_module, "QThreadPool", IdleThreadPool)
+    monkeypatch.setattr(review_module, "TaskPool", IdleThreadPool)
     window = ReviewWindow(
         QPixmap(1000, 800), QRect(200, 100, 300, 80), Settings()
     )
@@ -365,7 +365,7 @@ def test_control_panel_is_anchored_below_an_upper_selection(monkeypatch, qapp):
 
 
 def test_control_panel_is_anchored_above_a_lower_selection(monkeypatch, qapp):
-    monkeypatch.setattr(review_module, "QThreadPool", IdleThreadPool)
+    monkeypatch.setattr(review_module, "TaskPool", IdleThreadPool)
     window = ReviewWindow(
         QPixmap(1000, 800), QRect(500, 620, 250, 60), Settings()
     )
@@ -381,7 +381,7 @@ def test_control_panel_is_anchored_above_a_lower_selection(monkeypatch, qapp):
 
 
 def test_control_panel_stays_inside_screen_edges(monkeypatch, qapp):
-    monkeypatch.setattr(review_module, "QThreadPool", IdleThreadPool)
+    monkeypatch.setattr(review_module, "TaskPool", IdleThreadPool)
     window = ReviewWindow(
         QPixmap(1000, 800), QRect(0, 100, 120, 60), Settings()
     )
@@ -396,7 +396,7 @@ def test_control_panel_stays_inside_screen_edges(monkeypatch, qapp):
 
 
 def test_word_bubble_uses_review_overlay_and_avoids_panel(monkeypatch, qapp):
-    monkeypatch.setattr(review_module, "QThreadPool", IdleThreadPool)
+    monkeypatch.setattr(review_module, "TaskPool", IdleThreadPool)
     window = ReviewWindow(
         QPixmap(1000, 800), QRect(300, 600, 300, 60), Settings()
     )
@@ -426,7 +426,8 @@ def test_translation_task_delivers_sentence_and_words_progressively_even_if_one_
             assert results[0] == ("Sentence with context", {})
             calls.append(text)
             if text == "unknown":
-                raise review_module.TranslationUnavailable("No translation")
+                from language_lens.services.translation import TranslationUnavailable
+                raise TranslationUnavailable("No translation")
             return WordTranslation(("pratos", "cursos"))
 
     monkeypatch.setattr(review_module, "ArgosTranslator", Translator)
@@ -442,7 +443,7 @@ def test_translation_task_delivers_sentence_and_words_progressively_even_if_one_
     assert results[1][0] is None and results[-1][0] is None
     assert results[1][1]["courses"].candidates == ("pratos", "cursos")
     assert not results[-1][1]["unknown"].candidates
-    assert "unavailable" in results[-1][1]["unknown"].note
+    assert results[-1][1]["unknown"].note == "Translation stopped. Choose 'Retry translation'."
 
 
 def test_ranked_word_popup_updates_pinned_word_and_clears_stale_alternatives(qapp):
@@ -459,15 +460,15 @@ def test_ranked_word_popup_updates_pinned_word_and_clears_stale_alternatives(qap
     assert popup.translation.text() == "Translating…"
     canvas.set_translations({"courses": WordTranslation(("pratos", "cursos", "percursos", "rumos"))})
     assert canvas._pinned and canvas._hovered.text == "courses"
-    assert popup.translation_order.text() == "Best word translation"
-    assert popup.translation.text() == "1. pratos · Best match"
+    assert popup.translation_order.text() == "Top suggestion · isolated word"
+    assert popup.translation.text() == "1. pratos · Top suggestion"
     assert popup.alternatives.isHidden()
     assert popup.search_status.text() == "4 model suggestions available · showing best match"
     assert popup.more.text() == "Show 3 other candidates"
     assert "Word in isolation" in popup.translation_note.text()
     assert canvas.rect().contains(popup.geometry())
     popup.more.click()
-    assert "best → worst" in popup.translation_order.text()
+    assert "model order" in popup.translation_order.text()
     assert popup.alternatives.text() == "2. cursos\n3. percursos\n4. rumos"
     assert popup.more.text() == "Show best match only"
     # A different word is still pending; it must not inherit these alternatives.

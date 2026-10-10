@@ -77,6 +77,12 @@ class TaskPool:
             else:
                 value = (task.word, WordTranslation(tuple(result["candidates"]), result["note"]), "")
             task.signals.result.emit(value)
+        def release():
+            # Dispose only this one-shot domain task. Setup and speech jobs are
+            # reusable and are not dispatched through this pool.
+            job.event.disconnect(event)
+            task.signals.deleteLater()
+        job.settled.connect(release)
         job.event.connect(event)
         job.failed.connect(task.signals.error)
         if command == "more":

@@ -122,16 +122,15 @@ def test_missing_pack_activation_never_downloads(pack_store, monkeypatch):
         packs.activate("ja-text")
 
 
-def test_pack_readiness_only_invalidates_its_source_language(tmp_path, monkeypatch):
+def test_pack_readiness_only_invalidates_its_source_language(tmp_path, monkeypatch, offline_record):
     from language_lens.services import offline
     monkeypatch.setattr(offline, "assets_root", lambda: tmp_path)
     monkeypatch.setattr(offline, "runtime_identity", lambda: {"runtime": "fixture"})
     monkeypatch.setattr(packs, "ready", lambda _pack: True)
     model = tmp_path / "model"
     model.write_bytes(b"model")
-    marker = {"version": 2, "runtime": offline.runtime_identity(), "sentence_models": {},
-              "files": [[str(model), model.stat().st_size, model.stat().st_mtime_ns]]}
-    offline.marker_path("en", "ja").write_text(json.dumps(marker))
+    offline.marker_path("en", "ja").write_text(json.dumps(offline_record("en", "ja", model)))
+    marker = offline_record("ja", "en", model)
     marker["language_pack"] = packs.identity("ja-text")
     offline.marker_path("ja", "en").write_text(json.dumps(marker))
     assert offline.offline_ready("ja", "en")

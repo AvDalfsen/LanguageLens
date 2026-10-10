@@ -175,8 +175,11 @@ def test_static_tooltips_have_complete_dedicated_translations():
                                and n.func.id == "tr" for n in ast.walk(node.args[1])), path
                 sources.update(n.value for n in ast.walk(node.args[1])
                                if isinstance(n, ast.Constant) and isinstance(n.value, str))
-            elif isinstance(node.func, ast.Attribute) and node.func.attr == "setToolTip" and node.args:
-                argument = node.args[0]
+            elif ((isinstance(node.func, ast.Attribute) and node.func.attr == "setToolTip" and node.args)
+                  or (isinstance(node.func, ast.Name) and node.func.id == "ui_text"
+                      and any(kw.arg == "property" and isinstance(kw.value, ast.Constant)
+                              and kw.value.value == "toolTip" for kw in node.keywords))):
+                argument = node.args[0] if isinstance(node.func, ast.Attribute) else node.args[1]
                 if isinstance(argument, ast.Constant) and argument.value != "Language Lens":
                     sources.add(argument.value)
                 sources.update(n.args[0].value for n in ast.walk(argument)
@@ -250,3 +253,80 @@ def test_pronunciation_tooltips_translate_explanations_without_changing_phonemes
     assert popup.ipa.text() == "[" + phones + "]"
     assert item["phonemes"] == phones
     review.shutdown_speech()
+
+
+@pytest.mark.parametrize("code", ["nl", "ar", "ja"])
+@pytest.mark.parametrize("failure_code", ["sentence_language","sentence_split","missing_pack","pack_restart","pack_platform","disk_full","permission","network","timeout","route_unavailable","missing_assets","integrity","runtime","inspection","execution"])
+def test_categorized_failure_widgets_localize_and_survive_switches(qapp,code,failure_code):
+    from PySide6.QtWidgets import QLabel
+    from language_lens.i18n import ui_text, tr_message
+    from language_lens.services.errors import KnownTaskError, describe_failure
+    failure=describe_failure(KnownTaskError(failure_code,"PRIVATE_DETAIL"),"prepare")
+    set_language(code)
+    label=QLabel()
+    ui_text(label,tr_message(failure.message))
+    localized=label.text()
+    assert localized != failure.message and "PRIVATE_DETAIL" not in localized
+    set_language("en")
+    translate_ui(label,code)
+    assert label.text().startswith("Preparing local files: ")
+    assert label.text() != localized
+    set_language(code)
+    translate_ui(label,"en")
+    assert label.text() == localized
+
+
+def test_duplicate_french_captions_keep_explicit_identity_after_cache_eviction(qapp):
+    from language_lens.i18n import ui_widget, ui_text
+    set_language("fr")
+    menu=QMenu()
+    cancel=ui_widget(menu.addAction,tr("Cancel"))
+    undo=ui_widget(menu.addAction,tr("Undo"))
+    assert cancel.text()==undo.text()=="Annuler"
+    for count in range(700):
+        tr("Found {count} words. Hover for details; click to pin. Use the left and right arrow keys to browse words.",count=count)
+    set_language("en")
+    translate_ui(menu,"fr")
+    assert (cancel.text(),undo.text())==("Cancel","Undo")
+    set_language("fr")
+    translate_ui(menu,"en")
+    ui_text(cancel,tr("Redo"))
+    set_language("en")
+    translate_ui(menu,"fr")
+    assert cancel.text()=="Redo" and undo.text()=="Undo"
+
+
+def test_live_retranslation_does_not_translate_ocr_or_model_content(review_factory):
+    from language_lens.domain import OcrLine,WordTranslation
+    window,_=review_factory()
+    window._ocr_finished([OcrLine("Settings",1,((0,0),(100,0),(100,30),(0,30)))])
+    window._translation_finished(("Cancel",{"Settings":WordTranslation(("Undo",))}))
+    set_language("fr")
+    translate_ui(window,"en")
+    assert window.recognized_text.text()=="Settings"
+    assert window._translated_text=="Cancel" and "Cancel" in window.translation.text()
+    assert window.canvas._hits[0].translation.candidates==("Undo",)
+
+
+def test_dutch_voice_recovery_states_use_translated_messages(review_factory,monkeypatch):
+    from language_lens.ui import review as module
+    set_language("nl")
+    window,_=review_factory(settings=Settings(speech_enabled=True,show_ipa=False,ui_language="nl"))
+    monkeypatch.setattr(module,"runtime_ready",lambda:True)
+    monkeypatch.setattr(module,"voice_runtime_ready",lambda _:True)
+    monkeypatch.setattr(module,"voice_present",lambda _:False)
+    window._speech_text="Hello"
+    window._refresh_speech()
+    assert "Use 'Download voice'" not in window.speech_status.text()
+    assert "voorlezen" in window.speech_status.text()
+    monkeypatch.setattr(module,"voice_present",lambda _:True)
+    window._speech_text="x"*2001
+    window._refresh_speech()
+    assert window.speech_status.text().startswith("Selecteer een kortere passage")
+    monkeypatch.setattr(module,"runtime_ready",lambda:False)
+    window._refresh_speech()
+    assert "Start Language Lens.bat" in window.speech_status.text()
+    assert "Restart using" not in window.speech_status.text()
+    set_language("en")
+    translate_ui(window,"nl")
+    assert "Restart using" in window.speech_status.text()

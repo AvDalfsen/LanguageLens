@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from language_lens.i18n import tr, language
+from language_lens.i18n import tr, tr_message, language, ui_text, ui_widget
 
 from PySide6.QtCore import Qt, Signal
 from PySide6.QtWidgets import QFrame, QHBoxLayout, QLabel, QPushButton, QScrollArea, QStyle, QVBoxLayout, QWidget
@@ -40,9 +40,9 @@ class WordPopup(QFrame):
         layout.setSpacing(7)
         header = QHBoxLayout()
         self.word = self._label("popupWord")
-        close = QPushButton("×")
+        close = ui_widget(QPushButton, "×")
         close.setObjectName("dismissWord")
-        close.setAccessibleName(tr("Dismiss word details"))
+        ui_text(close, tr("Dismiss word details"), property="accessibleName")
         close.setFixedSize(24, 24)
         close.clicked.connect(self.dismissed)
         header.addWidget(self.word, 1)
@@ -63,41 +63,39 @@ class WordPopup(QFrame):
         self.translation = self._label("popupBestTranslation")
         self.alternatives = self._label()
         self.translation_note = self._label("popupTranslationNote")
-        self.translation_note.setToolTip(
-            tr("Ranked by the translation model for this word alone. The selected sentence is not "
+        ui_text(self.translation_note, tr("Ranked by the translation model for this word alone. The selected sentence is not "
             "used to rank these candidates. These are suggestions, not all dictionary meanings "
-            "or confidence percentages. A word can translate to several words in another language.")
-        )
+            "or confidence percentages. A word can translate to several words in another language."), property="toolTip")
         for label in (self.translation, self.alternatives):
             label.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
         self.ipa = self._label("popupIpa")
         self.ipa.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
         self.ipa.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
-        self.ipa.setToolTip(tr("Estimated pronunciation with display-only stress formatting; not a measurement of the voice's audio."))
+        ui_text(self.ipa, tr("Estimated pronunciation with display-only stress formatting; not a measurement of the voice's audio."), property="toolTip")
         self.detail = self._label("popupDetail")
         self.voice = self._label("popupVoice")
-        for label, name in ((self.word, tr("Selected source word")), (self.translation, tr("Best word translation")),
+        for label in (self.word, self.translation, self.alternatives, self.ipa):
+            label._lens_untranslated_text = True
+        for label, name in ((self.word, tr("Selected source word")), (self.translation, tr("Top suggestion · isolated word")),
                             (self.alternatives, tr("Other translation candidates")), (self.ipa, tr("Estimated pronunciation")),
                             (self.detail, tr("Pronunciation context")), (self.voice, tr("Pronunciation voice"))):
-            label.setAccessibleName(name)
-        self.more = QPushButton(tr("More candidates"))
+            ui_text(label, name, property="accessibleName")
+        self.more = ui_widget(QPushButton, tr("More candidates"))
         self.more.clicked.connect(self.more_requested)
-        self.search = QPushButton(tr("Search for more candidates"))
+        self.search = ui_widget(QPushButton, tr("Search for more candidates"))
         self.search.clicked.connect(self.search_requested)
-        self.search.setToolTip(tr("Suggestions are model guesses for this word alone, not dictionary meanings."))
-        self.more.setToolTip(
-            tr("Show or hide alternatives already found for this word; no new search or download is needed. "
+        ui_text(self.search, tr("Suggestions are model guesses for this word alone, not dictionary meanings."), property="toolTip")
+        ui_text(self.more, tr("Show or hide alternatives already found for this word; no new search or download is needed. "
             "'Show best match only' collapses the list. Use 'Search for more candidates' for a separate, "
-            "wider model search. These suggestions are not an exhaustive dictionary.")
-        )
+            "wider model search. These suggestions are not an exhaustive dictionary."), property="toolTip")
         self.search_status = self._label("popupSearchStatus")
         for widget in (self.translation_order, self.translation, self.alternatives,
                        self.more, self.search, self.search_status, self.translation_note, self.ipa, self.detail, self.voice):
             self._body_layout.addWidget(widget)
         buttons = QHBoxLayout()
-        self.play = QPushButton(tr("Pronounce word"))
+        self.play = ui_widget(QPushButton, tr("Pronounce word"))
         self.play.clicked.connect(self.play_requested)
-        self.retry = QPushButton(tr("Retry pronunciation"))
+        self.retry = ui_widget(QPushButton, tr("Retry pronunciation"))
         self.retry.clicked.connect(self.retry_requested)
         buttons.addWidget(self.play)
         buttons.addWidget(self.retry)
@@ -112,22 +110,18 @@ class WordPopup(QFrame):
         all_candidates = result.candidates if result else ()
         candidates = all_candidates if show_all else all_candidates[:1]
         multiple = len(all_candidates) > 1
-        self.translation_order.setText(
-            tr("Best word translation") if not show_all else
-            tr("Possible translations · best → worst") if multiple else tr("Word translation")
-        )
+        ui_text(self.translation_order, tr("Top suggestion · isolated word") if not show_all else
+            tr("Possible translations · model order") if multiple else tr("Word translation"))
         self.translation_order.setVisible(bool(candidates))
-        self.translation.setText(
-            f"1. {candidates[0]} · {tr('Best match')}" if multiple else
+        ui_text(self.translation, f"1. {candidates[0]} · {tr('Top suggestion')}" if multiple else
             candidates[0] if candidates else
-            tr("Translation unavailable") if result is not None else tr("Translating…")
-        )
-        self.alternatives.setText("\n".join(
+            tr("Translation unavailable") if result is not None else tr("Translating…"))
+        ui_text(self.alternatives, "\n".join(
             f"{rank}. {value}" for rank, value in enumerate(candidates[1:], 2)
         ))
         self.alternatives.setVisible(show_all and len(candidates) > 1)
         note = tr("Word in isolation · model ranking") if multiple else tr("Only one distinct candidate · word in isolation")
-        self.translation_note.setText(tr(result.note or note) if result else "")
+        ui_text(self.translation_note, tr(result.note or note) if result else "")
         self.translation_note.setVisible(result is not None)
 
     def set_expansion_state(self, *, available: bool, loading: bool = False,
@@ -137,17 +131,13 @@ class WordPopup(QFrame):
         self.more.setEnabled(True)
         self.search.setVisible(available and not searched)
         self.search.setEnabled(not loading)
-        self.search.setText(tr("Finding more…") if loading else tr("Retry wider search") if error else tr("Search for more candidates"))
+        ui_text(self.search, tr("Finding more…") if loading else tr("Retry wider search") if error else tr("Search for more candidates"))
         others = max(0, (count or 0) - 1)
-        self.more.setText(
-            tr("Show best match only") if showing else
-            f"Show {others} other {'candidate' if others == 1 else 'candidates'}" if language() == "en" else tr("Show {count} other candidates", count=others)
-        )
-        self.search_status.setText(
-            tr("Searching locally…") if loading else error or
+        ui_text(self.more, tr("Show best match only") if showing else
+            f"Show {others} other {'candidate' if others == 1 else 'candidates'}" if language() == "en" else tr("Show {count} other candidates", count=others))
+        ui_text(self.search_status, tr("Searching locally…") if loading else tr_message(error) if error else
             ((f"{count} distinct {'candidate' if count == 1 else 'candidates'} from {EXPANDED_HYPOTHESES} model guesses" if language() == "en" else tr("{count} distinct candidates from {guesses} model guesses", count=count, guesses=EXPANDED_HYPOTHESES)) if searched and count is not None else
-             (f"{count} model {'suggestion' if count == 1 else 'suggestions'} available · {'showing all' if showing else 'showing best match'}" if language() == "en" else tr("{count} model suggestions available", count=count)) if count is not None else "")
-        )
+             (f"{count} model {'suggestion' if count == 1 else 'suggestions'} available · {'showing all' if showing else 'showing best match'}" if language() == "en" else tr("{count} model suggestions available", count=count)) if count is not None else ""))
         self.search_status.setVisible(bool(self.search_status.text()))
 
     def fit_to_height(self, available: int) -> None:

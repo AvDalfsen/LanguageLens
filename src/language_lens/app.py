@@ -10,7 +10,7 @@ from PySide6.QtGui import QAction, QCursor
 from PySide6.QtWidgets import QApplication, QMenu, QSystemTrayIcon
 
 from language_lens.config import Settings, load_settings, save_settings
-from language_lens.i18n import tr, tr_message, translate_ui, MessageBox as QMessageBox
+from language_lens.i18n import tr, tr_message, translate_ui, MessageBox as QMessageBox, ui_text, ui_widget, runtime_message
 from language_lens.services.capture import capture_desktop
 from language_lens.services.hotkey import WindowsHotkeyListener
 from language_lens.services.windows import foreground_window, restore_foreground
@@ -23,7 +23,6 @@ from language_lens.services.diagnostics import initialize, record_failure
 from language_lens.services.instance import SingleInstance
 from language_lens.services.offline import offline_ready
 from language_lens.services.startup import report_startup
-from language_lens.runtime import recovery_instruction
 
 
 def persist(settings, parent=None, *, notify=True) -> bool:
@@ -208,22 +207,22 @@ class LensController(QObject):
         self.app.setWindowIcon(icon)
         self.setup.setWindowIcon(icon)
         self.tray = QSystemTrayIcon(icon, self)
-        self.tray.setToolTip("Language Lens")
+        ui_text(self.tray, "Language Lens", property="toolTip")
         menu = QMenu()
-        capture_action = QAction(tr("Capture now"), menu)
+        capture_action = ui_widget(QAction, tr("Capture now"), menu)
         capture_action.setEnabled(False)
         self._capture_action = capture_action
         capture_action.triggered.connect(lambda: self.begin_capture(from_external_app=True))
-        settings_action = QAction(tr("Settings"), menu)
+        settings_action = ui_widget(QAction, tr("Settings"), menu)
         settings_action.triggered.connect(self.show_settings)
-        self._listening_action = QAction(tr("Start listening"), menu)
+        self._listening_action = ui_widget(QAction, tr("Start listening"), menu)
         self._listening_action.triggered.connect(self._toggle_tray_listening)
-        quit_action = QAction(tr("Quit"), menu)
+        quit_action = ui_widget(QAction, tr("Quit"), menu)
         quit_action.triggered.connect(self.quit)
         menu.addAction(capture_action)
         menu.addAction(settings_action)
         menu.addAction(self._listening_action)
-        help_action = QAction(tr("Help and about"), menu)
+        help_action = ui_widget(QAction, tr("Help and about"), menu)
         help_action.triggered.connect(self.show_help)
         menu.addAction(help_action)
         menu.addSeparator()
@@ -331,12 +330,12 @@ class LensController(QObject):
         listening = self._desired_hotkey is not None
         state = self.setup.availability
         self._capture_action.setEnabled(state.capture_enabled and not self._busy and not self._shutting_down)
-        self._capture_action.setToolTip(tr(state.reason) if state.reason else tr("Pause games manually. The capture hotkey takes a screenshot; Escape closes it."))
-        self._listening_action.setText(tr("Pause listening") if listening else tr("Start listening"))
+        ui_text(self._capture_action, tr(state.reason) if state.reason else tr("Pause games manually. The capture hotkey takes a screenshot; Escape closes it."), property="toolTip")
+        ui_text(self._listening_action, tr("Pause listening") if listening else tr("Start listening"))
         self._listening_action.setEnabled(listening or (
             state.listening_enabled and not self._busy and not self._shutting_down))
         detail = tr("shortcut temporarily suspended") if listening and self._listener is None else tr("listening") if listening else tr("hotkey inactive")
-        self.tray.setToolTip(f"Language Lens · {detail}")
+        ui_text(self.tray, f"Language Lens · {detail}", property="toolTip")
 
     def _sync_listener(self) -> None:
         if self._syncing_listener:
@@ -588,7 +587,7 @@ def main() -> int:
         if instance is not None:
             instance.close()
         record_failure("startup", exc)
-        message = tr("Startup failed. Diagnostic files are in '%LOCALAPPDATA%/LanguageLens/logs'. ") + recovery_instruction()
+        message = runtime_message("Startup failed. Diagnostic files are in '%LOCALAPPDATA%/LanguageLens/logs'. ")
         report_startup("error", message)
         if not os.environ.get("LANGUAGE_LENS_STARTUP_FILE"):
             QMessageBox.critical(None, tr("Language Lens could not start"), message)

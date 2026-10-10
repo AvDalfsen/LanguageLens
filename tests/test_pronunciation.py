@@ -140,7 +140,7 @@ def word_window(qapp, monkeypatch, tmp_path):
             return IdlePool()
         def start(self, task):
             pass
-    monkeypatch.setattr(review, "QThreadPool", IdlePool)
+    monkeypatch.setattr(review, "TaskPool", IdlePool)
     monkeypatch.setattr(review, "runtime_ready", lambda: True)
     monkeypatch.setattr(review, "voice_present", lambda _: True)
     window = review.ReviewWindow(QPixmap(1000, 800), QRect(200, 300, 600, 40),

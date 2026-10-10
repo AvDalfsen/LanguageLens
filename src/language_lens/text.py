@@ -52,11 +52,14 @@ def word_spans(text: str, source_language: str | None = None):
     Mixed Latin words retain the
     same apostrophe/hyphen handling as other source languages.
     """
+    activated = False
     for match in _WORDS.finditer(text):
         part, start = match.group(), match.start()
         if source_language == "ja" and _JAPANESE.search(part):
             from language_lens.services.language_packs import activate
-            activate("ja-text")
+            if not activated:
+                activate("ja-text")
+                activated = True
             with _TOKENIZER_LOCK:
                 surfaces = list(_japanese_tokenizer().tokenize(part, wakati=True))
             cursor = 0
@@ -69,7 +72,9 @@ def word_spans(text: str, source_language: str | None = None):
                 cursor = position + len(surface)
         elif source_language == "zh" and _HAN.search(part):
             from language_lens.services.language_packs import activate
-            activate("zh-text")
+            if not activated:
+                activate("zh-text")
+                activated = True
             with _TOKENIZER_LOCK:
                 tokens = list(_chinese_tokenizer().tokenize(part, mode="default"))
             for surface, left, _right in tokens:

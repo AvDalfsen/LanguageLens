@@ -90,7 +90,7 @@ def main():
         loop = QEventLoop()
         timer = QTimer()
         timer.setInterval(50)
-        timer.timeout.connect(lambda: loop.quit() if window._jobs and all(not job.active for job in window._jobs if job) else None)
+        timer.timeout.connect(lambda: loop.quit() if not any(job.active for job in window._jobs if job) else None)
         deadline = QTimer()
         deadline.setSingleShot(True)
         deadline.timeout.connect(loop.quit)

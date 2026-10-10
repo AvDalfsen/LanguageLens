@@ -15,9 +15,15 @@ if (-not (Test-LensEnvironment $ProjectRoot)) {
     & $BootstrapPython -m venv $EnvironmentPath
     if ($LASTEXITCODE -ne 0) { throw "Could not create the Python environment. The previous environment remains in its backup folder." }
 }
-& $PythonPath -m pip install --upgrade pip
-if ($LASTEXITCODE -ne 0) { throw "Could not update pip. Check the internet connection and available disk space." }
-& $PythonPath -m pip install -e "$ProjectRoot[dev]"
+& $PythonPath -m pip install "pip==26.2.1"
+if ($LASTEXITCODE -ne 0) { throw "Could not install the tested pip version. Check the internet connection and available disk space." }
+$RuntimeVersion = & $PythonPath -I -c "import sys; print('.'.join(map(str, sys.version_info[:2])))"
+if ($LASTEXITCODE -ne 0) { throw "Could not check the Python runtime version." }
+$ConstraintArguments = @()
+if ($RuntimeVersion -eq "3.10") {
+    $ConstraintArguments = @("-c", (Join-Path $ProjectRoot "constraints/windows-python310.txt"))
+}
+& $PythonPath -m pip install @ConstraintArguments -e "$ProjectRoot[dev]"
 if ($LASTEXITCODE -ne 0) { throw "Could not install Language Lens dependencies. Existing environment backups were retained." }
 if (-not (Test-LensEnvironment $ProjectRoot)) { throw "Installed components did not pass the local checks. Close Lens if it is running, then retry setup." }
 

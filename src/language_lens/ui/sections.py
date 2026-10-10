@@ -1,5 +1,5 @@
 
-from language_lens.i18n import tr
+from language_lens.i18n import tr, ui_text, ui_widget
 """Small keyboard-operable disclosures and read-only text inspection helpers."""
 from PySide6.QtCore import Qt, Signal
 from PySide6.QtWidgets import QApplication, QLabel, QMenu, QToolButton, QVBoxLayout, QWidget
@@ -11,13 +11,13 @@ class ExpandableSection(QWidget):
     def __init__(self, title: str, parent=None) -> None:
         super().__init__(parent)
         self.toggle = QToolButton()
-        self.toggle.setText(title)
-        self.toggle.setAccessibleName(title)
+        ui_text(self.toggle, title)
+        ui_text(self.toggle, title, property="accessibleName")
         self.toggle.setCheckable(True)
         self.toggle.setToolButtonStyle(Qt.ToolButtonStyle.ToolButtonTextBesideIcon)
         self.toggle.setArrowType(Qt.ArrowType.RightArrow)
         self.content = QWidget()
-        self.content.setAccessibleName(title)
+        ui_text(self.content, title, property="accessibleName")
         self.content.hide()
         layout = QVBoxLayout(self)
         layout.setContentsMargins(0, 0, 0, 0)
@@ -33,22 +33,23 @@ class ExpandableSection(QWidget):
 
 def copy_menu(label: QLabel, text) -> QMenu:
     menu = QMenu(label)
-    selection = menu.addAction(tr("Copy selection"))
+    selection = ui_widget(menu.addAction, tr("Copy selection"))
     selection.setEnabled(bool(label.selectedText()))
-    selection.triggered.connect(lambda: QApplication.clipboard().setText(label.selectedText()))
-    whole = menu.addAction(tr("Copy all"))
+    selection.triggered.connect(lambda: ui_text(QApplication.clipboard(), label.selectedText()))
+    whole = ui_widget(menu.addAction, tr("Copy all"))
     whole.setEnabled(bool(text()))
-    whole.triggered.connect(lambda: QApplication.clipboard().setText(text()))
+    whole.triggered.connect(lambda: ui_text(QApplication.clipboard(), text()))
     return menu
 
 
 def make_copyable(label: QLabel, name: str, text) -> None:
-    label.setAccessibleName(name)
+    label._lens_untranslated_text = True
+    ui_text(label, name, property="accessibleName")
     label.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse |
                                   Qt.TextInteractionFlag.TextSelectableByKeyboard)
     label.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
     label.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
-    label.setAccessibleDescription(tr("Read-only text. Select and copy with the keyboard or use the context menu to copy all."))
+    ui_text(label, tr("Read-only text. Select and copy with the keyboard or use the context menu to copy all."), property="accessibleDescription")
 
     def show_menu(point):
         menu = copy_menu(label, text)

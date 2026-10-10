@@ -31,7 +31,7 @@ def main():
     root.mkdir(parents=True, exist_ok=True)
     clipped = []
     with patch("language_lens.ui.setup.ServiceJob.start", lambda *args: None), patch(
-            "language_lens.ui.review.QThreadPool", SimpleNamespace(
+            "language_lens.ui.review.TaskPool", SimpleNamespace(
                 globalInstance=lambda: SimpleNamespace(start=lambda *args: None))):
         for name, code in UI_LANGUAGES:
             window = SetupWindow(Settings(ui_language=code, source_language="ja", target_language="nl"))

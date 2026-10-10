@@ -9,7 +9,7 @@ from PySide6.QtWidgets import (
 )
 
 from language_lens import __version__
-from language_lens.i18n import tr, translate_ui
+from language_lens.i18n import tr, translate_ui, ui_item, ui_text, ui_widget
 from language_lens.services.diagnostics import open_folder
 from language_lens.ui.identity import app_icon
 
@@ -34,7 +34,7 @@ class HelpDialog(QDialog):
     def __init__(self, parent=None, *, root: Path | None = None):
         super().__init__(parent)
         self.root = (root or documentation_root()).resolve()
-        self.setWindowTitle(tr("Help and about — Language Lens"))
+        ui_text(self, tr("Help and about — Language Lens"), property="windowTitle")
         self.setWindowIcon(app_icon())
         self.setWindowModality(Qt.WindowModality.WindowModal)
         self.resize(800, 680)
@@ -48,18 +48,18 @@ class HelpDialog(QDialog):
         mark = QLabel()
         mark.setPixmap(app_icon().pixmap(40, 40))
         heading.addWidget(mark)
-        title = QLabel(f"Language Lens {__version__}")
+        title = ui_widget(QLabel, f"Language Lens {__version__}")
         title.setObjectName("title")
         heading.addWidget(title)
         heading.addStretch()
         layout.addLayout(heading)
         self.topics = QComboBox()
-        self.topics.setAccessibleName(tr("Help topic"))
+        ui_text(self.topics, tr("Help topic"), property="accessibleName")
         for title, name in TOPICS:
-            self.topics.addItem(tr(title), name)
+            ui_item(self.topics, tr(title), name)
         layout.addWidget(self.topics)
         self.browser = QTextBrowser()
-        self.browser.setAccessibleName(tr("User guide"))
+        ui_text(self.browser, tr("User guide"), property="accessibleName")
         self.browser.setOpenLinks(False)
         self.browser.setOpenExternalLinks(False)
         option = self.browser.document().defaultTextOption()
@@ -70,11 +70,11 @@ class HelpDialog(QDialog):
         self.browser.anchorClicked.connect(self._open_link)
         layout.addWidget(self.browser, 1)
         row = QHBoxLayout()
-        diagnostics = QPushButton(tr("Open diagnostics folder"))
+        diagnostics = ui_widget(QPushButton, tr("Open diagnostics folder"))
         diagnostics.clicked.connect(open_folder)
         row.addWidget(diagnostics)
         buttons = QDialogButtonBox(QDialogButtonBox.StandardButton.Close)
-        buttons.button(QDialogButtonBox.StandardButton.Close).setText(tr("Close"))
+        ui_text(buttons.button(QDialogButtonBox.StandardButton.Close), tr("Close"))
         buttons.rejected.connect(self.reject)
         row.addWidget(buttons)
         layout.addLayout(row)

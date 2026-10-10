@@ -61,3 +61,22 @@ def test_normalization_offsets_keep_whole_graphemes_and_emoji():
     accent = normalized.index("ó")
     assert text[slice(*offsets[accent])] == "o\u0301"
     assert offsets[0] == (0, 1)
+
+
+@pytest.mark.parametrize("language,pack,text", [("ja", "ja-text", "猫です"), ("zh", "zh-text", "我喜欢猫")])
+def test_pack_activation_is_once_per_segmentation_operation(monkeypatch, language, pack, text):
+    from types import SimpleNamespace
+    from language_lens import text as module
+    from language_lens.services import language_packs
+    checks = []
+    monkeypatch.setattr(language_packs, "activate", checks.append)
+    monkeypatch.setattr(module, "_japanese_tokenizer", lambda: SimpleNamespace(tokenize=lambda part, **kw: [part]))
+    monkeypatch.setattr(module, "_chinese_tokenizer", lambda: SimpleNamespace(tokenize=lambda part, **kw: [(part, 0, len(part))]))
+    passage = "hello " + "。 ".join([text] * 100)
+    spans = list(word_spans(passage, language))
+    assert len(spans) == 101 and checks == [pack]
+    assert [passage[start:end] for start,end in spans][1:] == [text] * 100
+    list(word_spans(text, language))
+    assert checks == [pack, pack]  # Revalidate on the next operation.
+    list(word_spans("only Latin words", language))
+    assert checks == [pack, pack]

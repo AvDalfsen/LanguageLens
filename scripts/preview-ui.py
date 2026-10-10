@@ -81,7 +81,7 @@ def main():
         text = "Read and learn a language"
         painter.drawText(40, 95, text)
         painter.end()
-        with patch("language_lens.ui.review.QThreadPool", SimpleNamespace(globalInstance=lambda: SimpleNamespace(start=lambda task: None))):
+        with patch("language_lens.ui.review.TaskPool", SimpleNamespace(globalInstance=lambda: SimpleNamespace(start=lambda task: None))):
             window = ReviewWindow(image, QRect(35, 65, min(560, width - 70), 45), Settings(source_language="en", target_language="nl", speech_enabled=False))
             window._ocr_finished([OcrLine(text, .99, ((5, 0), (480, 0), (480, 35), (5, 35)))])
             window._translation_finished(("Lees en leer een taal. " * 80, {"Read": WordTranslation(("Lees", "gelezen"))}))

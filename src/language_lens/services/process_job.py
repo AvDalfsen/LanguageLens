@@ -7,7 +7,9 @@ from threading import Event
 
 from PySide6.QtCore import QCoreApplication, QObject, QProcess, QTemporaryDir, QThread, QTimer, Signal, Slot
 from PySide6.QtGui import QImage
-from language_lens.runtime import recovery_instruction, worker_command
+from language_lens.runtime import worker_command
+from language_lens.services.diagnostics import record_failure
+from language_lens.services.errors import MESSAGES, describe_failure, failure_from_code
 
 
 # A window can disappear while PNG encoding is finishing. Keep the unparented
@@ -36,8 +38,9 @@ class _ImageStage(QThread):
                 if (Path(name).name != name or any(char in name for char in "\\/:")
                         or not image.save(str(Path(self.scratch.path()) / name), "PNG")):
                     raise OSError("Could not prepare the OCR crop.")
-        except Exception:
-            self.error = "Could not prepare local task files. Check disk space and directory permissions."
+        except Exception as exc:
+            record_failure("ocr-image-staging", exc)
+            self.error = describe_failure(exc, "ocr").message
         finally:
             self.images.clear()
 
@@ -61,11 +64,7 @@ class ProcessJob(QObject):
     failed = Signal(str)
     cancelled = Signal()
     activity_changed = Signal(bool)
-
-    start_failure = "Could not start the local task. " + recovery_instruction()
-    scratch_failure = "Could not create local task files. Check disk space and directory permissions."
-    overflow_failure = "The local task returned too much data. Try a smaller selection."
-    stopped_failure = "The local task stopped unexpectedly. Please retry."
+    settled = Signal()  # Emitted after terminal callbacks and scratch cleanup.
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -92,11 +91,13 @@ class ProcessJob(QObject):
             self._scratch = QTemporaryDir(str(root / ".job-XXXXXX"))
             if not self._scratch.isValid():
                 raise OSError("Task directory is not writable.")
-        except OSError:
+        except OSError as exc:
+            record_failure("task-scratch", exc)
             if self._scratch:
                 self._scratch.remove()
                 self._scratch = None
-            self.failed.emit(self.scratch_failure)
+            self.failed.emit(describe_failure(exc, command).message)
+            self.settled.emit()
             return
         process = QProcess(self)
         self._process = process
@@ -152,7 +153,7 @@ class ProcessJob(QObject):
             return
         self._buffer += bytes(process.readAllStandardOutput())
         if len(self._buffer) > 16 * 1024 * 1024:
-            self._error = self.overflow_failure
+            self._error = failure_from_code("execution", self._command).message
             process.kill()
             return
         while b"\n" in self._buffer:
@@ -165,7 +166,10 @@ class ProcessJob(QObject):
                 continue
             self._ok |= message.get("ok") is True
             if message.get("error"):
-                self._error = str(message["error"])
+                failure = message.get("failure")
+                self._error = (failure_from_code(failure["code"], self._command).message
+                               if isinstance(failure, dict) and failure.get("code") in MESSAGES
+                               else str(message["error"]))
             if not self._cancelled:
                 self._handle_message(message, process)
             if self._process is not process:
@@ -180,11 +184,11 @@ class ProcessJob(QObject):
 
     def _process_error(self, error):
         if error == QProcess.ProcessError.FailedToStart:
-            self._error = self.start_failure
+            self._error = failure_from_code("runtime", self._command).message
             self._finished(-1, QProcess.ExitStatus.CrashExit)
 
     def _timeout_message(self):
-        return "The local task timed out. Retry or select a smaller passage."
+        return failure_from_code("timeout", self._command).message
 
     def _timeout(self):
         self._error = self._timeout_message()
@@ -210,13 +214,14 @@ class ProcessJob(QObject):
             if cancelled:
                 self.cancelled.emit()
             elif code or status == QProcess.ExitStatus.CrashExit or error or not ok:
-                self.failed.emit(error or self.stopped_failure)
+                self.failed.emit(error or failure_from_code("execution", self._command).message)
             else:
                 self._succeeded(scratch)
         finally:
             if scratch:
                 scratch.remove()
             process.deleteLater()
+            self.settled.emit()
 
     def _succeeded(self, scratch):
         raise NotImplementedError

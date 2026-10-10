@@ -59,16 +59,16 @@ def test_offline_network_guard_restores_functions_and_blocks_outbound():
     assert socket.create_connection is original
 
 
-def test_offline_readiness_invalidates_changed_or_missing_assets(monkeypatch, tmp_path):
+def test_offline_readiness_invalidates_changed_or_missing_assets(monkeypatch, tmp_path, offline_record):
     monkeypatch.setattr(offline, "assets_root", lambda: tmp_path)
     model = tmp_path / "model.onnx"
     model.write_bytes(b"verified model")
-    stat = model.stat()
     marker = offline.marker_path("ja", "es")
     from language_lens.services import language_packs as packs
     monkeypatch.setattr(packs, "ready", lambda _pack: True)
-    marker.write_text(json.dumps({"version": 2, "runtime": offline.runtime_identity(), "sentence_models": {},
-        "language_pack": packs.identity("ja-text"), "files": [[str(model), stat.st_size, stat.st_mtime_ns]]}))
+    record = offline_record("ja", "es", model)
+    record["language_pack"] = packs.identity("ja-text")
+    marker.write_text(json.dumps(record))
     assert offline.offline_ready("ja", "es")
     model.write_bytes(b"changed")
     assert not offline.offline_ready("ja", "es")
@@ -351,14 +351,12 @@ def test_second_instance_requests_reopening(qapp, tmp_path):
         second.close()
 
 
-def test_offline_readiness_invalidates_runtime_change(monkeypatch, tmp_path):
+def test_offline_readiness_invalidates_runtime_change(monkeypatch, tmp_path, offline_record):
     monkeypatch.setattr(offline, "assets_root", lambda: tmp_path)
     marker = offline.marker_path("en", "nl")
     model = tmp_path / "model.onnx"
     model.write_bytes(b"model")
-    details = model.stat()
-    marker.write_text(json.dumps({"version": 2, "runtime": offline.runtime_identity(), "sentence_models": {},
-        "files": [[str(model), details.st_size, details.st_mtime_ns]]}))
+    marker.write_text(json.dumps(offline_record("en", "nl", model)))
     assert offline.offline_ready("en", "nl")
     monkeypatch.setattr(offline, "runtime_identity", lambda: {"rapidocr": "different"})
     assert not offline.offline_ready("en", "nl")

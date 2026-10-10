@@ -1,3 +1,4 @@
+from language_lens.i18n import ui_text
 from PySide6.QtWidgets import QProxyStyle, QStyle
 
 
@@ -16,5 +17,5 @@ def set_help(widget, text: str) -> None:
 
     from language_lens.i18n import tr
     widget._lens_help_source = text
-    widget.setToolTip(f'<div style="max-width: 420px">{escape(tr(text))}</div>')
+    ui_text(widget, f'<div style="max-width: 420px">{escape(tr(text))}</div>', property="toolTip")
     widget.setToolTipDuration(30_000)

@@ -130,15 +130,14 @@ def test_crash_recovery_handles_partial_retirement_and_publication(tmp_path, pha
 
 
 @pytest.mark.parametrize("runtime", ["ctranslate2", "sentencepiece", "sacremoses"])
-def test_readiness_tracks_translation_runtime_versions(monkeypatch, tmp_path, runtime):
+def test_readiness_tracks_translation_runtime_versions(monkeypatch, tmp_path, runtime, offline_record):
     monkeypatch.setattr(offline, "assets_root", lambda: tmp_path)
     model = tmp_path / "weights"
     model.write_bytes(b"weights")
     info = model.stat()
     versions = offline.runtime_identity()
     assert runtime in versions
-    offline.marker_path("en", "nl").write_text(json.dumps({"version": 2, "runtime": versions, "sentence_models": {},
-        "files": [[str(model), info.st_size, info.st_mtime_ns]]}))
+    offline.marker_path("en", "nl").write_text(json.dumps(offline_record("en", "nl", model)))
     assert offline.offline_ready("en", "nl")
     monkeypatch.setattr(offline, "runtime_identity", lambda: {**versions, runtime: "changed"})
     assert not offline.offline_ready("en", "nl")
@@ -265,7 +264,7 @@ def test_native_capture_selection_and_review_do_not_allocate_composite(monkeypat
     shot = QPixmap(1600, 1200)
     shot.fill(QColor("red"))
     capture = DesktopCapture(None, QRect(-800, 0, 800, 600), (ScreenCapture(shot, QRect(-800, 0, 800, 600)),))
-    monkeypatch.setattr(review, "QThreadPool", SimpleNamespace(globalInstance=lambda: SimpleNamespace(start=lambda _: None)))
+    monkeypatch.setattr(review, "TaskPool", SimpleNamespace(globalInstance=lambda: SimpleNamespace(start=lambda _: None)))
     selection = SelectionOverlay(capture)
     selection.show()
     window = review.ReviewWindow(capture, QRect(100, 100, 300, 40), Settings(speech_enabled=False))

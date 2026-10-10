@@ -447,7 +447,7 @@ def test_real_selector_review_close_and_second_capture(monkeypatch, qapp):
     monkeypatch.setattr(app_module, "capture_desktop", lambda *args: capture_stub(qapp))
     monkeypatch.setattr(app_module, "save_settings", lambda settings: None)
     monkeypatch.setattr(app_module, "foreground_window", lambda: None)
-    monkeypatch.setattr(review_module, "QThreadPool", SimpleNamespace(
+    monkeypatch.setattr(review_module, "TaskPool", SimpleNamespace(
         globalInstance=lambda: SimpleNamespace(start=lambda task: None),
     ))
     controller = controller_stub()
@@ -504,7 +504,7 @@ def test_reselection_uses_same_capture_without_ending_session(monkeypatch, qapp)
     captures = []
     frozen = capture_stub(qapp)
     monkeypatch.setattr(app_module, "capture_desktop", lambda *_args: captures.append(True) or frozen)
-    monkeypatch.setattr(review_module, "QThreadPool", SimpleNamespace(
+    monkeypatch.setattr(review_module, "TaskPool", SimpleNamespace(
         globalInstance=lambda: SimpleNamespace(start=lambda task: None)))
     controller = controller_stub()
     controller.settings = Settings(speech_enabled=False)

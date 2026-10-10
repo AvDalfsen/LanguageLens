@@ -2,13 +2,11 @@
 from __future__ import annotations
 
 from pathlib import Path
-import sys
 
 from PySide6.QtCore import QByteArray, QBuffer, QIODevice, QObject, QTimer, QUrl, Signal
 from PySide6.QtMultimedia import QAudioOutput, QMediaDevices, QMediaPlayer
 
 from language_lens.services.process_job import ProcessJob
-from language_lens.runtime import recovery_instruction
 from language_lens.services.voices import Voice, runtime_ready, voice_runtime_ready, voice_present, voices_root
 
 
@@ -16,11 +14,6 @@ class SpeechJob(ProcessJob):
     progress = Signal(int, int)
     stage_changed = Signal(str)
     succeeded = Signal(object)
-
-    start_failure = "Could not start local speech. " + recovery_instruction()
-    scratch_failure = "Could not create speech files. Check disk space and directory permissions."
-    overflow_failure = "The speech task returned too much data. Try a shorter selection."
-    stopped_failure = "The local speech process stopped unexpectedly. Please retry."
 
     def __init__(self, parent=None, *, root: Path | None = None) -> None:
         super().__init__(parent)
@@ -44,11 +37,6 @@ class SpeechJob(ProcessJob):
         if "done" in message and "total" in message:
             self._touch(60000)
             self.progress.emit(message["done"], message["total"])
-
-    def _timeout_message(self):
-        return ("The voice download stopped making progress. Check your connection and retry."
-                if self._command in ("download", "download-pronunciation") else
-                "Local speech timed out. Try again, or select a shorter passage.")
 
     def _succeeded(self, scratch):
         # Audio is consumed synchronously, before the base class cleans scratch.

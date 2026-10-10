@@ -191,14 +191,14 @@ def test_worker_timeout_is_reported_and_scratch_removed(qapp, tmp_path):
 
 
 def test_worker_failed_launch_cleans_up(qapp, tmp_path, monkeypatch):
-    import language_lens.services.speech as speech
-    monkeypatch.setattr(speech.sys, "executable", str(tmp_path / "missing-python.exe"))
+    from language_lens import runtime
+    monkeypatch.setattr(runtime.sys, "executable", str(tmp_path / "missing-python.exe"))
     job = SpeechJob(root=tmp_path)
     errors = []
     job.failed.connect(errors.append)
     job.start("synthesize", voices.VOICES[0], "Hello")
     wait_until(qapp, lambda: not job.active)
-    assert errors and "Could not start" in errors[0]
+    assert errors and "A required local component could not be loaded." in errors[0]
     assert not list(tmp_path.glob(".job-*"))
 
 
@@ -254,7 +254,7 @@ def test_review_reads_original_before_translation_and_ignores_late_results(qapp,
         def start(self, task):
             pass
 
-    monkeypatch.setattr(review, "QThreadPool", IdlePool)
+    monkeypatch.setattr(review, "TaskPool", IdlePool)
     monkeypatch.setattr(review, "runtime_ready", lambda: True)
     monkeypatch.setattr(review, "voice_present", lambda v: True)
     window = review.ReviewWindow(QPixmap(1000, 800), QRect(100, 100, 300, 60), Settings())

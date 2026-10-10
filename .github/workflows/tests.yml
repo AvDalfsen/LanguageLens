@@ -1,0 +1,43 @@
+name: Test supported Python runtimes
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  tests:
+    runs-on: windows-2022
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ["3.10.6", "3.11", "3.12"]
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: ${{ matrix.python }}
+          architecture: x64
+      - name: Install dependencies
+        shell: pwsh
+        run: |
+          python -m pip install "pip==26.2.1"
+          if ($LASTEXITCODE -ne 0) { throw "Could not install the tested pip version." }
+          $constraints = @()
+          if ("${{ matrix.python }}" -eq "3.10.6") {
+            $constraints = @("-c", "constraints/windows-python310.txt")
+          }
+          python -m pip install @constraints -e ".[dev,language-packs]"
+          if ($LASTEXITCODE -ne 0) { throw "Could not install dependencies." }
+          python -m pip check
+          if ($LASTEXITCODE -ne 0) { throw "Dependency compatibility check failed." }
+          python -m pip freeze
+      - name: Run application tests
+        run: python -m pytest -q -ra
+      - name: Run pronunciation reference tests
+        run: python -m pytest -q -ra prototypes/pronunciation/tests

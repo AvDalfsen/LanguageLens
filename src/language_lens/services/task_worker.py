@@ -30,13 +30,13 @@ def execute(command, payload, scratch, emit):
     translator = ArgosTranslator()
     if command == "status":
         from language_lens.services.offline import offline_ready
-        ready, route = False, []
+        ready, route, packages = False, [], []
         ready = translator.is_pair_installed(source, target)
         if ready:
             packages = translator.route(source, target)
             route = [packages[0].from_code, *(item.to_code for item in packages)] if packages else [source]
         emit({"result": {"source": source, "target": target, "ready": ready,
-                          "route": route, "prepared": offline_ready(source, target), "packs": packs.inventory()}})
+                          "route": route, "prepared": offline_ready(source, target, route=packages), "packs": packs.inventory()}})
         return
     if command in ("install", "repair", "remove", "prepare"):
         package, _backend = translator._modules()

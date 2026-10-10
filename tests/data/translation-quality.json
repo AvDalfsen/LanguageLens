@@ -1,0 +1,262 @@
+{
+  "schema": 1,
+  "review": "Audit examples with explicit meaning constraints; native-speaker review remains recommended. Word-context matches are observations, not a gate for isolated lookup.",
+  "cases": [
+    {
+      "source": "nl",
+      "target": "en",
+      "text": "Ik ben mijn sleutels kwijt.",
+      "word": "kwijt",
+      "sentence_requires_any": [
+        [
+          "key",
+          "keys"
+        ],
+        [
+          "lost",
+          "misplaced",
+          "cannot find",
+          "can't find"
+        ]
+      ],
+      "contextual_word_senses": [
+        "lost",
+        "misplaced"
+      ]
+    },
+    {
+      "source": "nl",
+      "target": "en",
+      "text": "Hij zat op de bank.",
+      "word": "bank",
+      "sentence_requires_any": [
+        [
+          "couch",
+          "sofa",
+          "bench"
+        ]
+      ],
+      "contextual_word_senses": [
+        "couch",
+        "sofa",
+        "bench"
+      ]
+    },
+    {
+      "source": "nl",
+      "target": "en",
+      "text": "Ik heb er geen zin in.",
+      "word": "zin",
+      "sentence_requires_any": [
+        [
+          "don't",
+          "do not",
+          "not"
+        ],
+        [
+          "feel like",
+          "in the mood",
+          "want"
+        ]
+      ],
+      "contextual_word_senses": [
+        "desire",
+        "inclination",
+        "mood"
+      ]
+    },
+    {
+      "source": "nl",
+      "target": "en",
+      "text": "Kun je het licht uitdoen?",
+      "word": "uitdoen",
+      "sentence_requires_any": [
+        [
+          "light",
+          "lights"
+        ],
+        [
+          "off"
+        ]
+      ],
+      "contextual_word_senses": [
+        "turn off",
+        "switch off"
+      ]
+    },
+    {
+      "source": "nl",
+      "target": "en",
+      "text": "Ik wil niet dat je gaat.",
+      "word": "niet",
+      "sentence_requires_any": [
+        [
+          "don't",
+          "do not",
+          "not"
+        ],
+        [
+          "go",
+          "leave"
+        ]
+      ],
+      "contextual_word_senses": [
+        "not"
+      ]
+    },
+    {
+      "source": "nl",
+      "target": "en",
+      "text": "Zij heeft drie katten, niet twee.",
+      "word": "drie",
+      "sentence_requires_any": [
+        [
+          "three",
+          "3"
+        ],
+        [
+          "two",
+          "2"
+        ],
+        [
+          "not"
+        ],
+        [
+          "cats"
+        ]
+      ],
+      "contextual_word_senses": [
+        "three",
+        "3"
+      ]
+    },
+    {
+      "source": "pt",
+      "target": "en",
+      "text": "A manga da camisa está rasgada.",
+      "word": "manga",
+      "sentence_requires_any": [
+        [
+          "sleeve"
+        ],
+        [
+          "shirt"
+        ],
+        [
+          "torn",
+          "ripped"
+        ]
+      ],
+      "contextual_word_senses": [
+        "sleeve"
+      ]
+    },
+    {
+      "source": "pt",
+      "target": "en",
+      "text": "Eu não quero que vás embora.",
+      "word": "embora",
+      "sentence_requires_any": [
+        [
+          "don't",
+          "do not",
+          "not"
+        ],
+        [
+          "leave",
+          "go away",
+          "go"
+        ]
+      ],
+      "contextual_word_senses": [
+        "leave",
+        "go away"
+      ]
+    },
+    {
+      "source": "pt",
+      "target": "nl",
+      "text": "Eu não quero que vás embora.",
+      "word": "embora",
+      "sentence_requires_any": [
+        [
+          "niet"
+        ],
+        [
+          "weggaat",
+          "weggaan",
+          "vertrekt",
+          "vertrekken"
+        ]
+      ],
+      "contextual_word_senses": [
+        "weggaan",
+        "vertrekken"
+      ]
+    },
+    {
+      "source": "pt",
+      "target": "nl",
+      "text": "A manga da camisa está rasgada.",
+      "word": "manga",
+      "sentence_requires_any": [
+        [
+          "mouw"
+        ],
+        [
+          "shirt",
+          "overhemd",
+          "hemd"
+        ],
+        [
+          "gescheurd",
+          "kapot"
+        ]
+      ],
+      "contextual_word_senses": [
+        "mouw"
+      ]
+    },
+    {
+      "source": "en",
+      "target": "nl",
+      "text": "The meeting was put off.",
+      "word": "off",
+      "sentence_requires_any": [
+        [
+          "vergadering",
+          "bijeenkomst"
+        ],
+        [
+          "uitgesteld"
+        ]
+      ],
+      "contextual_word_senses": [
+        "uitgesteld",
+        "uitstellen"
+      ]
+    },
+    {
+      "source": "en",
+      "target": "nl",
+      "text": "I do not want you to leave.",
+      "word": "leave",
+      "sentence_requires_any": [
+        [
+          "niet"
+        ],
+        [
+          "weggaat",
+          "weggaan",
+          "vertrekt",
+          "vertrekken",
+          "gaat"
+        ]
+      ],
+      "contextual_word_senses": [
+        "vertrekken",
+        "weggaan"
+      ]
+    }
+  ]
+}

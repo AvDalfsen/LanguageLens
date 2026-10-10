@@ -5,6 +5,10 @@ launcher, translation service, and main Python environment are unchanged. It pro
 local sentence synthesis and word synthesis from the same prepared phonemes, with
 source-position checks before claiming a word came from its sentence context.
 
+This directory is a frozen, independent reference for the experiment. Its copied
+phoneme helpers deliberately preserve the original baseline; application fixes
+belong in `src/language_lens`, with separate prototype tests checking this reference.
+
 ## Results from 2026-10-03
 
 Tested on Windows 10 22H2 x64, Python 3.10.6, Piper 1.8.0, bundled eSpeak NG

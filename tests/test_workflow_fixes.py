@@ -105,7 +105,7 @@ def controller(qapp, monkeypatch):
     monkeypatch.setattr(pronunciation, "SpeechJob", FakeSpeechJob)
     monkeypatch.setattr(pronunciation, "runtime_ready", lambda: True)
     monkeypatch.setattr(pronunciation, "voice_present", lambda *_args: False)
-    monkeypatch.setattr(review, "QThreadPool", SimpleNamespace(globalInstance=lambda: SimpleNamespace(start=lambda _task: None)))
+    monkeypatch.setattr(review, "TaskPool", SimpleNamespace(globalInstance=lambda: SimpleNamespace(start=lambda _task: None)))
     image = QPixmap(1280, 720)
     image.fill(Qt.GlobalColor.black)
     monkeypatch.setattr(app_module, "capture_desktop", lambda *_args: DesktopCapture(image, image.rect()))
@@ -252,7 +252,7 @@ def test_late_maintenance_completion_cannot_restart_checks_after_shutdown(contro
 
 @pytest.mark.parametrize("width,height", [(1280, 720), (640, 360)])
 def test_large_selection_keeps_full_controls_visible_and_movable(monkeypatch, qapp, width, height):
-    monkeypatch.setattr(review, "QThreadPool", SimpleNamespace(globalInstance=lambda: SimpleNamespace(start=lambda _task: None)))
+    monkeypatch.setattr(review, "TaskPool", SimpleNamespace(globalInstance=lambda: SimpleNamespace(start=lambda _task: None)))
     image = QPixmap(width, height)
     image.fill(Qt.GlobalColor.black)
     window = review.ReviewWindow(image, QRect(30, 80, width - 60, height - 160), Settings(speech_enabled=False))
@@ -286,7 +286,7 @@ def test_large_selection_keeps_full_controls_visible_and_movable(monkeypatch, qa
 
 @pytest.mark.parametrize("surface", ["frame", "status", "viewport"])
 def test_panel_background_drag_moves_without_a_toolbar(monkeypatch, qapp, surface):
-    monkeypatch.setattr(review, "QThreadPool", SimpleNamespace(globalInstance=lambda: SimpleNamespace(start=lambda _task: None)))
+    monkeypatch.setattr(review, "TaskPool", SimpleNamespace(globalInstance=lambda: SimpleNamespace(start=lambda _task: None)))
     window = review.ReviewWindow(QPixmap(1280, 900), QRect(300, 130, 500, 50), Settings(speech_enabled=False))
     window.show()
     qapp.processEvents()
@@ -309,7 +309,7 @@ def test_panel_background_drag_moves_without_a_toolbar(monkeypatch, qapp, surfac
 
 
 def test_panel_drag_does_not_intercept_buttons_sliders_or_scrollbars(monkeypatch, qapp):
-    monkeypatch.setattr(review, "QThreadPool", SimpleNamespace(globalInstance=lambda: SimpleNamespace(start=lambda _task: None)))
+    monkeypatch.setattr(review, "TaskPool", SimpleNamespace(globalInstance=lambda: SimpleNamespace(start=lambda _task: None)))
     window = review.ReviewWindow(QPixmap(1280, 900), QRect(300, 130, 500, 50), Settings(speech_enabled=False))
     window.show()
     qapp.processEvents()
@@ -354,7 +354,7 @@ def test_japanese_settings_widen_to_fit_without_overwriting_manual_size(controll
 
 
 def test_narrow_review_keeps_canvas_and_close_controls_on_screen(monkeypatch, qapp):
-    monkeypatch.setattr(review, "QThreadPool", SimpleNamespace(globalInstance=lambda: SimpleNamespace(start=lambda _task: None)))
+    monkeypatch.setattr(review, "TaskPool", SimpleNamespace(globalInstance=lambda: SimpleNamespace(start=lambda _task: None)))
     image = QPixmap(320, 480)
     image.fill(Qt.GlobalColor.black)
     window = review.ReviewWindow(image, QRect(30, 90, 260, 40), Settings(speech_enabled=False))

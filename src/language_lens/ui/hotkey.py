@@ -1,4 +1,5 @@
 """Single-chord recorder with a non-destructive listening prompt."""
+from language_lens.i18n import ui_text
 from PySide6.QtCore import QEvent
 from PySide6.QtGui import QKeySequence
 from PySide6.QtWidgets import QKeySequenceEdit, QLineEdit
@@ -23,7 +24,7 @@ class CaptureHotkeyEdit(QKeySequenceEdit):
             # Change display text only. The saved sequence remains intact until
             # Qt records an actual key; focusing must not clear user settings.
             from language_lens.i18n import tr
-            self._line_edit.setText(tr(self.PROMPT))
+            ui_text(self._line_edit, tr(self.PROMPT))
 
     def _remember_sequence(self, sequence: QKeySequence) -> None:
         if not sequence.isEmpty():
@@ -45,7 +46,7 @@ class CaptureHotkeyEdit(QKeySequenceEdit):
         super().focusOutEvent(event)
         # Qt deliberately skips finishing for popup focus changes, but the
         # display should still revert when the field loses focus to a menu.
-        self._line_edit.setText(self.keySequence().toString(QKeySequence.SequenceFormat.NativeText))
+        ui_text(self._line_edit, self.keySequence().toString(QKeySequence.SequenceFormat.NativeText))
 
     def eventFilter(self, watched, event) -> bool:  # noqa: N802
         if watched is getattr(self, "_line_edit", None) and event.type() == QEvent.Type.MouseButtonPress:

@@ -17,6 +17,7 @@
 
 [Contributing and source setup](../CONTRIBUTING.md) explains the development environment and tests.
 
+- [Full audit](full-audit-2026-10-10.md) and [repairs](audit-repairs-2026-10-10.md)
 - [Build a portable release](release-building.md)
 - [Language packs and updates](language-packs.md)
 - [Sentence models and validation](sentence-splitting.md)

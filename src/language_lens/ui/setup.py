@@ -25,7 +25,7 @@ from PySide6.QtWidgets import (
 )
 
 from language_lens.config import LANGUAGES, Settings
-from language_lens.i18n import UI_LANGUAGES, language, set_language, translate_ui, tr, tr_message, question
+from language_lens.i18n import UI_LANGUAGES, language, set_language, translate_ui, tr, tr_message, question, ui_item, ui_text, ui_widget
 from language_lens.services.hotkey import normalize_hotkey, display_hotkey
 from language_lens.services.model_download import DownloadProgress
 from language_lens.services.jobs import ServiceJob
@@ -56,7 +56,7 @@ class SetupWindow(QMainWindow):
     def __init__(self, settings: Settings) -> None:
         super().__init__()
         set_language("en")
-        self.setWindowTitle("Language Lens")
+        ui_text(self, "Language Lens", property="windowTitle")
         self.setWindowIcon(app_icon())
         self._help_dialog = None
         self._size_initialized = False
@@ -105,11 +105,11 @@ class SetupWindow(QMainWindow):
         self._progress_timer.setInterval(250)
         self._progress_timer.timeout.connect(self._update_download_metrics)
 
-        title = QLabel("Language Lens")
+        title = ui_widget(QLabel, "Language Lens")
         title.setObjectName("title")
         self.ui_language = QComboBox()
         self.ui_language.setObjectName("uiLanguage")
-        self.ui_language.setAccessibleName(tr("UI language"))
+        ui_text(self.ui_language, tr("UI language"), property="accessibleName")
         self.ui_language.setMaximumWidth(220)
         self.ui_language.setMaxVisibleItems(12)
         # Keep native names in a stable alphabetical order across UI switches.
@@ -119,7 +119,7 @@ class SetupWindow(QMainWindow):
             self.ui_language.addItem(name, code)
         self._select_data(self.ui_language, settings.ui_language)
         set_help(self.ui_language, "Change the interface language. Your text and voice preferences stay the same.")
-        self.ui_language_label = QLabel(tr("UI language"))
+        self.ui_language_label = ui_widget(QLabel, tr("UI language"))
         self.ui_language_label.setBuddy(self.ui_language)
         language_controls = QWidget()
         language_row = QHBoxLayout(language_controls)
@@ -134,10 +134,8 @@ class SetupWindow(QMainWindow):
         # The language selector stays in the top right for Arabic too.
         header.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
         header.setLayout(self._header_row)
-        intro = QLabel(
-            tr("Explore the text on your screen, one word or a whole sentence at a time. "
-            "Everything is processed on your computer.")
-        )
+        intro = ui_widget(QLabel, tr("Explore the text on your screen, one word or a whole sentence at a time. "
+            "Everything is processed on your computer."))
         intro.setWordWrap(True)
         intro.setObjectName("intro")
 
@@ -162,8 +160,8 @@ class SetupWindow(QMainWindow):
         self.hotkey_valid = True
         self.hotkey = CaptureHotkeyEdit(QKeySequence(display_hotkey(self._hotkey_value)))
         self.hotkey.setMaximumSequenceLength(1)
-        self.hotkey.setAccessibleName(tr("Capture hotkey"))
-        self.reset_hotkey = QPushButton(tr("Reset to F8"))
+        ui_text(self.hotkey, tr("Capture hotkey"), property="accessibleName")
+        self.reset_hotkey = ui_widget(QPushButton, tr("Reset to F8"))
         self.reset_hotkey.clicked.connect(lambda: self.hotkey.setKeySequence(QKeySequence("F8")))
         set_help(self.reset_hotkey, "Restore 'Capture hotkey' to F8, the default for new settings. "
             "The shortcut is remembered immediately for future sessions. Click 'Pause listening' before changing it; "
@@ -175,14 +173,14 @@ class SetupWindow(QMainWindow):
         hotkey_row.addWidget(self.hotkey, 1)
         hotkey_row.addWidget(self.reset_hotkey)
         hotkey_layout.addLayout(hotkey_row)
-        self.hotkey_note = QLabel(tr("Click the shortcut field and press your preferred key combination."))
+        self.hotkey_note = ui_widget(QLabel, tr("Click the shortcut field and press your preferred key combination."))
         self.hotkey_note.setObjectName("note")
         self.hotkey_note.setWordWrap(True)
         hotkey_layout.addWidget(self.hotkey_note)
 
         self.capture_scope = QComboBox()
-        self.capture_scope.addItem(tr("All monitors"), "all")
-        self.capture_scope.addItem(tr("Monitor under the pointer"), "current")
+        ui_item(self.capture_scope, tr("All monitors"), "all")
+        ui_item(self.capture_scope, tr("Monitor under the pointer"), "current")
         self._select_data(self.capture_scope, settings.capture_scope)
         set_help(self.source,
             "Choose the language written in the screenshot. This controls OCR, word segmentation, "
@@ -220,7 +218,7 @@ class SetupWindow(QMainWindow):
         form.addRow(tr("Capture area"), self.capture_scope)
         for field, name in ((self.source, tr("Text language")), (self.target, tr("Translate into")),
                             (self.capture_scope, tr("Capture area"))):
-            field.setAccessibleName(name)
+            ui_text(field, name, property="accessibleName")
         self.hotkey.keySequenceChanged.connect(self._hotkey_edited)
 
         self.model_status = QLabel()
@@ -239,18 +237,18 @@ class SetupWindow(QMainWindow):
         self.capabilities.setWordWrap(True)
         self.capabilities.setTextFormat(Qt.TextFormat.PlainText)
         self.capabilities.setObjectName("note")
-        self.prepare_button = QPushButton(tr("Download required files"))
+        self.prepare_button = ui_widget(QPushButton, tr("Download required files"))
         self.prepare_button.clicked.connect(self._prepare_files)
         set_help(self.prepare_button, "Lens always runs OCR and translation locally; there is no online translation mode. "
             "Download any missing OCR, translation, and sentence-boundary files, then check a fixed sample without networking. "
             "Translation between some languages needs two models via English; both are handled automatically. "
             "Only missing or changed files need downloading. Once checked, this button becomes 'Check required files' "
             "to repeat the check. Voices are separate downloads. Use 'Cancel model task' to stop the operation.")
-        self.repair_button = QPushButton(tr("Reinstall translation model"))
-        self.remove_button = QPushButton(tr("Remove translation"))
-        self.cancel_button = QPushButton(tr("Cancel model task"))
+        self.repair_button = ui_widget(QPushButton, tr("Reinstall translation model"))
+        self.remove_button = ui_widget(QPushButton, tr("Remove translation"))
+        self.cancel_button = ui_widget(QPushButton, tr("Cancel model task"))
         self.cancel_button.hide()
-        self.diagnostics_button = QPushButton(tr("Open diagnostics folder"))
+        self.diagnostics_button = ui_widget(QPushButton, tr("Open diagnostics folder"))
         self.diagnostics_button.clicked.connect(open_folder)
         self.diagnostics_button.hide()
         set_help(self.repair_button, "Optional troubleshooting: download and validate replacement translation packages "
@@ -276,13 +274,13 @@ class SetupWindow(QMainWindow):
         self._maintenance_layout.addWidget(self.remove_button, 1, 1)
         from language_lens.services import language_packs as packs
         self.pack_choice = QComboBox()
-        self.pack_choice.setAccessibleName(tr("Optional language pack"))
+        ui_text(self.pack_choice, tr("Optional language pack"), property="accessibleName")
         for key, item in packs.catalog()["packs"].items():
             self.pack_choice.addItem(item["name"], key)
         self.pack_status = QLabel()
         self.pack_status.setWordWrap(True)
-        self.pack_install = QPushButton(tr("Download pack"))
-        self.pack_remove = QPushButton(tr("Remove pack"))
+        self.pack_install = ui_widget(QPushButton, tr("Download pack"))
+        self.pack_remove = ui_widget(QPushButton, tr("Remove pack"))
         self._pack_inventory = []
         self._maintenance_layout.addWidget(self.pack_choice, 2, 0, 1, 2)
         self._maintenance_layout.addWidget(self.pack_status, 3, 0, 1, 2)
@@ -300,10 +298,10 @@ class SetupWindow(QMainWindow):
         details_layout.setContentsMargins(0, 0, 0, 0)
         details_layout.addWidget(self.capabilities)
 
-        self.start_button = QPushButton(tr("Start listening"))
+        self.start_button = ui_widget(QPushButton, tr("Start listening"))
         self.start_button.setObjectName("primaryButton")
         self.start_button.clicked.connect(self._toggle_listening)
-        self.try_button = QPushButton(tr("Try a capture now"))
+        self.try_button = ui_widget(QPushButton, tr("Try a capture now"))
         self.try_button.setObjectName("captureButton")
         self.try_button.clicked.connect(self.capture_requested)
         set_help(self.try_button,
@@ -314,7 +312,7 @@ class SetupWindow(QMainWindow):
             "Closing or cancelling the screenshot returns to 'Settings'."
         )
 
-        self.help_button = QPushButton(tr("Help and about"))
+        self.help_button = ui_widget(QPushButton, tr("Help and about"))
         self.help_button.setObjectName("helpButton")
         self.help_button.clicked.connect(self.show_help)
         button_row = QHBoxLayout()
@@ -327,10 +325,8 @@ class SetupWindow(QMainWindow):
         buttons = QWidget()
         buttons.setLayout(button_row)
 
-        note = QLabel(
-            tr("Pause games manually before capturing. Borderless-windowed apps work best. "
-            "Closing 'Settings' keeps Lens running in the tray.")
-        )
+        note = ui_widget(QLabel, tr("Pause games manually before capturing. Borderless-windowed apps work best. "
+            "Closing 'Settings' keeps Lens running in the tray."))
         note.setWordWrap(True)
         note.setObjectName("note")
 
@@ -402,7 +398,7 @@ class SetupWindow(QMainWindow):
         if not self._installing and self._last_model_status is not None:
             self._apply_model_status(self._last_model_status)
         if self._installing and self._model_stage_source:
-            self.model_status.setText(tr_message(self._model_stage_source))
+            ui_text(self.model_status, tr_message(self._model_stage_source))
         self._update_download_metrics()
         self._auto_width = None
         self._sizing_timer.start(0)
@@ -643,7 +639,7 @@ class SetupWindow(QMainWindow):
         self._refresh_listening()
         self.repair_button.setEnabled(False)
         self.remove_button.setEnabled(False)
-        self.model_status.setText(tr("Checking local capabilities…"))
+        ui_text(self.model_status, tr("Checking local capabilities…"))
         self._place_file_check(False)
         self._status_check_failed = False
         self._show_model_task_error()
@@ -651,7 +647,7 @@ class SetupWindow(QMainWindow):
 
     def _show_model_task_error(self) -> None:
         if self._model_task_error and self._model_task_error[:2] == (self.source.currentData(), self.target.currentData()):
-            self.model_status.setText(self.model_status.text() + tr("\nPrevious model task failed: {error}", error=self._model_task_error[2]))
+            ui_text(self.model_status, self.model_status.text() + tr("\nPrevious model task failed: {error}", error=self._model_task_error[2]))
 
     def _start_status_check(self) -> None:
         if self._installing or self._shutting_down:
@@ -671,10 +667,10 @@ class SetupWindow(QMainWindow):
             self._translation_ready = False
             self._set_files_ready(False)
             self._status_check_failed = True
-            self.model_status.setText(tr("Could not check models: {error}", error=message))
+            ui_text(self.model_status, tr("Could not check models: {error}", error=message))
             self.model_status.setObjectName("modelMissing")
-            self.prepare_button.setText(tr("Retry file check"))
-            self.capabilities.setText(tr("Installation status is unknown because the check failed. No local files were removed."))
+            ui_text(self.prepare_button, tr("Retry file check"))
+            ui_text(self.capabilities, tr("Installation status is unknown because the check failed. No local files were removed."))
             self.diagnostics_button.show()
             self._refresh_availability()
 
@@ -693,16 +689,16 @@ class SetupWindow(QMainWindow):
         ready = self._translation_ready = result["ready"]
         prepared = result["prepared"]
         if ready and prepared:
-            self.model_status.setText(tr("Ready to capture — required local files verified"))
+            ui_text(self.model_status, tr("Ready to capture — required local files verified"))
             self.model_status.setObjectName("modelReady")
         elif ready:
-            self.model_status.setText(tr("Translation model installed. Required files still need checking; use 'Download required files'."))
+            ui_text(self.model_status, tr("Translation model installed. Required files still need checking; use 'Download required files'."))
             self.model_status.setObjectName("modelMissing")
         else:
-            self.model_status.setText(tr("Translation model missing for this language pair; use 'Download required files'."))
+            ui_text(self.model_status, tr("Translation model missing for this language pair; use 'Download required files'."))
             self.model_status.setObjectName("modelMissing")
         self._set_files_ready(ready and prepared)
-        self.prepare_button.setText(tr("Check required files") if ready and prepared else tr("Download required files"))
+        ui_text(self.prepare_button, tr("Check required files") if ready and prepared else tr("Download required files"))
         self._place_file_check(ready and prepared)
         self.repair_button.setEnabled(ready and self.source.currentData() != self.target.currentData())
         self.remove_button.setEnabled(self.repair_button.isEnabled())
@@ -710,18 +706,18 @@ class SetupWindow(QMainWindow):
         from language_lens.services import language_packs as packs
         required = packs.text_pack(source)
         if required and any(item["id"] == required and not item["ready"] for item in self._pack_inventory):
-            self.model_status.setText(self.model_status.text() +
+            ui_text(self.model_status, self.model_status.text() +
                 " " + tr("{pack} adds a {size} MB download.", pack=packs.definition(required)['name'],
                          size=f"{packs.download_bytes(required) / 1_000_000:.1f}"))
         segmentation = tr("Offline dictionary segmentation") if source in {"ja", "zh"} else tr("Unicode word boundaries; not a morphological parser")
         route_text = " → ".join(result["route"]) if result["route"] else tr("Same language") if ready else tr("Missing")
         notation = tr("Audited estimated IPA") if source in {"en", "pt", "pb"} else tr("Engine phonetic notation (not conventionally formatted IPA)")
         if language() == "en":
-            self.capabilities.setText(f"Required OCR + translation files: {'checked and ready' if ready and prepared else 'not checked / files changed'}. "
+            ui_text(self.capabilities, f"Required OCR + translation files: {'checked and ready' if ready and prepared else 'not checked / files changed'}. "
                 f"Translation route: {route_text}.\nWords: {segmentation}. Pronunciation display: {notation}. "
                 "Voice readiness is shown below. Recognition, word boundaries and pronunciations may be approximate.")
         else:
-            self.capabilities.setText(tr("Required files: {state}. Translation route: {route}. Words: {words}. Pronunciation: {notation}.",
+            ui_text(self.capabilities, tr("Required files: {state}. Translation route: {route}. Words: {words}. Pronunciation: {notation}.",
                 state=tr("checked and ready") if ready and prepared else tr("not checked / files changed"),
                 route=route_text, words=segmentation, notation=notation) + " " +
                 tr("Voice readiness is shown below. Recognition, word boundaries and pronunciations may be approximate."))
@@ -737,8 +733,8 @@ class SetupWindow(QMainWindow):
         installed = item.get("ready", False)
         label = tr("Installed") if installed else tr("Not installed or needs updating")
         size = packs.download_bytes(key) / 1_000_000
-        self.pack_status.setText(label + tr(" · Download: {size} MB. Shared by all language pairs.", size=f"{size:.1f}"))
-        self.pack_install.setText(tr("Check pack files") if installed else tr("Download pack"))
+        ui_text(self.pack_status, label + tr(" · Download: {size} MB. Shared by all language pairs.", size=f"{size:.1f}"))
+        ui_text(self.pack_install, tr("Check pack files") if installed else tr("Download pack"))
         allowed = self.availability.maintenance_enabled
         self.pack_choice.setEnabled(allowed)
         self.pack_install.setEnabled(allowed)
@@ -796,7 +792,7 @@ class SetupWindow(QMainWindow):
 
     def _model_stage_changed(self, message: str) -> None:
         self._model_stage_source = message
-        self.model_status.setText(tr_message(message))
+        ui_text(self.model_status, tr_message(message))
         self._transfer_metrics.reset(monotonic())
         self._download_snapshot = None
         self.model_progress.setRange(0, 0)
@@ -818,7 +814,7 @@ class SetupWindow(QMainWindow):
     def _update_download_metrics(self) -> None:
         if not self._installing:
             return
-        self.model_details.setText(self._transfer_metrics.text(monotonic()))
+        ui_text(self.model_details, self._transfer_metrics.text(monotonic()))
 
     def _stop_model_progress(self) -> None:
         self._installing = False
@@ -863,7 +859,7 @@ class SetupWindow(QMainWindow):
                 self.hotkey.blockSignals(blocked)
         self.hotkey.setEnabled(not listening)
         self.reset_hotkey.setEnabled(not listening)
-        self.start_button.setText(tr("Pause listening") if listening else tr("Start listening"))
+        ui_text(self.start_button, tr("Pause listening") if listening else tr("Start listening"))
         # Stopping an existing listener must remain possible even when models
         # are missing, being checked or undergoing maintenance.
         self.start_button.setEnabled(listening or (
@@ -926,12 +922,12 @@ class SetupWindow(QMainWindow):
             value = normalize_hotkey(sequence.toString(QKeySequence.SequenceFormat.PortableText))
         except ValueError as exc:
             self.hotkey_valid = False
-            self.hotkey_note.setText(tr_message(str(exc)))
+            ui_text(self.hotkey_note, tr_message(str(exc)))
         else:
             self.hotkey_valid = True
             changed = value != self._hotkey_value
             self._hotkey_value = value
-            self.hotkey_note.setText(tr("Click the shortcut field and press your preferred key combination."))
+            ui_text(self.hotkey_note, tr("Click the shortcut field and press your preferred key combination."))
             if changed:
                 self.hotkey_changed.emit(value)
         self._refresh_listening()

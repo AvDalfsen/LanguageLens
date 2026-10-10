@@ -8,6 +8,7 @@ from threading import RLock
 import unicodedata
 
 from language_lens.domain import WordTranslation
+from language_lens.services.diagnostics import record_failure
 from language_lens.runtime import recovery_instruction
 from language_lens.services.model_download import DownloadProgress, download_model
 
@@ -35,17 +36,19 @@ def selection_results(translator, text, words, source, target, report, cancelled
         return
     try:
         sentence = translator.translate(text, source, target)
-    except Exception:
+    except Exception as exc:
+        record_failure("translation-sentence", exc)
         sentence = ""
-        report("Whole-selection translation failed. Word lookups remain available; choose 'Retry translation' to try again.")
+        report("Whole-selection translation unavailable. Word lookups are independent.")
     yield sentence, {}
     for word in dict.fromkeys(words):
         if cancelled():
             return
         try:
             translation = translator.word_candidates(word, source, target)
-        except Exception:
-            translation = WordTranslation((), "Word translation unavailable. Choose 'Retry translation' to try again.")
+        except Exception as exc:
+            record_failure("translation-word", exc)
+            translation = WordTranslation((), "Translation stopped. Choose 'Retry translation'.")
         yield None, {word: translation}
 
 
@@ -226,6 +229,8 @@ class ArgosTranslator:
                 if candidates:
                     return WordTranslation(tuple(candidates if expanded else candidates[:4]))
             except Exception as exc:
+                if not isinstance(exc, NotImplementedError):
+                    record_failure("translation-hypotheses", exc)
                 if expanded:
                     raise TranslationUnavailable("Could not load more candidates. Please retry.") from exc
                 # Some packages/backends can translate but cannot return an n-best list.
@@ -248,5 +253,8 @@ class ArgosTranslator:
                 raise TranslationUnavailable(
                     f"Local translation failed for {source} → {target}. Use 'Check required files' or 'Reinstall translation model' in 'Settings'."
                 ) from exc
-        return result.strip() or text
+        value = result.strip()
+        if not value:
+            raise TranslationUnavailable("The local translation returned no usable text. Please retry.")
+        return value
 

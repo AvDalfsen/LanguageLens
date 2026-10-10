@@ -198,3 +198,36 @@ def test_expanded_failure_preserves_compact_results_and_can_be_retried(monkeypat
     assert translator.word_candidates("four", "en", "pt") == compact
     fail[0] = False
     assert translator.word_candidates("four", "en", "pt", expanded=True).candidates == ("vier", "4")
+
+
+@pytest.mark.parametrize("output", ["", "   ", "\n\t"])
+def test_empty_sentence_and_word_fallback_are_failures(monkeypatch, output):
+    translator = candidate_backend(monkeypatch, lambda *a, **kw: [], lambda *a: output)
+    with pytest.raises(translation_module.TranslationUnavailable, match="no usable text"):
+        translator.translate("Bonjour", "fr", "en")
+    with pytest.raises(translation_module.TranslationUnavailable):
+        translator.word_candidates("Bonjour", "fr", "en")
+
+
+def test_valid_unchanged_name_and_explicit_passthrough_are_allowed(monkeypatch):
+    translator = candidate_backend(monkeypatch, lambda *a, **kw: [], lambda *a: "Amsterdam")
+    assert translator.translate("Amsterdam", "nl", "en") == "Amsterdam"
+    monkeypatch.setattr(ArgosTranslator, "_modules", staticmethod(lambda: pytest.fail("Passthrough must not load models")))
+    assert translator.translate("", "nl", "en") == ""
+    assert translator.translate("Bonjour", "fr", "fr") == "Bonjour"
+
+
+def test_partial_translation_failures_log_types_without_private_text(caplog):
+    class Translator:
+        def translate(self, *_args):
+            raise RuntimeError("PRIVATE_SENTENCE")
+        def word_candidates(self, word, *_args):
+            if word == "bad":
+                raise ValueError("PRIVATE_WORD")
+            return WordTranslation(("usable",))
+    results = list(translation_module.selection_results(Translator(), "source", ["bad", "good"], "fr", "en", lambda _: None))
+    assert results[0] == ("", {})
+    assert results[-1][1]["good"].candidates == ("usable",)
+    assert "translation-sentence: RuntimeError" in caplog.text
+    assert "translation-word: ValueError" in caplog.text
+    assert "PRIVATE_" not in caplog.text

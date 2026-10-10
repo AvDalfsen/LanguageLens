@@ -6,7 +6,7 @@ from dataclasses import asdict
 from PySide6.QtCore import QObject, QPoint, QRect, QRunnable, QSize, Qt, Signal
 from PySide6.QtGui import QImage
 from language_lens.config import Settings
-from language_lens.domain import OcrLine, WordTranslation, reading_order
+from language_lens.domain import OcrLine, reading_order
 from language_lens.services.capture import DesktopCapture
 from language_lens.services.ocr import RapidOcrEngine
 from language_lens.services.translation import ArgosTranslator

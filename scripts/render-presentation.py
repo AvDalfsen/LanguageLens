@@ -91,7 +91,7 @@ def main():
         "uma": ("a",), "história": ("story",),
     }
     pool = SimpleNamespace(globalInstance=lambda: SimpleNamespace(start=lambda _task: None))
-    with patch("language_lens.ui.review.QThreadPool", pool):
+    with patch("language_lens.ui.review.TaskPool", pool):
         window = ReviewWindow(page, selection, Settings(source_language="pt", target_language="en", speech_enabled=False))
         window._ocr_finished([OcrLine(text, .99, ((8, 1), (text_width + 8, 1), (text_width + 8, 39), (8, 39)))])
         window._translation_finished(("These words tell a story.", {word: WordTranslation(values) for word, values in translations.items()}))

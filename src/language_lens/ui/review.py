@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from language_lens.i18n import tr, tr_message, language
+from language_lens.i18n import tr, tr_message, language, ui_text, ui_widget, runtime_message
 
 import html
 import json
@@ -17,7 +17,7 @@ from PySide6.QtCore import (
     QTimer,
     Signal,
 )
-from PySide6.QtGui import QColor, QCloseEvent, QCursor, QImage, QKeyEvent, QKeySequence, QShortcut, QMouseEvent, QPainter, QPen, QPixmap
+from PySide6.QtGui import QColor, QCloseEvent, QCursor, QKeyEvent, QKeySequence, QShortcut, QMouseEvent, QPainter, QPen, QPixmap
 from PySide6.QtWidgets import (
     QFrame,
     QAbstractButton,
@@ -36,13 +36,12 @@ from PySide6.QtWidgets import (
 )
 
 from language_lens.config import Settings
-from language_lens.runtime import recovery_instruction
 from language_lens.domain import OcrLine, Rect, WordHit, WordTranslation, build_word_hits
 from language_lens.services.capture import DesktopCapture
 from language_lens.services.ocr import RapidOcrEngine
-from language_lens.services.translation import ArgosTranslator, TranslationUnavailable
+from language_lens.services.translation import ArgosTranslator
 from language_lens.services.speech import SpeechJob, SpeechPlayer
-from language_lens.services.jobs import TaskPool as QThreadPool
+from language_lens.services.jobs import TaskPool
 # Domain tasks retain their testable QRunnable interface; this dispatcher starts
 # isolated QProcess workers, not Qt worker threads or native engines in the GUI.
 from language_lens.services.voices import MAX_TEXT_LENGTH, runtime_ready, voice_runtime_ready, selected_voice, voice_present
@@ -188,9 +187,9 @@ class ImageCanvas(QWidget):
         self._playback_state = "idle"
         self._active_word: tuple[int, int] | None = None
         self.setMouseTracking(True)
-        self.setAccessibleName(tr("Captured screenshot"))
-        self.setAccessibleDescription(tr("Hover over recognized words, or click one to pin its details. "
-                                      "Use the left and right arrow keys to browse recognized words; Escape closes the screenshot."))
+        ui_text(self, tr("Captured screenshot"), property="accessibleName")
+        ui_text(self, tr("Hover over recognized words, or click one to pin its details. "
+                                      "Use the left and right arrow keys to browse recognized words; Escape closes the screenshot."), property="accessibleDescription")
         self.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
         self.setMinimumSize(480, 260)
 
@@ -308,7 +307,7 @@ class ImageCanvas(QWidget):
             return
         bubble = self._bubble
         item = self._pronunciations.get(self._span(hit))
-        bubble.word.setText(hit.text)
+        ui_text(bubble.word, hit.text)
         word = hit.lookup_text
         expanded_result = self._expanded_translations.get(word)
         showing = word in self._candidate_lists_visible
@@ -328,13 +327,13 @@ class ImageCanvas(QWidget):
             error=self._candidate_errors.get(word, ""),
         )
         bubble.ipa.setVisible(self._show_ipa and bool(item and item["ipa"]))
-        bubble.ipa.setText(f'[{item["ipa"]}]' if item and item["ipa"] else "")
+        ui_text(bubble.ipa, f'[{item["ipa"]}]' if item and item["ipa"] else "")
         notes = tuple(tr(note) for note in item.get("ipa_notes", ())) if item else ()
-        bubble.ipa.setToolTip("\n".join((
+        ui_text(bubble.ipa, "\n".join((
             tr("Estimated pronunciation, not a measurement of the voice's audio."),
             *notes,
             tr("Original synthesis phonemes: [{phonemes}]", phonemes=item["phonemes"]) if item else "",
-        )))
+        )), property="toolTip")
         detail = self._pronunciation_message
         if item:
             detail = {"context": tr("From selected sentence"), "isolated": tr("Word in isolation"),
@@ -346,17 +345,17 @@ class ImageCanvas(QWidget):
                 tr("Mapped from the selected sentence. The engine can still misread ambiguous words.")
                 if item["mode"] == "context" else tr("Generated for this word in isolation.")
             )
-            bubble.detail.setToolTip("\n".join((origin, *notes)))
+            ui_text(bubble.detail, "\n".join((origin, *notes)), property="toolTip")
         else:
-            bubble.detail.setToolTip(detail)
-        bubble.detail.setText(detail)
+            ui_text(bubble.detail, detail, property="toolTip")
+        ui_text(bubble.detail, detail)
         bubble.detail.setVisible(bool(detail) and (self._show_ipa or self._audio_enabled))
-        bubble.voice.setText(self._voice_name)
+        ui_text(bubble.voice, self._voice_name)
         bubble.voice.setVisible(bool(self._voice_name) and (self._show_ipa or self._audio_enabled))
         busy = self._playback_state in ("generating", "loading", "playing", "stopping")
         own_audio = busy and self._active_word == self._span(hit)
         bubble.play.setVisible(self._audio_enabled)
-        bubble.play.setText(tr("Stop word") if own_audio else tr("Pronounce word"))
+        ui_text(bubble.play, tr("Stop word") if own_audio else tr("Pronounce word"))
         bubble.play.setEnabled(bool(item and item["phonemes"] and item["mode"] != "unavailable")
                                and (not busy or own_audio) and self._playback_state != "stopping")
         bubble.retry.setVisible(self._pronunciation_failed)
@@ -587,7 +586,7 @@ class ReviewWindow(QWidget):
         self.settings = settings
         self._closed = False
         self._jobs = []
-        self._more_job = None
+        self._translation_job = self._more_job = None
         self._more_word = None
         self._current_word_index = -1
         self._manual_panel_position = None
@@ -638,16 +637,16 @@ class ReviewWindow(QWidget):
             canvas.word_audio_requested.connect(self._read_word)
             canvas.pronunciation_retry_requested.connect(self._prepare_pronunciation)
             canvas.more_candidates_requested.connect(self._request_more_candidates)
-        self.status = QLabel(tr("Reading the selected text locally…"))
+        self.status = ui_widget(QLabel, tr("Reading the selected text locally…"))
         self.status.setWordWrap(True)
         self.status.setObjectName("statusLabel")
-        self.status.setAccessibleName(tr("Recognition and translation status"))
-        self.translation = QLabel("")
+        ui_text(self.status, tr("Recognition and translation status"), property="accessibleName")
+        self.translation = ui_widget(QLabel, "")
         self.translation.setObjectName("sentenceTranslation")
         self.translation.setWordWrap(True)
         make_copyable(self.translation, tr("Whole-selection translation"), lambda: self._translated_text)
         self.translation.hide()
-        close_button = QPushButton(tr("Close and return   Esc"))
+        close_button = ui_widget(QPushButton, tr("Close and return   Esc"))
         close_button.clicked.connect(self.close)
 
         footer = DraggablePanel()
@@ -658,7 +657,7 @@ class ReviewWindow(QWidget):
         body_layout = QVBoxLayout(self._footer_body)
         body_layout.setContentsMargins(0, 0, 0, 0)
         body_layout.addWidget(self.status)
-        self.diagnostics_button = QPushButton(tr("Open diagnostics folder"))
+        self.diagnostics_button = ui_widget(QPushButton, tr("Open diagnostics folder"))
         self.diagnostics_button.clicked.connect(open_folder)
         self.diagnostics_button.hide()
         body_layout.addWidget(self.diagnostics_button)
@@ -684,7 +683,7 @@ class ReviewWindow(QWidget):
         self._footer_scroll.setWidget(self._footer_body)
         footer_layout.addWidget(self._footer_scroll)
         button_row = QGridLayout()
-        self.read_button = QPushButton(tr("Read selection"))
+        self.read_button = ui_widget(QPushButton, tr("Read selection"))
         self.read_button.setEnabled(False)
         self.read_button.clicked.connect(self._read_selection)
         self.speech_status = QLabel()
@@ -692,17 +691,17 @@ class ReviewWindow(QWidget):
         self.speech_status.setTextFormat(Qt.TextFormat.PlainText)
         self.speech_status.setWordWrap(True)
         self.speech.changed.connect(self._speech_changed)
-        self.retry_ocr = QPushButton(tr("Retry OCR"))
+        self.retry_ocr = ui_widget(QPushButton, tr("Retry OCR"))
         self.retry_ocr.clicked.connect(self._retry_ocr)
-        self.reselect = QPushButton(tr("Select another area"))
+        self.reselect = ui_widget(QPushButton, tr("Select another area"))
         self.reselect.clicked.connect(lambda: self.reselect_requested.emit(self.canvas.capture))
-        self.copy_button = QPushButton(tr("Copy source text"))
+        self.copy_button = ui_widget(QPushButton, tr("Copy source text"))
         self.copy_button.clicked.connect(self._copy_source)
         self.copy_button.setEnabled(False)
-        self.retry_translation = QPushButton(tr("Retry translation"))
+        self.retry_translation = ui_widget(QPushButton, tr("Retry translation"))
         self.retry_translation.clicked.connect(self._start_translation)
         self.retry_translation.setEnabled(False)
-        self.collapse_translation = QPushButton(tr("Hide translation"))
+        self.collapse_translation = ui_widget(QPushButton, tr("Hide translation"))
         self.collapse_translation.clicked.connect(self._toggle_translation)
         self.collapse_translation.setEnabled(False)
         self._translation_hidden = False
@@ -732,7 +731,7 @@ class ReviewWindow(QWidget):
         self.speed_label = QLabel()
         self.speed_label.setObjectName("note")
         self.speed_slider = QSlider(Qt.Orientation.Horizontal)
-        self.speed_slider.setAccessibleName(tr("Pronunciation speed"))
+        ui_text(self.speed_slider, tr("Pronunciation speed"), property="accessibleName")
         self.speed_slider.setRange(50, 150)
         self.speed_slider.setSingleStep(5)
         self.speed_slider.setPageStep(25)
@@ -747,7 +746,7 @@ class ReviewWindow(QWidget):
         speed_row.addWidget(self.speed_label)
         speed_row.addWidget(self.speed_slider, 1)
         footer_layout.addLayout(speed_row)
-        self.speed_label.setText(f"{tr('Pronunciation speed')}: {self.speech.speed:g}×")
+        ui_text(self.speed_label, f"{tr('Pronunciation speed')}: {self.speech.speed:g}×")
 
         self._footer = footer
         footer.setParent(self)
@@ -812,7 +811,7 @@ class ReviewWindow(QWidget):
         self.copy_button.setEnabled(False)
         self.retry_translation.setEnabled(False)
         self.collapse_translation.setEnabled(False)
-        self.status.setText(tr("Reading selected text locally…"))
+        ui_text(self.status, tr("Reading selected text locally…"))
         self.retry_ocr.setEnabled(False)
         capture, selection, settings = self.canvas.capture, self._selection, self.settings
         padding = max(16, min(48, round(min(selection.width(), selection.height()) * 0.35)))
@@ -831,12 +830,27 @@ class ReviewWindow(QWidget):
                 selection_size=selection.size(),
             )
         task.signals.result.connect(self._ocr_finished)
-        task.signals.setParent(self)
         task.signals.error.connect(self._ocr_failed)
-        task.signals.progress.connect(lambda message: self.status.setText(tr_message(message)))
+        task.signals.progress.connect(lambda message: ui_text(self.status, tr_message(message)))
         # One spanning window has only one DPR. Native windows per monitor retain
         # each screen's logical-to-physical mapping for display and mouse input.
-        self._jobs.append(QThreadPool.globalInstance().start(task))
+        self._start_task(task)
+
+    def _start_task(self, task):
+        task.signals.setParent(self)
+        job = TaskPool.globalInstance().start(task)
+        if job is not None and job.active:
+            self._jobs.append(job)
+            job.settled.connect(lambda: self._task_settled(job))
+            return job
+        return None
+
+    def _task_settled(self, job) -> None:
+        self._jobs = [item for item in self._jobs if item is not job]
+        if self._translation_job is job:
+            self._translation_job = None
+        if self._more_job is job:
+            self._more_job = None
 
     def _ocr_failed(self, message: str) -> None:
         if not self._closed:
@@ -852,7 +866,7 @@ class ReviewWindow(QWidget):
             return
         self._translation_hidden = not self._translation_hidden
         self.translation.setVisible(bool(self.translation.text()) and not self._translation_hidden)
-        self.collapse_translation.setText(tr("Show translation") if self._translation_hidden else tr("Hide translation"))
+        ui_text(self.collapse_translation, tr("Show translation") if self._translation_hidden else tr("Hide translation"))
         self._position_children()
 
     def _word_selected(self, hit: WordHit, canvas: ImageCanvas) -> None:
@@ -914,43 +928,37 @@ class ReviewWindow(QWidget):
         self._translation_total = len({hit.lookup_text for hit in self._hits})
         self._update_canvases("set_hits", self._hits)
         self._speech_text = " ".join(line.text for line in self._lines)
-        self.recognized_text.setText(self._speech_text)
+        ui_text(self.recognized_text, self._speech_text)
         self.recognized_section.toggle.setEnabled(bool(self._speech_text.strip()))
         self.copy_button.setEnabled(bool(self._speech_text))
         self._refresh_speech()
         self._prepare_pronunciation()
         self._position_children()
         if not self._lines:
-            self.status.setText(
-                tr("No text found after a second enlarged scan. Try including a little "
-                "space around the text, or select a clearer/larger version.")
-            )
+            ui_text(self.status, tr("No text found after a second enlarged scan. Try including a little "
+                "space around the text, or select a clearer/larger version."))
             return
-        self.status.setText(
-            tr("Found {count} words. Hover for details; click to pin. Use the left and right arrow keys to browse words.", count=len(self._hits))
-        )
+        ui_text(self.status, tr("Found {count} words. Hover for details; click to pin. Use the left and right arrow keys to browse words.", count=len(self._hits)))
         self._start_translation()
 
     def _start_translation(self) -> None:
         if self._closed or not self._lines:
             return
-        for job in self._jobs[1:]:
+        for job in (self._translation_job, self._more_job):
             if job is not None:
                 job.shutdown()
         self.retry_translation.setEnabled(False)
         self._translations.clear()
         self._failed_words.clear()
-        self.status.setText(self._word_instructions() + tr("\nTranslating the selection locally…"))
+        ui_text(self.status, self._word_instructions() + tr("\nTranslating the selection locally…"))
         task = TranslationTask(
             self._lines, (hit.lookup_text for hit in self._hits), self.settings,
             translator=self._translator, cancelled=self._translation_cancelled,
         )
         task.signals.result.connect(self._translation_finished)
-        task.signals.setParent(self)
         task.signals.error.connect(self._translation_failed)
-        task.signals.progress.connect(lambda message: self.status.setText(tr_message(message)))
-        job = QThreadPool.globalInstance().start(task)
-        self._jobs.append(job)
+        task.signals.progress.connect(lambda message: ui_text(self.status, tr_message(message)))
+        job = self._translation_job = self._start_task(task)
         if job is not None:
             job.finished.connect(lambda: self.retry_translation.setEnabled(True))
 
@@ -968,7 +976,7 @@ class ReviewWindow(QWidget):
         sentence, translations = result
         if sentence is not None:
             self._translated_text = sentence
-            self.translation.setText(f"<b>{html.escape(tr('Whole selection:'))}</b> {html.escape(sentence)}" if sentence else tr("Whole-selection translation unavailable. Word lookups are independent."))
+            ui_text(self.translation, f"<b>{html.escape(tr('Whole selection:'))}</b> {html.escape(sentence)}" if sentence else tr("Whole-selection translation unavailable. Word lookups are independent."))
             self.translation.setVisible(not self._translation_hidden)
             self.collapse_translation.setEnabled(True)
         self._translations.update(translations)
@@ -991,7 +999,8 @@ class ReviewWindow(QWidget):
                         if language() == "en" else " " + tr("{count} word lookups unavailable; retry translation.", count=failed))
         if not self._translated_text:
             message += " " + tr("Whole-selection translation unavailable. Word lookups are independent.")
-        self.status.setText(message)
+        ui_text(self.status, message)
+        self.diagnostics_button.setVisible(bool(failed or not self._translated_text))
         self._translation_layout_timer.start(0)
 
     def _word_instructions(self) -> str:
@@ -1002,13 +1011,10 @@ class ReviewWindow(QWidget):
             return
         task = MoreCandidatesTask(word, self.settings, self._translator, self._translation_cancelled)
         task.signals.result.connect(self._more_candidates_finished)
-        task.signals.setParent(self)
         if self._more_job is not None and self._more_job.active:
             self._more_job.shutdown()
         self._more_word = word
-        self._more_job = QThreadPool.globalInstance().start(task)
-        self._jobs = self._jobs[:1] + [job for job in self._jobs[1:] if job is not None and job.active]
-        self._jobs.append(self._more_job)
+        self._more_job = self._start_task(task)
 
     def _more_candidates_finished(self, result: object) -> None:
         if not self._closed:
@@ -1018,7 +1024,7 @@ class ReviewWindow(QWidget):
     def _failed(self, message: str) -> None:
         if self._closed:
             return
-        self.status.setText(tr("Could not finish: {error}", error=message))
+        ui_text(self.status, tr("Could not finish: {error}", error=message))
         self.diagnostics_button.show()
         self._position_children()
 
@@ -1030,21 +1036,21 @@ class ReviewWindow(QWidget):
         elif self._voice is None:
             message = tr("No pronunciation voice is available for this text language yet.")
         elif not runtime_ready():
-            message = tr("Speech components could not be loaded. ") + recovery_instruction()
+            message = runtime_message("Speech components could not be loaded. ")
         elif not voice_runtime_ready(self._voice):
             message = tr("Download the Japanese pronunciation pack in 'Settings' to read this text aloud.")
         elif not voice_present(self._voice):
-            message = "Use 'Download voice' in 'Settings' to read this text aloud."
+            message = tr("Use 'Download voice' in 'Settings' to read this text aloud.")
         elif len(self._speech_text) > MAX_TEXT_LENGTH:
-            message = "Select a shorter passage to read aloud (up to 2,000 characters)."
+            message = tr("Select a shorter passage to read aloud (up to 2,000 characters).")
         elif self._speech_text.strip():
             ready = True
             message = self._voice.name
         self.read_button.setEnabled(ready)
         self.speed_slider.setEnabled(ready or self.speech.busy)
-        self.read_button.setText(tr("Read selection"))
-        self.read_button.setToolTip(tr("Read the original text aloud in the selected voice."))
-        self.speech_status.setText(message)
+        ui_text(self.read_button, tr("Read selection"))
+        ui_text(self.read_button, tr("Read the original text aloud in the selected voice."), property="toolTip")
+        ui_text(self.speech_status, message)
         self.speech_status.setVisible(bool(message))
 
     def _read_selection(self) -> None:
@@ -1062,7 +1068,7 @@ class ReviewWindow(QWidget):
         speed = value / 100
         self.speech.stop()
         self.speech.speed = self.settings.speech_speed = speed
-        self.speed_label.setText(f"{tr('Pronunciation speed')}: {speed:g}×")
+        ui_text(self.speed_label, f"{tr('Pronunciation speed')}: {speed:g}×")
         self.speech_speed_changed.emit(speed)
 
     def eventFilter(self, watched, event) -> bool:  # noqa: N802
@@ -1090,7 +1096,7 @@ class ReviewWindow(QWidget):
         if not has_runtime:
             message = (tr("Download the Japanese pronunciation pack in 'Settings' to enable phonetic notation.")
                        if self._voice.phoneme_type == "japanese" else
-                       "Pronunciation components could not be loaded. " + recovery_instruction())
+                       runtime_message("Pronunciation components could not be loaded. "))
             self._update_canvases("set_pronunciations", [], message)
             return
         if not self._speech_text.strip() or len(self._speech_text) > MAX_TEXT_LENGTH:
@@ -1145,10 +1151,10 @@ class ReviewWindow(QWidget):
         self._update_canvases("set_playback", state, self._active_word)
         self._refresh_speech()
         if self.speech.busy:
-            self.read_button.setText(tr("Cancel audio") if state == "generating" else tr("Stop audio"))
+            ui_text(self.read_button, tr("Cancel audio") if state == "generating" else tr("Stop audio"))
             self.read_button.setEnabled(state != "stopping")
         if message:
-            self.speech_status.setText(tr("Pronouncing word…") if state == "playing" and self._active_word else tr_message(message))
+            ui_text(self.speech_status, tr("Pronouncing word…") if state == "playing" and self._active_word else tr_message(message))
             self.speech_status.show()
         self._position_children()
 
