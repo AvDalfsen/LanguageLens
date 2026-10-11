@@ -1,0 +1,256 @@
+{
+  "description": "Original fresh final validation passages for the joint model/settings experiment. Literal rendered strings are ground truth. No passage is used for screening or tuning.",
+  "categories": ["daily-life", "orthography", "short-label", "quotation", "measurements", "technical", "context", "mixed-script"],
+  "languages": {
+    "ar": [
+      "في الصباح اشترت مريم خبزًا وزيتونًا من السوق القريب.",
+      "تَأَمَّلَ رَؤُوفٌ أَشْجَارَ اللَّيْمُونِ بِهُدُوءٍ.",
+      "إعدادات العرض المتقدمة",
+      "سأل: «أين وضعتَ نظارتي؟» فأجابت: «على الرفّ».",
+      "المسافة ٧٫٨ كم؛ الوزن ٠٫٦٥ كغ؛ الرصيد ٢٤٨٫٩٠ €.",
+      "الملف notes_07.txt؛ المنفذ 8086؛ الأمر git status.",
+      "كانت النافذة مفتوحة عندما بدأ المطر، لذلك نقلنا الأوراق إلى الغرفة الأخرى وأغلقنا الستائر قبل العودة إلى العمل.",
+      "الفئة B7: العربية / English؛ النموذج ZX-906؛ μ = 0.8."
+    ],
+    "zh": [
+      "早晨，林老师在附近的市场买了面包和新鲜蔬菜。",
+      "比较：辨认与辩论，晴天与眼睛，己／已／巳。",
+      "高级显示设置",
+      "他问：“我的眼镜放在哪里？”她答道：“在书架上。”",
+      "距离7.8公里；重量0.65千克；余额¥248.90。",
+      "文件 notes_07.txt；端口8086；命令 git status。",
+      "下雨时窗户还开着，所以我们把桌上的纸张搬到另一间房里，关好窗帘以后才继续讨论周末的计划。",
+      "类别B7：中文／English；型號ZX-906；μ = 0.8。"
+    ],
+    "cs": [
+      "Ráno koupila Tereza v nedalekém obchodě chléb a čerstvou zeleninu.",
+      "Ďáblův číšník přinesl horký čaj, lískové oříšky a džbán vody.",
+      "Pokročilé nastavení zobrazení",
+      "Zeptal se: „Kde mám brýle?“ Odpověděla: „Na poličce.“",
+      "Vzdálenost 7,8 km; hmotnost 0,65 kg; zůstatek 248,90 Kč.",
+      "Soubor notes_07.txt; port 8086; příkaz git status.",
+      "Když začalo pršet, okno bylo stále otevřené, a proto jsme přenesli papíry do vedlejší místnosti a teprve potom pokračovali v práci.",
+      "Třída B7: čeština / English; model ZX-906; μ = 0.8."
+    ],
+    "da": [
+      "Om morgenen købte Lærke brød og friske grøntsager i den lokale butik.",
+      "Høj søgang, små øer, mærkelige spørgsmål og en grøn paraply.",
+      "Avancerede skærmindstillinger",
+      "Han spurgte: »Hvor er mine briller?« Hun svarede: »På hylden.«",
+      "Afstand 7,8 km; vægt 0,65 kg; saldo 248,90 kr.",
+      "Fil notes_07.txt; port 8086; kommando git status.",
+      "Vinduet stod stadig åbent, da regnen begyndte, så vi flyttede papirerne ind i det næste rum og fortsatte derefter arbejdet.",
+      "Klasse B7: dansk / English; model ZX-906; μ = 0.8."
+    ],
+    "nl": [
+      "In de ochtend kocht Noëlle brood en verse groenten bij de buurtwinkel.",
+      "Een geëmailleerde schaal, een skiër, ideeën en een officiële enquête.",
+      "Geavanceerde beeldscherminstellingen",
+      "Hij vroeg: ‘Waar ligt mijn bril?’ Zij antwoordde: ‘Op de plank.’",
+      "Afstand 7,8 km; gewicht 0,65 kg; saldo €248,90.",
+      "Bestand notes_07.txt; poort 8086; opdracht git status.",
+      "Toen het begon te regenen stond het raam nog open, dus brachten we de papieren naar de andere kamer voordat we weer aan het werk gingen.",
+      "Klasse B7: Nederlands / English; model ZX-906; μ = 0.8."
+    ],
+    "en": [
+      "At dawn, Eleanor bought fresh bread and vegetables from the corner shop.",
+      "A coöperative résumé: façade, piñata, soufflé and tête-à-tête.",
+      "Advanced display preferences",
+      "He asked, “Where are my glasses?” She replied, “On the shelf.”",
+      "Distance 7.8 km; mass 0.65 kg; balance £248.90.",
+      "File notes_07.txt; port 8086; command git status.",
+      "The window was still open when the rain began, so we carried the papers into the next room and drew the curtains before returning to work.",
+      "Class B7: English / français; model ZX-906; μ = 0.8."
+    ],
+    "fi": [
+      "Aamulla Sini osti lähikaupasta leipää ja tuoreita vihanneksia.",
+      "Ystävällinen lääkäri käveli järven rannalla öljylamppu kädessään.",
+      "Näytön lisäasetukset",
+      "Hän kysyi: ”Missä silmälasini ovat?” Vastaus oli: ”Hyllyllä.”",
+      "Matka 7,8 km; paino 0,65 kg; saldo 248,90 €.",
+      "Tiedosto notes_07.txt; portti 8086; komento git status.",
+      "Ikkuna oli vielä auki sateen alkaessa, joten siirsimme paperit viereiseen huoneeseen ja suljimme verhot ennen työn jatkamista.",
+      "Luokka B7: suomi / English; malli ZX-906; μ = 0.8."
+    ],
+    "fr": [
+      "À l'aube, Élodie a acheté du pain et des légumes frais à l'épicerie.",
+      "Un œuf, des huîtres, une mosaïque, un faïencier et un cœur léger.",
+      "Paramètres d'affichage avancés",
+      "Il demanda : « Où sont mes lunettes ? » Elle répondit : « Sur l'étagère. »",
+      "Distance 7,8 km ; masse 0,65 kg ; solde 248,90 €.",
+      "Fichier notes_07.txt ; port 8086 ; commande git status.",
+      "La fenêtre était encore ouverte quand la pluie a commencé ; nous avons donc porté les papiers dans la pièce voisine avant de reprendre le travail.",
+      "Classe B7 : français / English ; modèle ZX-906 ; μ = 0.8."
+    ],
+    "de": [
+      "Am Morgen kaufte Charlotte im Laden frisches Brot und Gemüse.",
+      "Die äußerst fleißige Verkäuferin prüft Größen, Öfen und Fußböden.",
+      "Erweiterte Anzeigeeinstellungen",
+      "Er fragte: „Wo liegt meine Brille?“ Sie antwortete: „Im Regal.“",
+      "Strecke 7,8 km; Masse 0,65 kg; Guthaben 248,90 €.",
+      "Datei notes_07.txt; Port 8086; Befehl git status.",
+      "Als der Regen begann, stand das Fenster noch offen, deshalb brachten wir die Papiere ins Nebenzimmer und arbeiteten anschließend weiter.",
+      "Klasse B7: Deutsch / English; Modell ZX-906; μ = 0.8."
+    ],
+    "el": [
+      "Το πρωί η Ελένη αγόρασε ψωμί και φρέσκα λαχανικά από το κατάστημα.",
+      "Μαΐου, προϋπόθεση, ευφυΐα, αϋπνία και φωτεινός ουρανός.",
+      "Προχωρημένες ρυθμίσεις οθόνης",
+      "Ρώτησε: «Πού είναι τα γυαλιά μου;» Εκείνη είπε: «Στο ράφι.»",
+      "Απόσταση 7,8 χλμ.; βάρος 0,65 κιλά; υπόλοιπο 248,90 €.",
+      "Αρχείο notes_07.txt· θύρα 8086· εντολή git status.",
+      "Το παράθυρο ήταν ακόμη ανοιχτό όταν άρχισε η βροχή, οπότε μεταφέραμε τα χαρτιά στο διπλανό δωμάτιο πριν συνεχίσουμε τη δουλειά.",
+      "Κατηγορία B7: ελληνικά / English· μοντέλο ZX-906· μ = 0.8."
+    ],
+    "hi": [
+      "सुबह अनन्या ने पास की दुकान से रोटी और ताज़ी सब्ज़ियाँ ख़रीदीं।",
+      "कृपया दृष्टि, श्रद्धा, क्षत्रिय, ज्ञान और स्वतंत्रता पढ़िए।",
+      "उन्नत प्रदर्शन सेटिंग्स",
+      "उसने पूछा, “मेरा चश्मा कहाँ है?” उत्तर मिला, “अलमारी में।”",
+      "दूरी ७.८ किमी; वज़न ०.६५ किग्रा; राशि ₹२४८.९०।",
+      "फ़ाइल notes_07.txt; पोर्ट 8086; कमांड git status।",
+      "बारिश शुरू होने पर खिड़की खुली हुई थी, इसलिए हमने काग़ज़ दूसरे कमरे में रख दिए और काम जारी रखने से पहले पर्दे बंद कर दिए।",
+      "श्रेणी B7: हिन्दी / English; मॉडल ZX-906; μ = 0.8."
+    ],
+    "hu": [
+      "Reggel Réka friss kenyeret és zöldséget vett a közeli boltban.",
+      "Gyönyörű gyümölcs, tűző nap, hűvös szellő és könnyű esőkabát.",
+      "Speciális megjelenítési beállítások",
+      "Megkérdezte: „Hol van a szemüvegem?” A válasz: „A polcon.”",
+      "Távolság 7,8 km; tömeg 0,65 kg; egyenleg 248,90 Ft.",
+      "Fájl notes_07.txt; port 8086; parancs git status.",
+      "Az ablak még nyitva volt, amikor eleredt az eső, ezért átvittük a papírokat a szomszéd szobába, majd folytattuk a munkát.",
+      "B7 osztály: magyar / English; modell ZX-906; μ = 0.8."
+    ],
+    "it": [
+      "All'alba Chiara ha comprato pane e verdure fresche nel negozio vicino.",
+      "Perché l'acqua è già tiepida? Città, virtù, più, né e caffè.",
+      "Impostazioni avanzate dello schermo",
+      "Chiese: «Dove sono i miei occhiali?» Lei rispose: «Sullo scaffale».",
+      "Distanza 7,8 km; massa 0,65 kg; saldo 248,90 €.",
+      "File notes_07.txt; porta 8086; comando git status.",
+      "La finestra era ancora aperta quando iniziò a piovere, così portammo i fogli nella stanza accanto prima di riprendere il lavoro.",
+      "Classe B7: italiano / English; modello ZX-906; μ = 0.8."
+    ],
+    "ja": [
+      "朝、美咲さんは近所の店でパンと新鮮な野菜を買いました。",
+      "読み分け：議論と義理、土と士、シとツ、ぬとめ。",
+      "ディスプレイの詳細設定",
+      "彼は「眼鏡はどこ？」と聞き、彼女は「棚の上です」と答えた。",
+      "距離7.8km、重さ0.65kg、残高248.90円。",
+      "ファイル notes_07.txt、ポート8086、コマンド git status。",
+      "雨が降り始めたとき窓はまだ開いていたので、私たちは書類を隣の部屋へ運び、カーテンを閉めてから仕事を再開した。",
+      "区分B7：日本語／English、型番ZX-906、μ = 0.8。"
+    ],
+    "ko": [
+      "아침에 지민은 가까운 가게에서 빵과 신선한 채소를 샀습니다.",
+      "값, 꽃, 닭, 읽다, 넓다, 앉다, 괜찮다와 푸른 하늘.",
+      "고급 디스플레이 설정",
+      "그는 “내 안경이 어디 있어?”라고 물었고 그녀는 “선반 위에”라고 답했다.",
+      "거리 7.8km; 무게 0.65kg; 잔액 ₩248.90.",
+      "파일 notes_07.txt; 포트 8086; 명령 git status.",
+      "비가 내리기 시작했을 때 창문은 여전히 열려 있었기 때문에 우리는 서류를 옆방으로 옮기고 커튼을 닫은 뒤 일을 계속했다.",
+      "분류 B7: 한국어 / English; 모델 ZX-906; μ = 0.8."
+    ],
+    "nb": [
+      "Om morgenen kjøpte Ingrid brød og ferske grønnsaker i nærbutikken.",
+      "Høye bølger, små øyer, særegne spørsmål og en grønn paraply.",
+      "Avanserte skjerminnstillinger",
+      "Han spurte: «Hvor er brillene mine?» Hun svarte: «På hyllen.»",
+      "Avstand 7,8 km; vekt 0,65 kg; saldo 248,90 kr.",
+      "Fil notes_07.txt; port 8086; kommando git status.",
+      "Vinduet var fortsatt åpent da regnet begynte, så vi flyttet papirene til rommet ved siden av og fortsatte deretter arbeidet.",
+      "Klasse B7: norsk / English; modell ZX-906; μ = 0.8."
+    ],
+    "pl": [
+      "Rano Zofia kupiła chleb i świeże warzywa w pobliskim sklepie.",
+      "Łąka, źdźbło, żółw, gęś i ćma obok drewnianej łódki.",
+      "Zaawansowane ustawienia wyświetlania",
+      "Zapytał: „Gdzie są moje okulary?” Odpowiedziała: „Na półce”.",
+      "Odległość 7,8 km; masa 0,65 kg; saldo 248,90 zł.",
+      "Plik notes_07.txt; port 8086; polecenie git status.",
+      "Kiedy zaczął padać deszcz, okno było nadal otwarte, więc przenieśliśmy dokumenty do sąsiedniego pokoju i dopiero potem wróciliśmy do pracy.",
+      "Klasa B7: polski / English; model ZX-906; μ = 0.8."
+    ],
+    "pt": [
+      "De manhã, Inês comprou pão e legumes frescos na mercearia do bairro.",
+      "Açúcar, bênção, amêndoa, frequência e um coração tranquilo.",
+      "Definições avançadas do ecrã",
+      "Ele perguntou: «Onde estão os meus óculos?» Ela respondeu: «Na prateleira.»",
+      "Distância 7,8 km; massa 0,65 kg; saldo 248,90 €.",
+      "Ficheiro notes_07.txt; porta 8086; comando git status.",
+      "A janela ainda estava aberta quando começou a chover, por isso levámos os papéis para a sala ao lado antes de continuar o trabalho.",
+      "Classe B7: português / English; modelo ZX-906; μ = 0.8."
+    ],
+    "pb": [
+      "De manhã, Cecília comprou pão e legumes frescos no mercado do bairro.",
+      "Açúcar, bênção, amêndoa, frequência e um coração tranquilo.",
+      "Configurações avançadas da tela",
+      "Ele perguntou: “Onde estão meus óculos?” Ela respondeu: “Na prateleira.”",
+      "Distância 7,8 km; massa 0,65 kg; saldo R$248,90.",
+      "Arquivo notes_07.txt; porta 8086; comando git status.",
+      "A janela ainda estava aberta quando começou a chover, então levamos os papéis para o quarto ao lado antes de continuar o trabalho.",
+      "Classe B7: português / English; modelo ZX-906; μ = 0.8."
+    ],
+    "ro": [
+      "Dimineața, Irina a cumpărat pâine și legume proaspete de la magazin.",
+      "Înălțime, țesătură, șopârlă, mâini și un câmp liniștit.",
+      "Setări avansate de afișare",
+      "El a întrebat: „Unde sunt ochelarii mei?” Ea a răspuns: „Pe raft.”",
+      "Distanță 7,8 km; masă 0,65 kg; sold 248,90 lei.",
+      "Fișier notes_07.txt; port 8086; comandă git status.",
+      "Fereastra era încă deschisă când a început ploaia, așa că am dus hârtiile în camera alăturată înainte de a continua lucrul.",
+      "Clasa B7: română / English; model ZX-906; μ = 0.8."
+    ],
+    "ru": [
+      "Утром Анастасия купила хлеб и свежие овощи в соседнем магазине.",
+      "Съёмка, подъезд, вьюга, шёпот и тёплые шерстяные варежки.",
+      "Дополнительные параметры экрана",
+      "Он спросил: «Где мои очки?» Она ответила: «На полке».",
+      "Расстояние 7,8 км; масса 0,65 кг; остаток 248,90 ₽.",
+      "Файл notes_07.txt; порт 8086; команда git status.",
+      "Когда начался дождь, окно ещё было открыто, поэтому мы перенесли бумаги в соседнюю комнату и вернулись к работе только после этого.",
+      "Класс B7: русский / English; модель ZX-906; μ = 0.8."
+    ],
+    "es": [
+      "Al amanecer, Lucía compró pan y verduras frescas en la tienda del barrio.",
+      "El pingüino, la cigüeña, el océano y un corazón lleno de alegría.",
+      "Configuración avanzada de pantalla",
+      "Él preguntó: «¿Dónde están mis gafas?» Ella respondió: «En la estantería».",
+      "Distancia 7,8 km; masa 0,65 kg; saldo 248,90 €.",
+      "Archivo notes_07.txt; puerto 8086; comando git status.",
+      "La ventana seguía abierta cuando empezó a llover, así que llevamos los papeles a la habitación de al lado antes de continuar con el trabajo.",
+      "Clase B7: español / English; modelo ZX-906; μ = 0.8."
+    ],
+    "sv": [
+      "På morgonen köpte Märta bröd och färska grönsaker i den närmaste butiken.",
+      "Höga vågor, små öar, säregna frågor och ett grönt paraply.",
+      "Avancerade bildskärmsinställningar",
+      "Han frågade: ”Var är mina glasögon?” Hon svarade: ”På hyllan.”",
+      "Avstånd 7,8 km; vikt 0,65 kg; saldo 248,90 kr.",
+      "Fil notes_07.txt; port 8086; kommando git status.",
+      "Fönstret var fortfarande öppet när regnet började, så vi flyttade papperen till rummet intill och fortsatte sedan med arbetet.",
+      "Klass B7: svenska / English; modell ZX-906; μ = 0.8."
+    ],
+    "tr": [
+      "Sabah Çağla, yakındaki dükkândan taze ekmek ve sebze aldı.",
+      "Ilık ışık, iğne, üzüm, çiçek, gökyüzü ve küçük bir şemsiye.",
+      "Gelişmiş görüntü ayarları",
+      "O, “Gözlüğüm nerede?” diye sordu. Yanıt: “Rafta.”",
+      "Mesafe 7,8 km; kütle 0,65 kg; bakiye ₺248,90.",
+      "Dosya notes_07.txt; bağlantı noktası 8086; komut git status.",
+      "Yağmur başladığında pencere hâlâ açıktı, bu yüzden kâğıtları yan odaya taşıdık ve işe dönmeden önce perdeleri kapattık.",
+      "B7 sınıfı: Türkçe / English; model ZX-906; μ = 0.8."
+    ],
+    "uk": [
+      "Уранці Соломія купила хліб і свіжі овочі в сусідній крамниці.",
+      "Ґанок, подвір’я, об’єкт, їжак, м’який плед і синє небо.",
+      "Додаткові параметри екрана",
+      "Він запитав: «Де мої окуляри?» Вона відповіла: «На полиці».",
+      "Відстань 7,8 км; маса 0,65 кг; залишок 248,90 ₴.",
+      "Файл notes_07.txt; порт 8086; команда git status.",
+      "Коли почався дощ, вікно ще було відчинене, тому ми перенесли папери до сусідньої кімнати й лише потім повернулися до роботи.",
+      "Клас B7: українська / English; модель ZX-906; μ = 0.8."
+    ]
+  }
+}

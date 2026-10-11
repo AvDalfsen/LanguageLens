@@ -33,13 +33,8 @@ def no_network():
 
 
 def ocr_parameters(language: str) -> dict:
-    from rapidocr import LangRec, ModelType, OCRVersion
-    from language_lens.services.ocr import SCRIPT_BY_LANGUAGE
-    return {"Rec.lang_type": getattr(LangRec, SCRIPT_BY_LANGUAGE.get(language, "LATIN")),
-            "Rec.model_type": ModelType.MOBILE, "Rec.ocr_version": OCRVersion.PPOCRV5,
-            "Global.text_score": .35, "Global.log_level": "critical",
-            "EngineConfig.onnxruntime.intra_op_num_threads": 2,
-            "EngineConfig.onnxruntime.inter_op_num_threads": 1}
+    from language_lens.services.ocr_profiles import parameters_for
+    return parameters_for(language)
 
 
 def ocr_models(language: str) -> list[tuple[str, Path, str, str, Path]]:
@@ -87,7 +82,7 @@ def marker_path(source: str, target: str) -> Path:
 
 def runtime_identity() -> dict:
     identity = {}
-    for name in ("rapidocr", "onnxruntime", "argostranslate", "ctranslate2", "sentencepiece", "sacremoses",
+    for name in ("rapidocr", "onnxruntime", "python-bidi", "argostranslate", "ctranslate2", "sentencepiece", "sacremoses",
                  "minisbd", "regex"):
         try:
             identity[name] = version(name)
@@ -95,6 +90,8 @@ def runtime_identity() -> dict:
             identity[name] = "missing"
     from language_lens.services.sentence_models import BACKEND_ID
     identity["sentence_backend"] = BACKEND_ID
+    from language_lens.services.ocr_profiles import policy_identity
+    identity["ocr_policy"] = policy_identity()
     return identity
 
 

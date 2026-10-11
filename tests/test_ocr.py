@@ -3,11 +3,15 @@ from types import SimpleNamespace
 
 import pytest
 import rapidocr
+import numpy as np
 from rapidocr.inference_engine.base import FileInfo, InferSession
 from rapidocr.utils.typings import EngineType, TaskType
 
 from language_lens.config import LANGUAGES
 from language_lens.services.ocr import RapidOcrEngine, _attach_boxes
+from language_lens.services import offline
+from language_lens.services.ocr_profiles import PROFILES_BY_LANGUAGE
+from language_lens.services.ocr_settings import OcrSettings, SETTINGS_BY_LANGUAGE
 from language_lens.domain import OcrLine, build_word_hits
 
 
@@ -37,9 +41,56 @@ def test_offered_language_resolves_to_an_available_recognition_model(
     RapidOcrEngine(source_language)
 
     assert resolved[0]["model_dir"].endswith(".onnx")
+    prepared = next(model for model in offline.ocr_models(source_language) if model[0] == "Rec")
+    assert prepared[2:4] == (resolved[0]["model_dir"], resolved[0]["SHA256"])
 
 
-def test_japanese_uses_the_multilingual_ppocrv5_recognizer(monkeypatch):
+def test_every_offered_language_has_an_explicit_model_assignment():
+    assert set(PROFILES_BY_LANGUAGE) == {code for _name, code in LANGUAGES}
+    assert set(SETTINGS_BY_LANGUAGE) == {code for _name, code in LANGUAGES}
+
+
+def test_language_settings_reach_both_inference_and_offline_preparation(monkeypatch):
+    from language_lens.services import ocr_settings
+    selected = OcrSettings(det_limit_type="max", unclip_ratio=1.0,
+                           cls_thresh=.8, use_cls=False, rec_min_width=64,
+                           preprocessing="dark-invert")
+    monkeypatch.setitem(ocr_settings.SETTINGS_BY_LANGUAGE, "en", selected)
+    configurations, calls, inputs = [], [], []
+    def construct(*, params):
+        configurations.append(params)
+        def recognize(image, **kwargs):
+            calls.append(kwargs)
+            inputs.append(image)
+            return SimpleNamespace(boxes=None, txts=None, scores=None)
+        return recognize
+    monkeypatch.setattr(rapidocr, "RapidOCR", construct)
+    image = np.full((32, 96, 3), 20, dtype=np.uint8)
+    RapidOcrEngine("en").recognize(image)
+    assert all(configurations[0][key] == value for key, value in selected.parameters().items())
+    assert configurations[0] == offline.ocr_parameters("en")
+    assert calls[0]["use_cls"] is False
+    assert np.array_equal(inputs[0], 255 - image)
+
+
+def test_preprocessing_keeps_original_coordinates_and_bgr_layout():
+    from language_lens.services.ocr_settings import preprocess_image
+    dark = np.full((32, 96, 3), 20, dtype=np.uint8)
+    dark[10:20, 10:80] = (220, 210, 200)
+    inverted = preprocess_image(dark, "dark-invert")
+    assert inverted.shape == dark.shape and inverted.dtype == dark.dtype
+    assert np.array_equal(inverted, 255 - dark)
+    light = 255 - dark
+    assert preprocess_image(light, "dark-invert") is light
+    for mode in ("gray", "contrast"):
+        result = preprocess_image(dark, mode)
+        assert result.shape == dark.shape and result.dtype == np.uint8
+    assert preprocess_image(dark, "none") is dark
+    with pytest.raises(ValueError):
+        preprocess_image(dark, "invalid")
+
+
+def test_japanese_uses_the_tested_multilingual_ppocrv6_recognizer(monkeypatch):
     configurations = []
     monkeypatch.setattr(
         rapidocr, "RapidOCR", lambda *, params: configurations.append(params)
@@ -57,7 +108,7 @@ def test_japanese_uses_the_multilingual_ppocrv5_recognizer(monkeypatch):
             model_type=params["Rec.model_type"],
         )
     )
-    assert PurePosixPath(model["model_dir"]).name == "ch_PP-OCRv5_rec_mobile.onnx"
+    assert PurePosixPath(model["model_dir"]).name == "PP-OCRv6_rec_medium.onnx"
 
 
 def polygon(x, y, width, height=20):
@@ -77,7 +128,7 @@ def test_native_boxes_are_requested_and_kept_for_proportional_text(monkeypatch):
         calls.append(kwargs)
         return result
     monkeypatch.setattr(rapidocr, "RapidOCR", lambda **kwargs: recognize)
-    lines = RapidOcrEngine("en").recognize(object())
+    lines = RapidOcrEngine("en").recognize(np.zeros((32, 96, 3), dtype=np.uint8))
     assert calls[0]["return_word_box"] and calls[0]["return_single_char_box"]
     hits = build_word_hits(lines, "en")
     assert hits[0].bounds.width == 6 and hits[1].bounds.width == 36
@@ -110,7 +161,7 @@ def test_rtl_source_does_not_use_upstream_ltr_character_projection(monkeypatch, 
         return SimpleNamespace(boxes=[polygon(10, 20, 200)], txts=["هذا كتاب"], scores=[.99],
                                word_results=[(('هذا كتاب', .99, polygon(10, 20, 200)),)])
     monkeypatch.setattr(rapidocr, "RapidOCR", lambda **kwargs: recognize)
-    lines = RapidOcrEngine("ar").recognize(object())
+    lines = RapidOcrEngine("ar").recognize(np.zeros((32, 96, 3), dtype=np.uint8))
     assert not calls[0]["return_word_box"] and not lines[0].span_boxes
     hits = build_word_hits(lines, "ar")
     assert hits[0].bounds.x > hits[1].bounds.x
@@ -123,6 +174,6 @@ def test_rtl_source_does_not_use_upstream_ltr_character_projection(monkeypatch, 
 def test_ocr_prepares_dictionary_spans_before_ui_work(monkeypatch, source, text, expected):
     result = SimpleNamespace(boxes=[polygon(10, 20, 300)], txts=[text], scores=[.99])
     monkeypatch.setattr(rapidocr, "RapidOCR", lambda **kwargs: lambda *a, **kw: result)
-    recognized = RapidOcrEngine(source).recognize(object())[0]
+    recognized = RapidOcrEngine(source).recognize(np.zeros((32, 96, 3), dtype=np.uint8))[0]
     assert recognized.token_spans is not None
     assert [text[start:end] for start, end in recognized.token_spans] == expected

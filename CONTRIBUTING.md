@@ -44,6 +44,29 @@ The curated corpus accepts selected paraphrases and reports isolated-word sense 
 
 Use opt-in verification scripts for real local inference and existing development fixtures. [Release verification](docs/release-building.md), [sentence splitting](docs/sentence-splitting.md), and [historical validation](docs/archive/README.md) record results and their limits. Do not use selected private text/images as committed fixtures.
 
+[OCR model selection](docs/ocr-model-selection.md) records the per-language
+recognizer comparison and reproducible commands. `scripts/verify-ocr-models.py`
+compares identical line crops, including a public challenge corpus with small
+print, blur, compression and mixed text. `scripts/report-ocr-models.py` balances
+rendering scenarios and excludes the original reported heading from ranking.
+
+[OCR settings selection](docs/ocr-settings-selection.md) records fixed-model
+pipeline tuning against disjoint development and validation passages, multiple
+layouts, negative controls and additional colored text. Run
+`scripts/verify-ocr-settings.py`, `scripts/finalize-ocr-settings.py` and
+`scripts/report-ocr-settings.py` to reproduce the comparison; use
+`scripts/audit-ocr-settings.py` to check the real adapter and word geometry.
+`scripts/audit-ocr-workers.py` verifies the offline subprocess protocol with
+workspace-local assets and public text.
+
+[Joint OCR validation](docs/ocr-joint-selection.md) follows those phases by
+comparing every compatible recognizer with baseline and tuned settings, tuning
+strong challengers, and freezing the proposal before fresh passages. Run
+`scripts/verify-ocr-joint.py`, `scripts/verify-ocr-joint-english.py` (the expanded
+English catalogue comparison) and `scripts/report-ocr-joint.py`; use
+`scripts/audit-ocr-joint.py` for uncached adapter and worker verification.
+[Candidate tables](docs/ocr-joint-candidates.md) expose each model's scores.
+
 ## Interface translations
 
 `src/language_lens/data/ui-translations.json` contains the bundled UI catalog. `english` defines messages, `sources` maps original text to message keys, and `languages` supplies every supported locale (the app uses `pb` for Brazilian Portuguese). Keep each locale complete and preserve named placeholders such as `{count}` and `{error}`. Each distinct English message must have its own key. Translate the complete meaning of tooltips, including conditions, keyboard limits, and recovery steps. Quoted control names must match their localized captions. Never map detailed help to a generic summary. The full English guides remain bundled.

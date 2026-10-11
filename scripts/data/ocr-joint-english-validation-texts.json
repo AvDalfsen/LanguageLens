@@ -1,0 +1,16 @@
+{
+  "description": "Fresh final English passages for the expanded all-catalogue recognizer comparison. These replace the earlier English holdout, whose results cannot select models in this expanded run.",
+  "categories": ["daily-life", "orthography", "short-label", "quotation", "measurements", "technical", "context", "mixed-script"],
+  "languages": {
+    "en": [
+      "Before lunch, Malcolm returned a borrowed bicycle to the railway station.",
+      "The exposé mentions a château, a señorita, an éclair and a rôle.",
+      "Restore previous window arrangement",
+      "“Is this yours?” asked Harriet. “No, mine has a yellow handle.”",
+      "Length 3.25 cm; volume 0.48 L; credit $706.18; tolerance ±2%.",
+      "Open draft_19.csv; port 9443; command python --version.",
+      "Although the last bus had already left, we waited beneath the shelter while our neighbour checked the timetable and called a taxi for everyone.",
+      "Group Q4: English / español; serial MN-472; Ω = 6.3."
+    ]
+  }
+}

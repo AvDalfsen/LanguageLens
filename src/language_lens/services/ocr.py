@@ -6,24 +6,12 @@ from typing import Any
 
 from language_lens.domain import OcrLine, OcrSpanBox, suppress_contained_ocr_fragments
 from language_lens.text import normalized_offsets, word_spans
+from language_lens.services.ocr_profiles import parameters_for, profile_for
+from language_lens.services.ocr_settings import preprocess_image, settings_for
 
 
 class OcrUnavailable(RuntimeError):
     pass
-
-
-SCRIPT_BY_LANGUAGE = {
-    "ar": "ARABIC",
-    "el": "EL",
-    "hi": "DEVANAGARI",
-    # PP-OCRv5's CH model recognizes Chinese, English and Japanese; there is
-    # no separate JAPAN recognition model in that generation.
-    "ja": "CH",
-    "ko": "KOREAN",
-    "ru": "CYRILLIC",
-    "uk": "CYRILLIC",
-    "zh": "CH",
-}
 
 
 def _aligned_boxes(text: str, raw_boxes) -> tuple[OcrSpanBox, ...]:
@@ -89,28 +77,23 @@ def _attach_boxes(lines: list[OcrLine], word_results) -> list[OcrLine]:
 
 
 class RapidOcrEngine:
-    """RapidOCR adapter configured for screen text in the selected script."""
+    """RapidOCR adapter using the selected language's tested recognizer."""
 
     def __init__(self, source_language: str, *, params: dict | None = None) -> None:
         try:
-            from rapidocr import LangRec, ModelType, OCRVersion, RapidOCR
+            from rapidocr import RapidOCR
         except ImportError as exc:  # pragma: no cover - exercised in installed app
             raise OcrUnavailable("RapidOCR is not installed.") from exc
 
-        script_name = SCRIPT_BY_LANGUAGE.get(source_language, "LATIN")
+        profile = profile_for(source_language)
         self.source_language = source_language
         # RapidOCR's supported character-box extraction is for Latin/Chinese
         # recognition; other scripts use the bidi-aware shaped fallback.
-        self._return_character_boxes = script_name in {"LATIN", "CH"}
-        language = getattr(LangRec, script_name)
-        self._engine = RapidOCR(
-            params=params or {
-                "Rec.lang_type": language,
-                "Rec.model_type": ModelType.MOBILE,
-                "Rec.ocr_version": OCRVersion.PPOCRV5,
-                "Global.text_score": 0.35,
-            }
-        )
+        self._return_character_boxes = profile.character_boxes
+        configuration = parameters_for(source_language) if params is None else params
+        self._use_classifier = configuration.get("Global.use_cls", True)
+        self._preprocessing = settings_for(source_language).preprocessing
+        self._engine = RapidOCR(params=configuration)
 
     def recognize(self, image: Any, min_confidence: float = 0.45) -> list[OcrLine]:
         """Recognize a uint8 BGR numpy array and return filtered, ordered lines.
@@ -119,7 +102,8 @@ class RapidOcrEngine:
         swap channels. Qt images must use qimage_to_bgr_array before this call.
         """
         result = self._engine(
-            image, use_det=True, use_cls=True, use_rec=True,
+            preprocess_image(image, self._preprocessing),
+            use_det=True, use_cls=self._use_classifier, use_rec=True,
             return_word_box=self._return_character_boxes,
             return_single_char_box=self._return_character_boxes,
         )

@@ -27,7 +27,7 @@ a = Analysis(
     pathex=[str(root / "src")],
     datas=datas,
     binaries=binaries,
-    hiddenimports=["rapidocr.main", "pydantic"],
+    hiddenimports=["rapidocr.main", "bidi.algorithm", "pydantic"],
     # Lens installs its version-checked SBD adapter before importing Argos.
     # OCR and sentence models both use ONNX; CTranslate2 runs translation.
     excludes=["janome", "jieba", "pyopenjtalk", "sudachipy", "sudachidict_core",

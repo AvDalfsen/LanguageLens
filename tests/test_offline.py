@@ -71,3 +71,59 @@ def test_legacy_marker_requires_one_new_offline_check(pivot):
     record["version"] = 2
     path.write_text(json.dumps(record), "utf-8")
     assert not offline.offline_ready("pt", "nl")
+
+
+def test_recognizer_changes_invalidate_preparation_without_loading_native_models(
+    monkeypatch, tmp_path, offline_record
+):
+    from language_lens.services import ocr_profiles
+
+    monkeypatch.setattr(offline, "assets_root", lambda: tmp_path)
+    asset = tmp_path / "weights"
+    asset.write_bytes(b"verified asset")
+    marker = offline.marker_path("en", "nl")
+    record = offline_record("en", "nl", asset)
+    marker.write_text(json.dumps(record), "utf-8")
+    assert offline.offline_ready("en", "nl")
+
+    real = builtins.__import__
+    def guarded(name, *args, **kwargs):
+        assert name not in {"rapidocr", "onnxruntime", "language_lens.services.ocr"}, name
+        return real(name, *args, **kwargs)
+    monkeypatch.setattr(builtins, "__import__", guarded)
+    selected = ocr_profiles.PROFILES_BY_LANGUAGE["en"]
+    replacement = (ocr_profiles.MULTILINGUAL_SMALL if selected == ocr_profiles.LATIN_V5
+                   else ocr_profiles.LATIN_V5)
+    monkeypatch.setitem(ocr_profiles.PROFILES_BY_LANGUAGE, "en", replacement)
+    assert not offline.offline_ready("en", "nl")
+    monkeypatch.setitem(ocr_profiles.PROFILES_BY_LANGUAGE, "en", selected)
+    assert offline.offline_ready("en", "nl")
+
+    # Previously prepared assets do not identify which recognizer was checked.
+    del record["runtime"]["ocr_policy"]
+    marker.write_text(json.dumps(record), "utf-8")
+    assert not offline.offline_ready("en", "nl")
+
+
+def test_setting_changes_invalidate_preparation_without_loading_native_models(
+    monkeypatch, tmp_path, offline_record
+):
+    from dataclasses import replace
+    from language_lens.services import ocr_settings
+    monkeypatch.setattr(offline, "assets_root", lambda: tmp_path)
+    asset = tmp_path / "weights"
+    asset.write_bytes(b"verified asset")
+    marker = offline.marker_path("en", "nl")
+    marker.write_text(json.dumps(offline_record("en", "nl", asset)), "utf-8")
+    assert offline.offline_ready("en", "nl")
+    real = builtins.__import__
+    def guarded(name, *args, **kwargs):
+        assert name not in {"rapidocr", "onnxruntime", "language_lens.services.ocr"}, name
+        return real(name, *args, **kwargs)
+    monkeypatch.setattr(builtins, "__import__", guarded)
+    original = ocr_settings.settings_for("en")
+    changed = replace(original, unclip_ratio=original.unclip_ratio + .1)
+    monkeypatch.setitem(ocr_settings.SETTINGS_BY_LANGUAGE, "en", changed)
+    assert not offline.offline_ready("en", "nl")
+    monkeypatch.setitem(ocr_settings.SETTINGS_BY_LANGUAGE, "en", original)
+    assert offline.offline_ready("en", "nl")

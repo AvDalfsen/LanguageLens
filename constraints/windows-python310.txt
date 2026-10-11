@@ -66,6 +66,7 @@ PySide6==6.11.2
 PySide6_Addons==6.11.2
 PySide6_Essentials==6.11.2
 pytest==9.0.3
+python-bidi==0.6.11
 PyYAML==6.0.3
 rapidocr==3.9.2
 regex==2026.9.29
