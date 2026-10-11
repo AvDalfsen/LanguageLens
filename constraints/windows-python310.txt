@@ -65,7 +65,7 @@ pyreadline3==3.5.6
 PySide6==6.11.2
 PySide6_Addons==6.11.2
 PySide6_Essentials==6.11.2
-pytest==8.4.2
+pytest==9.0.3
 PyYAML==6.0.3
 rapidocr==3.9.2
 regex==2026.9.29

@@ -31,14 +31,24 @@ def execute(command, payload, scratch, emit):
     if command == "status":
         from language_lens.services.offline import offline_ready
         ready, route, packages = False, [], []
-        ready = translator.is_pair_installed(source, target)
+        try:
+            ready = translator.is_pair_installed(source, target)
+        except (ValueError, UnicodeError, FileNotFoundError, AttributeError, TypeError, KeyError):
+            from language_lens.services.model_management import damaged_metadata
+            package, _backend = translator._modules()
+            damaged = damaged_metadata(package)
+            if not damaged:
+                raise
+            emit({"result": {"source": source, "target": target, "ready": False, "route": [],
+                              "prepared": False, "packs": packs.inventory(), "damaged_models": damaged}})
+            return
         if ready:
             packages = translator.route(source, target)
             route = [packages[0].from_code, *(item.to_code for item in packages)] if packages else [source]
         emit({"result": {"source": source, "target": target, "ready": ready,
                           "route": route, "prepared": offline_ready(source, target, route=packages), "packs": packs.inventory()}})
         return
-    if command in ("install", "repair", "remove", "prepare"):
+    if command in ("install", "repair", "remove", "prepare", "quarantine"):
         package, _backend = translator._modules()
         from language_lens.services.model_download import configure_cache
         configure_cache(package, scratch)
@@ -48,7 +58,10 @@ def execute(command, payload, scratch, emit):
         root.parent.mkdir(parents=True, exist_ok=True)
         with FileLock(str(root.parent / "language-lens-models.lock"), timeout=10):
             recover_transactions(root)
-            if command == "prepare":
+            if command == "quarantine":
+                from language_lens.services.model_management import quarantine_damaged
+                quarantine_damaged(package, payload["damaged_models"], report)
+            elif command == "prepare":
                 prepare(source, target, report, progress)
             elif command == "remove":
                 remove_route(source, target, report)
@@ -86,7 +99,7 @@ def execute(command, payload, scratch, emit):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("command", choices=("status", "ocr", "translate", "more", "install", "prepare", "repair", "remove", "pack-install", "pack-remove"))
+    parser.add_argument("command", choices=("status", "ocr", "translate", "more", "install", "prepare", "repair", "remove", "quarantine", "pack-install", "pack-remove"))
     parser.add_argument("--scratch", type=Path, required=True)
     args = parser.parse_args()
     output = sys.stdout

@@ -86,6 +86,7 @@ class SetupWindow(QMainWindow):
         self._files_ready = False
         self._model_task_error = None
         self._status_check_failed = False
+        self._damaged_models = []
         self._status_job = ServiceJob(self)
         self._status_job.event.connect(self._status_event)
         self._status_job.failed.connect(self._status_failed)
@@ -246,6 +247,9 @@ class SetupWindow(QMainWindow):
             "to repeat the check. Voices are separate downloads. Use 'Cancel model task' to stop the operation.")
         self.repair_button = ui_widget(QPushButton, tr("Reinstall translation model"))
         self.remove_button = ui_widget(QPushButton, tr("Remove translation"))
+        self.quarantine_button = ui_widget(QPushButton, tr("Move damaged models to backup"))
+        self.quarantine_button.hide()
+        self.quarantine_button.clicked.connect(self._quarantine_models)
         self.cancel_button = ui_widget(QPushButton, tr("Cancel model task"))
         self.cancel_button.hide()
         self.diagnostics_button = ui_widget(QPushButton, tr("Open diagnostics folder"))
@@ -272,6 +276,7 @@ class SetupWindow(QMainWindow):
         self._maintenance_layout.setContentsMargins(0, 0, 0, 0)
         self._maintenance_layout.addWidget(self.repair_button, 1, 0)
         self._maintenance_layout.addWidget(self.remove_button, 1, 1)
+        self._maintenance_layout.addWidget(self.quarantine_button, 2, 0, 1, 2)
         from language_lens.services import language_packs as packs
         self.pack_choice = QComboBox()
         ui_text(self.pack_choice, tr("Optional language pack"), property="accessibleName")
@@ -282,10 +287,10 @@ class SetupWindow(QMainWindow):
         self.pack_install = ui_widget(QPushButton, tr("Download pack"))
         self.pack_remove = ui_widget(QPushButton, tr("Remove pack"))
         self._pack_inventory = []
-        self._maintenance_layout.addWidget(self.pack_choice, 2, 0, 1, 2)
-        self._maintenance_layout.addWidget(self.pack_status, 3, 0, 1, 2)
-        self._maintenance_layout.addWidget(self.pack_install, 4, 0)
-        self._maintenance_layout.addWidget(self.pack_remove, 4, 1)
+        self._maintenance_layout.addWidget(self.pack_choice, 3, 0, 1, 2)
+        self._maintenance_layout.addWidget(self.pack_status, 4, 0, 1, 2)
+        self._maintenance_layout.addWidget(self.pack_install, 5, 0)
+        self._maintenance_layout.addWidget(self.pack_remove, 5, 1)
         self.pack_choice.currentIndexChanged.connect(self._refresh_packs)
         self.pack_install.clicked.connect(lambda: self._start_model_job("pack-install", pack=self.pack_choice.currentData()))
         self.pack_remove.clicked.connect(self._remove_pack)
@@ -428,7 +433,7 @@ class SetupWindow(QMainWindow):
         order.extend((self.cancel_button, self.diagnostics_button, self.maintenance.toggle))
         if optional:
             order.append(self.prepare_button)
-        order.extend((self.repair_button, self.remove_button, self.pack_choice, self.pack_install, self.pack_remove, self.technical_details.toggle,
+        order.extend((self.repair_button, self.remove_button, self.quarantine_button, self.pack_choice, self.pack_install, self.pack_remove, self.technical_details.toggle,
                       self.pronunciation.enabled, self.pronunciation.show_ipa, self.pronunciation.voices,
                       self.pronunciation.install, self.pronunciation.preview, self.pronunciation.details,
                       self.try_button, self.help_button, self.start_button))
@@ -634,6 +639,8 @@ class SetupWindow(QMainWindow):
         if self._installing or self._shutting_down:
             return
         self._last_model_status = None
+        self._damaged_models = []
+        self.quarantine_button.hide()
         self._translation_ready = False
         self._set_files_ready(False)
         self._refresh_listening()
@@ -663,6 +670,8 @@ class SetupWindow(QMainWindow):
 
     def _status_failed(self, message: str) -> None:
         if not self._installing:
+            self._damaged_models = []
+            self.quarantine_button.hide()
             self._last_model_status = None
             self._translation_ready = False
             self._set_files_ready(False)
@@ -681,6 +690,17 @@ class SetupWindow(QMainWindow):
             self._start_model_job("prepare")
 
     def _apply_model_status(self, result) -> None:
+        if result.get("damaged_models"):
+            self._status_failed(tr("Damaged translation model metadata was found."))
+            self._damaged_models = result["damaged_models"]
+            self._pack_inventory = result.get("packs", [])
+            ui_text(self.capabilities, tr("Move damaged models to backup, then check required files. Shared language pairs may be affected."))
+            self.quarantine_button.show()
+            self.maintenance.toggle.setChecked(True)
+            self._refresh_availability()
+            return
+        self._damaged_models = []
+        self.quarantine_button.hide()
         self._last_model_status = result
         self._pack_inventory = result.get("packs", [])
         self.pronunciation.refresh()
@@ -749,6 +769,17 @@ class SetupWindow(QMainWindow):
             QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
         if answer == QMessageBox.StandardButton.Yes:
             self._start_model_job("pack-remove", pack=self.pack_choice.currentData())
+
+    def _quarantine_models(self) -> None:
+        if not self.availability.maintenance_enabled or not self._damaged_models:
+            return
+        answer = question(self, tr("Manage local translation models"),
+            tr("Move damaged models to backup, then check required files. Shared language pairs may be affected.")
+            + "\n\n" + "\n".join(item["name"] for item in self._damaged_models)
+            + "\n\n" + tr("Backups are kept beside the Argos packages directory. Continue?"),
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
+        if answer == QMessageBox.StandardButton.Yes:
+            self._start_model_job("quarantine", damaged_models=list(self._damaged_models))
 
     def _manage_model(self, command: str) -> None:
         if not self.availability.maintenance_enabled:
@@ -901,6 +932,7 @@ class SetupWindow(QMainWindow):
         self.prepare_button.setEnabled(state.maintenance_enabled)
         self.repair_button.setEnabled(state.maintenance_enabled and managed)
         self.remove_button.setEnabled(state.maintenance_enabled and managed)
+        self.quarantine_button.setEnabled(state.maintenance_enabled and bool(self._damaged_models))
         self.pronunciation.set_maintenance_blocked(state.capture_busy or state.model_busy or state.shutting_down)
         self._refresh_packs()
         self._refresh_listening()

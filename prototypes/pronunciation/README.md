@@ -9,6 +9,9 @@ This directory is a frozen, independent reference for the experiment. Its copied
 phoneme helpers deliberately preserve the original baseline; application fixes
 belong in `src/language_lens`, with separate prototype tests checking this reference.
 
+The engine/model baseline remains fixed. Its pytest pin was updated to 9.0.3
+on 10 October 2026; all 32 prototype tests passed with that version.
+
 ## Results from 2026-10-03
 
 Tested on Windows 10 22H2 x64, Python 3.10.6, Piper 1.8.0, bundled eSpeak NG

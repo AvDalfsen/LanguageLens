@@ -361,7 +361,10 @@
     "failure_stage_detail_recovery": "{stage}: {detail} {recovery}",
     "translation_single_fallback": "Alternatives unavailable; showing a single translation.",
     "search_cancelled_recovery": "Search cancelled. Choose 'Retry wider search'.",
-    "recovery_message": "{message}{recovery}"
+    "recovery_message": "{message}{recovery}",
+    "quarantine_models": "Move damaged models to backup",
+    "damaged_model_metadata": "Damaged translation model metadata was found.",
+    "quarantine_models_advice": "Move damaged models to backup, then check required files. Shared language pairs may be affected."
   },
   "sources": {
     "UI language": "ui_language",
@@ -724,7 +727,10 @@
     "Top suggestion": "best_match",
     "Alternatives unavailable; showing a single translation.": "translation_single_fallback",
     "Search cancelled. Choose 'Retry wider search'.": "search_cancelled_recovery",
-    "{message}{recovery}": "recovery_message"
+    "{message}{recovery}": "recovery_message",
+    "Move damaged models to backup": "quarantine_models",
+    "Damaged translation model metadata was found.": "damaged_model_metadata",
+    "Move damaged models to backup, then check required files. Shared language pairs may be affected.": "quarantine_models_advice"
   },
   "languages": {
     "nl": {
@@ -1088,7 +1094,10 @@
       "failure_stage_detail_recovery": "{stage}: {detail} {recovery}",
       "translation_single_fallback": "Alternatieven zijn niet beschikbaar; er wordt één vertaling getoond.",
       "search_cancelled_recovery": "Zoeken geannuleerd. Kies 'Uitgebreid zoeken opnieuw proberen'.",
-      "recovery_message": "{message}{recovery}"
+      "recovery_message": "{message}{recovery}",
+      "quarantine_models": "Beschadigde modellen naar back-up verplaatsen",
+      "damaged_model_metadata": "Beschadigde metagegevens van vertaalmodellen gevonden.",
+      "quarantine_models_advice": "Verplaats beschadigde modellen naar een back-up en controleer daarna de vereiste bestanden. Gedeelde taalparen kunnen hierdoor worden beïnvloed."
     },
     "de": {
       "ui_language": "Sprache der Benutzeroberfläche",
@@ -1451,7 +1460,10 @@
       "failure_stage_detail_recovery": "{stage}: {detail} {recovery}",
       "translation_single_fallback": "Alternativen sind nicht verfügbar; eine einzelne Übersetzung wird angezeigt.",
       "search_cancelled_recovery": "Suche abgebrochen. Wähle 'Erweiterte Suche wiederholen'.",
-      "recovery_message": "{message}{recovery}"
+      "recovery_message": "{message}{recovery}",
+      "quarantine_models": "Beschädigte Modelle sichern",
+      "damaged_model_metadata": "Beschädigte Metadaten von Übersetzungsmodellen gefunden.",
+      "quarantine_models_advice": "Verschieben Sie beschädigte Modelle in eine Sicherung und prüfen Sie anschließend die erforderlichen Dateien. Gemeinsam genutzte Sprachpaare können betroffen sein."
     },
     "fr": {
       "ui_language": "Langue de l’interface",
@@ -1814,7 +1826,10 @@
       "failure_stage_detail_recovery": "{stage}: {detail} {recovery}",
       "translation_single_fallback": "Les alternatives sont indisponibles ; une seule traduction est affichée.",
       "search_cancelled_recovery": "Recherche annulée. Choisissez 'Relancer la recherche élargie'.",
-      "recovery_message": "{message}{recovery}"
+      "recovery_message": "{message}{recovery}",
+      "quarantine_models": "Sauvegarder les modèles endommagés",
+      "damaged_model_metadata": "Des métadonnées de modèles de traduction endommagées ont été trouvées.",
+      "quarantine_models_advice": "Déplacez les modèles endommagés vers une sauvegarde, puis vérifiez les fichiers requis. Les paires de langues partagées peuvent être affectées."
     },
     "es": {
       "ui_language": "Idioma de la interfaz",
@@ -2177,7 +2192,10 @@
       "failure_stage_detail_recovery": "{stage}: {detail} {recovery}",
       "translation_single_fallback": "No hay alternativas disponibles; se muestra una sola traducción.",
       "search_cancelled_recovery": "Búsqueda cancelada. Elige 'Reintentar búsqueda ampliada'.",
-      "recovery_message": "{message}{recovery}"
+      "recovery_message": "{message}{recovery}",
+      "quarantine_models": "Guardar copia de los modelos dañados",
+      "damaged_model_metadata": "Se encontraron metadatos dañados de modelos de traducción.",
+      "quarantine_models_advice": "Mueva los modelos dañados a una copia de seguridad y compruebe los archivos necesarios. Los pares de idiomas compartidos pueden verse afectados."
     },
     "it": {
       "ui_language": "Lingua dell’interfaccia",
@@ -2540,7 +2558,10 @@
       "failure_stage_detail_recovery": "{stage}: {detail} {recovery}",
       "translation_single_fallback": "Le alternative non sono disponibili; viene mostrata una sola traduzione.",
       "search_cancelled_recovery": "Ricerca annullata. Scegli 'Riprova ricerca estesa'.",
-      "recovery_message": "{message}{recovery}"
+      "recovery_message": "{message}{recovery}",
+      "quarantine_models": "Salva i modelli danneggiati nel backup",
+      "damaged_model_metadata": "Sono stati trovati metadati danneggiati nei modelli di traduzione.",
+      "quarantine_models_advice": "Sposta i modelli danneggiati in un backup, poi verifica i file necessari. Le coppie di lingue condivise potrebbero essere interessate."
     },
     "pt": {
       "ui_language": "Idioma da interface",
@@ -2903,7 +2924,10 @@
       "failure_stage_detail_recovery": "{stage}: {detail} {recovery}",
       "translation_single_fallback": "As alternativas não estão disponíveis; é apresentada uma única tradução.",
       "search_cancelled_recovery": "Pesquisa cancelada. Escolha 'Repetir pesquisa alargada'.",
-      "recovery_message": "{message}{recovery}"
+      "recovery_message": "{message}{recovery}",
+      "quarantine_models": "Mover modelos danificados para cópia de segurança",
+      "damaged_model_metadata": "Foram encontrados metadados danificados de modelos de tradução.",
+      "quarantine_models_advice": "Mova os modelos danificados para uma cópia de segurança e verifique os ficheiros necessários. Os pares de idiomas partilhados podem ser afetados."
     },
     "pb": {
       "ui_language": "Idioma da interface",
@@ -3266,7 +3290,10 @@
       "failure_stage_detail_recovery": "{stage}: {detail} {recovery}",
       "translation_single_fallback": "As alternativas não estão disponíveis; uma única tradução é exibida.",
       "search_cancelled_recovery": "Busca cancelada. Escolha 'Repetir busca ampliada'.",
-      "recovery_message": "{message}{recovery}"
+      "recovery_message": "{message}{recovery}",
+      "quarantine_models": "Mover modelos danificados para backup",
+      "damaged_model_metadata": "Foram encontrados metadados danificados de modelos de tradução.",
+      "quarantine_models_advice": "Mova os modelos danificados para um backup e verifique os arquivos necessários. Pares de idiomas compartilhados podem ser afetados."
     },
     "da": {
       "ui_language": "Grænsefladesprog",
@@ -3629,7 +3656,10 @@
       "failure_stage_detail_recovery": "{stage}: {detail} {recovery}",
       "translation_single_fallback": "Alternativer er ikke tilgængelige; der vises én oversættelse.",
       "search_cancelled_recovery": "Søgning annulleret. Vælg 'Prøv udvidet søgning igen'.",
-      "recovery_message": "{message}{recovery}"
+      "recovery_message": "{message}{recovery}",
+      "quarantine_models": "Flyt beskadigede modeller til en sikkerhedskopi",
+      "damaged_model_metadata": "Der blev fundet beskadigede metadata for oversættelsesmodeller.",
+      "quarantine_models_advice": "Flyt beskadigede modeller til en sikkerhedskopi, og kontrollér derefter de nødvendige filer. Delte sprogpar kan blive påvirket."
     },
     "sv": {
       "ui_language": "Gränssnittsspråk",
@@ -3992,7 +4022,10 @@
       "failure_stage_detail_recovery": "{stage}: {detail} {recovery}",
       "translation_single_fallback": "Alternativ är inte tillgängliga; en enda översättning visas.",
       "search_cancelled_recovery": "Sökningen avbröts. Välj 'Försök med utökad sökning igen'.",
-      "recovery_message": "{message}{recovery}"
+      "recovery_message": "{message}{recovery}",
+      "quarantine_models": "Flytta skadade modeller till säkerhetskopia",
+      "damaged_model_metadata": "Skadade metadata för översättningsmodeller hittades.",
+      "quarantine_models_advice": "Flytta skadade modeller till en säkerhetskopia och kontrollera sedan nödvändiga filer. Delade språkpar kan påverkas."
     },
     "nb": {
       "ui_language": "Grensesnittspråk",
@@ -4355,7 +4388,10 @@
       "failure_stage_detail_recovery": "{stage}: {detail} {recovery}",
       "translation_single_fallback": "Alternativer er ikke tilgjengelige; én oversettelse vises.",
       "search_cancelled_recovery": "Søket er avbrutt. Velg 'Prøv utvidet søk igjen'.",
-      "recovery_message": "{message}{recovery}"
+      "recovery_message": "{message}{recovery}",
+      "quarantine_models": "Flytt skadede modeller til sikkerhetskopi",
+      "damaged_model_metadata": "Det ble funnet skadede metadata for oversettelsesmodeller.",
+      "quarantine_models_advice": "Flytt skadede modeller til en sikkerhetskopi, og kontroller deretter nødvendige filer. Delte språkpar kan bli påvirket."
     },
     "fi": {
       "ui_language": "Käyttöliittymän kieli",
@@ -4718,7 +4754,10 @@
       "failure_stage_detail_recovery": "{stage}: {detail} {recovery}",
       "translation_single_fallback": "Vaihtoehtoja ei ole saatavilla; näytetään yksi käännös.",
       "search_cancelled_recovery": "Haku peruttiin. Valitse 'Yritä laajempaa hakua uudelleen'.",
-      "recovery_message": "{message}{recovery}"
+      "recovery_message": "{message}{recovery}",
+      "quarantine_models": "Siirrä vioittuneet mallit varmuuskopioon",
+      "damaged_model_metadata": "Käännösmallien vioittuneita metatietoja löytyi.",
+      "quarantine_models_advice": "Siirrä vioittuneet mallit varmuuskopioon ja tarkista sitten tarvittavat tiedostot. Jaetut kieliparit voivat muuttua."
     },
     "cs": {
       "ui_language": "Jazyk rozhraní",
@@ -5081,7 +5120,10 @@
       "failure_stage_detail_recovery": "{stage}: {detail} {recovery}",
       "translation_single_fallback": "Alternativy nejsou dostupné; zobrazuje se jediný překlad.",
       "search_cancelled_recovery": "Hledání zrušeno. Zvolte 'Opakovat širší hledání'.",
-      "recovery_message": "{message}{recovery}"
+      "recovery_message": "{message}{recovery}",
+      "quarantine_models": "Přesunout poškozené modely do zálohy",
+      "damaged_model_metadata": "Byla nalezena poškozená metadata překladových modelů.",
+      "quarantine_models_advice": "Přesuňte poškozené modely do zálohy a poté zkontrolujte požadované soubory. Sdílené jazykové páry mohou být ovlivněny."
     },
     "pl": {
       "ui_language": "Język interfejsu",
@@ -5444,7 +5486,10 @@
       "failure_stage_detail_recovery": "{stage}: {detail} {recovery}",
       "translation_single_fallback": "Alternatywy są niedostępne; wyświetlany jest jeden przekład.",
       "search_cancelled_recovery": "Wyszukiwanie anulowano. Wybierz 'Ponów szersze wyszukiwanie'.",
-      "recovery_message": "{message}{recovery}"
+      "recovery_message": "{message}{recovery}",
+      "quarantine_models": "Przenieś uszkodzone modele do kopii zapasowej",
+      "damaged_model_metadata": "Znaleziono uszkodzone metadane modeli tłumaczenia.",
+      "quarantine_models_advice": "Przenieś uszkodzone modele do kopii zapasowej, a następnie sprawdź wymagane pliki. Może to wpłynąć na współdzielone pary języków."
     },
     "hu": {
       "ui_language": "Felület nyelve",
@@ -5807,7 +5852,10 @@
       "failure_stage_detail_recovery": "{stage}: {detail} {recovery}",
       "translation_single_fallback": "Nincsenek elérhető alternatívák; egy fordítás jelenik meg.",
       "search_cancelled_recovery": "Keresés megszakítva. Válassza ezt: 'Bővebb keresés újrapróbálása'.",
-      "recovery_message": "{message}{recovery}"
+      "recovery_message": "{message}{recovery}",
+      "quarantine_models": "Sérült modellek áthelyezése biztonsági másolatba",
+      "damaged_model_metadata": "Sérült fordítási modell-metaadatok találhatók.",
+      "quarantine_models_advice": "Helyezze a sérült modelleket biztonsági másolatba, majd ellenőrizze a szükséges fájlokat. A közösen használt nyelvpárok érintettek lehetnek."
     },
     "ro": {
       "ui_language": "Limba interfeței",
@@ -6170,7 +6218,10 @@
       "failure_stage_detail_recovery": "{stage}: {detail} {recovery}",
       "translation_single_fallback": "Alternativele nu sunt disponibile; este afișată o singură traducere.",
       "search_cancelled_recovery": "Căutare anulată. Alegeți 'Reîncearcă o căutare extinsă'.",
-      "recovery_message": "{message}{recovery}"
+      "recovery_message": "{message}{recovery}",
+      "quarantine_models": "Mută modelele deteriorate într-o copie de siguranță",
+      "damaged_model_metadata": "Au fost găsite metadate deteriorate ale modelelor de traducere.",
+      "quarantine_models_advice": "Mută modelele deteriorate într-o copie de siguranță, apoi verifică fișierele necesare. Perechile de limbi partajate pot fi afectate."
     },
     "ru": {
       "ui_language": "Язык интерфейса",
@@ -6533,7 +6584,10 @@
       "failure_stage_detail_recovery": "{stage}: {detail} {recovery}",
       "translation_single_fallback": "Другие варианты недоступны; показан один перевод.",
       "search_cancelled_recovery": "Поиск отменён. Выберите 'Повторить расширенный поиск'.",
-      "recovery_message": "{message}{recovery}"
+      "recovery_message": "{message}{recovery}",
+      "quarantine_models": "Переместить повреждённые модели в резервную копию",
+      "damaged_model_metadata": "Обнаружены повреждённые метаданные моделей перевода.",
+      "quarantine_models_advice": "Переместите повреждённые модели в резервную копию, затем проверьте необходимые файлы. Общие языковые пары могут быть затронуты."
     },
     "uk": {
       "ui_language": "Мова інтерфейсу",
@@ -6896,7 +6950,10 @@
       "failure_stage_detail_recovery": "{stage}: {detail} {recovery}",
       "translation_single_fallback": "Інші варіанти недоступні; показано один переклад.",
       "search_cancelled_recovery": "Пошук скасовано. Виберіть 'Повторити розширений пошук'.",
-      "recovery_message": "{message}{recovery}"
+      "recovery_message": "{message}{recovery}",
+      "quarantine_models": "Перемістити пошкоджені моделі до резервної копії",
+      "damaged_model_metadata": "Знайдено пошкоджені метадані моделей перекладу.",
+      "quarantine_models_advice": "Перемістіть пошкоджені моделі до резервної копії, а потім перевірте потрібні файли. Спільні мовні пари можуть бути зачеплені."
     },
     "ar": {
       "ui_language": "لغة الواجهة",
@@ -7259,7 +7316,10 @@
       "failure_stage_detail_recovery": "{stage}: {detail} {recovery}",
       "translation_single_fallback": "البدائل غير متاحة؛ تُعرض ترجمة واحدة.",
       "search_cancelled_recovery": "أُلغي البحث. اختر 'إعادة البحث الموسع'.",
-      "recovery_message": "{message}{recovery}"
+      "recovery_message": "{message}{recovery}",
+      "quarantine_models": "نقل النماذج التالفة إلى نسخة احتياطية",
+      "damaged_model_metadata": "تم العثور على بيانات وصفية تالفة لنماذج الترجمة.",
+      "quarantine_models_advice": "انقل النماذج التالفة إلى نسخة احتياطية، ثم تحقق من الملفات المطلوبة. قد تتأثر أزواج اللغات المشتركة."
     },
     "zh": {
       "ui_language": "界面语言",
@@ -7622,7 +7682,10 @@
       "failure_stage_detail_recovery": "{stage}: {detail} {recovery}",
       "translation_single_fallback": "其他候选项不可用；仅显示一个译法。",
       "search_cancelled_recovery": "搜索已取消。请选择 '重试扩大搜索'。",
-      "recovery_message": "{message}{recovery}"
+      "recovery_message": "{message}{recovery}",
+      "quarantine_models": "将损坏的模型移至备份",
+      "damaged_model_metadata": "发现翻译模型的元数据已损坏。",
+      "quarantine_models_advice": "将损坏的模型移至备份，然后检查所需文件。共享的语言对可能受到影响。"
     },
     "ja": {
       "ui_language": "表示言語",
@@ -7985,7 +8048,10 @@
       "failure_stage_detail_recovery": "{stage}: {detail} {recovery}",
       "translation_single_fallback": "別の候補を取得できないため、翻訳を1つ表示しています。",
       "search_cancelled_recovery": "検索をキャンセルしました。'拡張検索を再試行' を選んでください。",
-      "recovery_message": "{message}{recovery}"
+      "recovery_message": "{message}{recovery}",
+      "quarantine_models": "破損したモデルをバックアップへ移動",
+      "damaged_model_metadata": "翻訳モデルのメタデータの破損が見つかりました。",
+      "quarantine_models_advice": "破損したモデルをバックアップへ移動してから、必要なファイルを確認してください。共有する言語ペアに影響する場合があります。"
     },
     "ko": {
       "ui_language": "인터페이스 언어",
@@ -8348,7 +8414,10 @@
       "failure_stage_detail_recovery": "{stage}: {detail} {recovery}",
       "translation_single_fallback": "다른 후보를 사용할 수 없어 번역 하나만 표시합니다.",
       "search_cancelled_recovery": "검색이 취소되었습니다. '확장 검색 다시 시도'을 선택하세요.",
-      "recovery_message": "{message}{recovery}"
+      "recovery_message": "{message}{recovery}",
+      "quarantine_models": "손상된 모델을 백업으로 이동",
+      "damaged_model_metadata": "번역 모델의 손상된 메타데이터가 발견되었습니다.",
+      "quarantine_models_advice": "손상된 모델을 백업으로 이동한 다음 필요한 파일을 확인하세요. 공유 언어 쌍에 영향을 줄 수 있습니다."
     },
     "el": {
       "ui_language": "Γλώσσα διεπαφής",
@@ -8711,7 +8780,10 @@
       "failure_stage_detail_recovery": "{stage}: {detail} {recovery}",
       "translation_single_fallback": "Δεν υπάρχουν διαθέσιμες εναλλακτικές· εμφανίζεται μία μετάφραση.",
       "search_cancelled_recovery": "Η αναζήτηση ακυρώθηκε. Επιλέξτε 'Επανάληψη ευρύτερης αναζήτησης'.",
-      "recovery_message": "{message}{recovery}"
+      "recovery_message": "{message}{recovery}",
+      "quarantine_models": "Μεταφορά κατεστραμμένων μοντέλων σε αντίγραφο",
+      "damaged_model_metadata": "Βρέθηκαν κατεστραμμένα μεταδεδομένα μοντέλων μετάφρασης.",
+      "quarantine_models_advice": "Μεταφέρετε τα κατεστραμμένα μοντέλα σε αντίγραφο ασφαλείας και ελέγξτε τα απαιτούμενα αρχεία. Μπορεί να επηρεαστούν κοινά ζεύγη γλωσσών."
     },
     "hi": {
       "ui_language": "इंटरफ़ेस की भाषा",
@@ -9074,7 +9146,10 @@
       "failure_stage_detail_recovery": "{stage}: {detail} {recovery}",
       "translation_single_fallback": "विकल्प उपलब्ध नहीं हैं; एक अनुवाद दिखाया जा रहा है।",
       "search_cancelled_recovery": "खोज रद्द हुई। 'विस्तृत खोज फिर आज़माएँ' चुनें।",
-      "recovery_message": "{message}{recovery}"
+      "recovery_message": "{message}{recovery}",
+      "quarantine_models": "खराब मॉडल बैकअप में ले जाएँ",
+      "damaged_model_metadata": "अनुवाद मॉडल का खराब मेटाडेटा मिला।",
+      "quarantine_models_advice": "खराब मॉडल बैकअप में ले जाएँ, फिर आवश्यक फ़ाइलें जाँचें। साझा भाषा जोड़े प्रभावित हो सकते हैं।"
     },
     "tr": {
       "ui_language": "Arayüz dili",
@@ -9437,7 +9512,10 @@
       "failure_stage_detail_recovery": "{stage}: {detail} {recovery}",
       "translation_single_fallback": "Alternatifler kullanılamıyor; tek bir çeviri gösteriliyor.",
       "search_cancelled_recovery": "Arama iptal edildi. 'Geniş aramayı yeniden dene' seçeneğini seçin.",
-      "recovery_message": "{message}{recovery}"
+      "recovery_message": "{message}{recovery}",
+      "quarantine_models": "Bozuk modelleri yedeğe taşı",
+      "damaged_model_metadata": "Çeviri modellerinde bozuk meta veriler bulundu.",
+      "quarantine_models_advice": "Bozuk modelleri yedeğe taşıyın, ardından gerekli dosyaları denetleyin. Paylaşılan dil çiftleri etkilenebilir."
     },
     "en": {
       "ui_language": "UI language",
@@ -9800,7 +9878,10 @@
       "failure_stage_detail_recovery": "{stage}: {detail} {recovery}",
       "translation_single_fallback": "Alternatives unavailable; showing a single translation.",
       "search_cancelled_recovery": "Search cancelled. Choose 'Retry wider search'.",
-      "recovery_message": "{message}{recovery}"
+      "recovery_message": "{message}{recovery}",
+      "quarantine_models": "Move damaged models to backup",
+      "damaged_model_metadata": "Damaged translation model metadata was found.",
+      "quarantine_models_advice": "Move damaged models to backup, then check required files. Shared language pairs may be affected."
     }
   },
   "tooltips": [

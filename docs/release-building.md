@@ -76,14 +76,19 @@ retains stdin/stdout for the existing JSON protocol, while QProcess launches it
 without opening a console. Source mode still uses `python -m`. Worker crashes,
 cancellation, timeouts and scratch cleanup retain their existing supervision.
 
-The windowed uninstaller validates a fixed release marker and expected executable
-layout, refuses to run while the app owns its instance lock, and schedules
-deletion from a hidden Windows PowerShell process after its own process exits.
+The windowed uninstaller validates a fixed release marker, expected executable
+layout, and shipped-file inventory. It refuses to run while the app owns its
+instance lock and schedules cleanup from a hidden Windows PowerShell process
+after its own process exits. Only inventoried app files are deleted; directories
+are removed only when empty, preserving unrelated and newly added files. The
+freeze script writes the inventory, and the archive script refreshes it after
+adding documentation and notices. Releases without a valid inventory are refused.
 The helper must acknowledge startup before the final dialog appears. It retries
 briefly locked files and records remaining paths and errors in a temporary
 `LanguageLens-uninstall-*` diagnostic directory; a failed deletion also displays
-an error. Paths cross that process boundary as base64-encoded JSON rather than
-executable text. Application data is removed by default. Shared Argos translation data has a separate warning
+an error. Paths cross that process boundary as JSON in the diagnostic directory,
+with a small base64-encoded handoff that fits Windows command-line limits.
+Application data is removed by default. Shared Argos translation data has a separate warning
 and choice because another Argos-based application may use it.
 
 The spec collects only the imported Qt modules and required native dependencies.

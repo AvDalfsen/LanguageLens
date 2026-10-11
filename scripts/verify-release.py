@@ -96,6 +96,39 @@ def main():
                                            "stderr": core.stderr.decode("utf-8", errors="replace")}
                 if core.returncode:
                     raise RuntimeError("Core inference failed after removing optional packs")
+            # Exercise damaged metadata through the actual frozen worker, using
+            # only this verifier's private package copies.
+            broken = root / "data/argos-translate/packages/lens-verifier-damaged-model"
+            broken.mkdir(parents=True)
+            (broken / "metadata.json").write_text("{", encoding="utf-8")
+            scratch = root / "metadata-recovery-job"
+            scratch.mkdir()
+            from dataclasses import asdict
+            from language_lens.config import Settings
+
+            def maintenance(command, **payload):
+                request = json.dumps({"settings": asdict(Settings(source_language="pt", target_language="nl")),
+                                      **payload}).encode()
+                check = subprocess.run([str(bundle / "LanguageLensWorker.exe"), "--worker", "task",
+                                        command, "--scratch", str(scratch)],
+                                       input=request, cwd=root, env=env, capture_output=True, timeout=120,
+                                       creationflags=subprocess.CREATE_NO_WINDOW)
+                messages = [json.loads(line) for line in check.stdout.splitlines() if line.startswith(b"{")]
+                if check.returncode or not messages or not messages[-1].get("ok"):
+                    raise RuntimeError(f"Bundled metadata recovery failed: {command}")
+                return next((message["result"] for message in messages if "result" in message), None)
+
+            status = maintenance("status")
+            if status.get("damaged_models") != [{"root": str(broken.parent), "name": broken.name}]:
+                raise RuntimeError("Bundled worker did not diagnose the damaged package")
+            maintenance("quarantine", damaged_models=status["damaged_models"])
+            backups = list((broken.parent.parent / "language-lens-removed-models").glob(broken.name + "-*"))
+            if broken.exists() or len(backups) != 1 or (backups[0] / "metadata.json").read_text("utf-8") != "{":
+                raise RuntimeError("Bundled worker did not preserve the damaged package in backup")
+            status = maintenance("status")
+            if status.get("damaged_models") or (args.fixtures and not status["ready"]):
+                raise RuntimeError("Bundled worker did not restore model inspection")
+            result["damaged_model_recovery"] = True
             # Exercise the windowed entry point and normal application startup.
             app_data = root / "LanguageLens"
             app_data.mkdir(exist_ok=True)

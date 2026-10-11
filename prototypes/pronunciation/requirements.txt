@@ -16,7 +16,8 @@ pluggy==1.6.0
 protobuf==7.36.2
 Pygments==2.21.0
 pyreadline3==3.5.6
-pytest==8.4.2
+# Test tooling refreshed 2026-10-10; the engine/model baseline is unchanged.
+pytest==9.0.3
 sympy==1.14.0
 tomli==2.4.1
 typing_extensions==4.16.0

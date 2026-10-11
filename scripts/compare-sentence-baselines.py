@@ -19,6 +19,8 @@ def main():
     root.mkdir(parents=True, exist_ok=True)
     os.environ["LOCALAPPDATA"] = str(root)
     from language_lens.services.offline import no_network
+    from stanza_safety import require_safe_checkpoint_loading
+    require_safe_checkpoint_loading()
     import stanza
     corpus = json.loads((Path(__file__).resolve().parents[1] / "tests/data/sentence-boundaries.json").read_text("utf-8"))
     results = []

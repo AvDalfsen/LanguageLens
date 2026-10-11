@@ -23,7 +23,7 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-dev = ["pytest>=8,<9"]
+dev = ["pytest>=9.0.3,<10"]
 language-packs = ["janome==0.5.0", "jieba==0.42.1", "pyopenjtalk-plus==0.4.1.post9",
                   "sudachipy==0.7.0", "sudachidict-core==20260723.1"]
 

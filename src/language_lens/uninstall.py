@@ -14,6 +14,8 @@ import time
 
 PRODUCT = "Language Lens"
 MARKER = Path("_internal/portable-release.json")
+INVENTORY = Path("_internal/uninstall-files.json")
+EXECUTABLES = ("LanguageLens.exe", "LanguageLensWorker.exe", "LanguageLensUninstall.exe")
 MB_OK = 0x0
 MB_OKCANCEL = 0x1
 MB_YESNO = 0x4
@@ -54,10 +56,74 @@ def validate_install_root(executable: Path) -> Path:
         raise ValueError("This folder is not a complete Language Lens portable release.") from exc
     if marker != {"product": PRODUCT, "layout": 1}:
         raise ValueError("The Language Lens release marker is invalid.")
-    required = ("LanguageLens.exe", "LanguageLensWorker.exe", "LanguageLensUninstall.exe", "_internal")
-    if not all((root / name).exists() for name in required):
+    if not all((root / name).is_file() for name in EXECUTABLES) or not (root / "_internal").is_dir():
         raise ValueError("This folder is not a complete Language Lens portable release.")
+    release_cleanup_plan(root)
     return root
+
+
+def _release_entry(root: Path, value: str) -> Path:
+    if (not isinstance(value, str) or not value or any(c in value for c in "\\:")
+            or any(part in ("", ".", "..") or part.rstrip(" .") != part for part in value.split("/"))):
+        raise ValueError("The release file inventory contains an unsafe path.")
+    path = root.joinpath(*value.split("/"))
+    if not path.is_relative_to(root):
+        raise ValueError("The release file inventory contains an unsafe path.")
+    checked = path
+    while checked.is_relative_to(root):
+        try:
+            attributes = checked.lstat()
+        except FileNotFoundError:
+            attributes = None
+        if attributes and (checked.is_symlink() or getattr(attributes, "st_file_attributes", 0) & stat.FILE_ATTRIBUTE_REPARSE_POINT):
+            raise ValueError("Release cleanup paths must not be links or junctions.")
+        if checked == root:
+            break
+        checked = checked.parent
+    return path
+
+
+def write_install_inventory(root: Path) -> None:
+    """Called by packaging only, after collecting all shipped files."""
+    root = root.resolve()
+    files = {INVENTORY.as_posix()}
+    for path in root.rglob("*"):
+        relative = path.relative_to(root).as_posix()
+        _release_entry(root, relative)
+        if path.is_file():
+            files.add(relative)
+    (root / INVENTORY).write_text(json.dumps({"product": PRODUCT, "version": 1,
+                                            "files": sorted(files)}, indent=2), encoding="utf-8")
+
+
+def release_cleanup_plan(root: Path) -> dict:
+    """Only inventoried files may be removed; directories are removed if empty."""
+    root = root.absolute()
+    if root == Path(root.anchor) or root == Path.home().absolute():
+        raise ValueError("The application folder is not safe to remove.")
+    _release_entry(root, INVENTORY.as_posix())
+    try:
+        if (root / INVENTORY).stat().st_size > 4 * 1024 * 1024:
+            raise ValueError("Release file inventory is too large.")
+        record = json.loads((root / INVENTORY).read_text(encoding="utf-8"))
+    except (OSError, ValueError, UnicodeError) as exc:
+        raise ValueError("The release file inventory is missing or invalid. Extract a fresh complete release.") from exc
+    if not isinstance(record, dict) or record.get("product") != PRODUCT or record.get("version") != 1:
+        raise ValueError("The release file inventory is invalid.")
+    names = record.get("files")
+    if not isinstance(names, list) or not names or len(names) > 50000:
+        raise ValueError("The release file inventory is invalid.")
+    files = [_release_entry(root, name) for name in names]
+    if len({str(path).casefold() for path in files}) != len(files):
+        raise ValueError("The release file inventory contains duplicate paths.")
+    required = {*EXECUTABLES, MARKER.as_posix(), INVENTORY.as_posix()}
+    if not required.issubset(names):
+        raise ValueError("The release file inventory is incomplete.")
+    directories = {root}
+    for path in files:
+        directories.update(parent for parent in path.parents if parent.is_relative_to(root))
+    return {"root": str(root), "files": [str(path) for path in files],
+            "directories": [str(path) for path in sorted(directories, key=lambda path: len(path.parts), reverse=True)]}
 
 
 def application_running(_root: Path) -> bool:
@@ -78,6 +144,9 @@ _CLEANUP_SCRIPT = r"""
 $ErrorActionPreference = 'Stop'
 $ProgressPreference = 'SilentlyContinue'
 $job = [Text.Encoding]::UTF8.GetString([Convert]::FromBase64String('__PAYLOAD__')) | ConvertFrom-Json
+if ($job.manifest) {
+    $job = [IO.File]::ReadAllText($job.manifest) | ConvertFrom-Json
+}
 if ($job.status) {
     [IO.File]::WriteAllText((Join-Path $job.status 'started'), 'ready')
 }
@@ -85,6 +154,52 @@ while (Get-Process -Id $job.pid -ErrorAction SilentlyContinue) {
     Start-Sleep -Milliseconds 200
 }
 $failures = @()
+function Assert-ReleasePath([string]$path) {
+    $root = [IO.Path]::GetFullPath($job.release.root)
+    $current = [IO.Path]::GetFullPath($path)
+    if ($current -ne $root -and -not $current.StartsWith($root + [IO.Path]::DirectorySeparatorChar, [StringComparison]::OrdinalIgnoreCase)) {
+        throw 'Release cleanup path is outside the application folder.'
+    }
+    while ($current) {
+        if (Test-Path -LiteralPath $current) {
+            if ([IO.File]::GetAttributes($current) -band [IO.FileAttributes]::ReparsePoint) {
+                throw 'Release cleanup paths must not be links or junctions.'
+            }
+        }
+        if ($current -eq $root) { break }
+        $current = [IO.Path]::GetDirectoryName($current)
+    }
+}
+if ($job.release) {
+    foreach ($path in $job.release.files) {
+        for ($attempt = 0; $attempt -lt 20; $attempt++) {
+            try {
+                Assert-ReleasePath $path
+                if (Test-Path -LiteralPath $path) {
+                    if ([IO.File]::GetAttributes($path) -band [IO.FileAttributes]::Directory) {
+                        throw 'A shipped file has been replaced by a directory; it was preserved.'
+                    }
+                    [IO.File]::Delete($path)
+                }
+                break
+            } catch {
+                if ($attempt -eq 19) { $failures += @{path = $path; error = $_.Exception.Message} }
+                else { Start-Sleep -Milliseconds 250 }
+            }
+        }
+    }
+    foreach ($path in $job.release.directories) {
+        try {
+            Assert-ReleasePath $path
+            if ([IO.Directory]::Exists($path) -and -not (Get-ChildItem -LiteralPath $path -Force | Select-Object -First 1)) {
+                # Never recurse here: files added after planning must survive too.
+                [IO.Directory]::Delete($path, $false)
+            }
+        } catch {
+            $failures += @{path = $path; error = $_.Exception.Message}
+        }
+    }
+}
 foreach ($path in $job.paths) {
     for ($attempt = 0; $attempt -lt 20; $attempt++) {
         try {
@@ -129,29 +244,42 @@ exit 0
 
 
 def cleanup_command(paths: list[Path], pid: int, *, status_dir: Path | None = None,
-                    show_errors: bool = False) -> tuple[Path, list[str]]:
+                    show_errors: bool = False, release_root: Path | None = None) -> tuple[Path, list[str]]:
     if not isinstance(pid, int) or pid <= 0:
         raise ValueError("The uninstaller process ID is invalid.")
     paths = [path.absolute() for path in paths]
     if any(path == Path(path.anchor) or path == Path.home().absolute() for path in paths):
         raise ValueError("The cleanup target is not safe to remove.")
+    release = release_cleanup_plan(release_root) if release_root is not None else None
+    if release and any(Path(release["root"]).is_relative_to(path) for path in paths):
+        raise ValueError("Recursive data cleanup must not contain the application folder.")
     # Paths cross the process boundary only as base64-encoded JSON. PowerShell
     # parses no user-controlled path as source code.
     job = {"paths": [str(path) for path in paths], "pid": pid,
-           "status": str(status_dir) if status_dir else None, "show_errors": show_errors}
+           "status": str(status_dir) if status_dir else None, "show_errors": show_errors, "release": release}
+    # A full portable inventory exceeds Windows's process command-line limit.
+    # Hand off JSON in our private diagnostics directory; paths remain data.
+    if status_dir is not None:
+        manifest = status_dir.absolute() / "cleanup.json"
+        with manifest.open("x", encoding="utf-8") as handle:
+            json.dump(job, handle)
+        job = {"manifest": str(manifest)}
     payload = base64.b64encode(json.dumps(job).encode("utf-8")).decode("ascii")
     script = _CLEANUP_SCRIPT.replace("__PAYLOAD__", payload)
     encoded = base64.b64encode(script.encode("utf-16le")).decode("ascii")
+    if len(encoded) > 30000:
+        raise ValueError("A status directory is required for a large cleanup plan.")
     powershell = Path(os.environ["SystemRoot"]) / "System32/WindowsPowerShell/v1.0/powershell.exe"
     return powershell, ["-NoLogo", "-NoProfile", "-NonInteractive", "-WindowStyle", "Hidden",
                         "-EncodedCommand", encoded]
 
 
 def schedule_cleanup(paths: list[Path], pid: int | None = None, *,
-                     show_errors: bool = False) -> Path:
+                     show_errors: bool = False, release_root: Path | None = None) -> Path:
     status = Path(tempfile.mkdtemp(prefix="LanguageLens-uninstall-"))
     powershell, arguments = cleanup_command(
-        paths, os.getpid() if pid is None else pid, status_dir=status, show_errors=show_errors)
+        paths, os.getpid() if pid is None else pid, status_dir=status, show_errors=show_errors,
+        release_root=release_root)
     if not powershell.is_file():
         raise OSError("Windows PowerShell is unavailable.")
     env = dict(os.environ)
@@ -206,14 +334,22 @@ def verify_cleanup() -> None:
             target.mkdir()
             (target / "fixture.dat").write_bytes(b"Uninstaller verification fixture")
         # This cannot be a live Windows process ID; don't wait for our own exit.
-        status = schedule_cleanup(targets, pid=2147483647)
+        portable = targets[0]
+        (portable / MARKER).parent.mkdir()
+        (portable / MARKER).write_text(json.dumps({"product": PRODUCT, "layout": 1}), encoding="utf-8")
+        for name in EXECUTABLES:
+            (portable / name).write_bytes(b"Uninstaller verification executable")
+        write_install_inventory(portable)
+        keep = portable / "unrelated-document.txt"
+        keep.write_bytes(b"Preserve unrelated files")
+        status = schedule_cleanup(targets[1:], pid=2147483647, release_root=portable)
         result = status / "result.json"
         deadline = time.monotonic() + 15
         while not result.is_file() and time.monotonic() < deadline:
             time.sleep(.05)
         if not result.is_file() or not json.loads(result.read_text("utf-8"))["ok"]:
             raise OSError(f"Cleanup verification failed. Details: {status}")
-        if any(target.exists() for target in targets):
+        if any(target.exists() for target in targets[1:]) or sorted(portable.iterdir()) != [keep]:
             raise OSError("Cleanup verification left test files behind.")
 
 
@@ -230,7 +366,7 @@ def main() -> int:
             _message("Close Language Lens from its tray icon before uninstalling it.", MB_OK | MB_ICONWARNING)
             return 1
         answer = _message(
-            "Remove Language Lens, its application folder, downloaded OCR and sentence models, "
+            "Remove Language Lens's shipped files, downloaded OCR and sentence models, "
             "voices, language packs, caches, logs and settings?\n\nThis cannot be undone.",
             MB_OKCANCEL | MB_ICONWARNING,
         )
@@ -245,10 +381,9 @@ def main() -> int:
             )
             if answer == IDYES:
                 paths.extend(shared_argos_roots())
-        paths.append(install_root)
-        schedule_cleanup(paths, show_errors=True)
+        schedule_cleanup(paths, show_errors=True, release_root=install_root)
         _message("Close this message to finish uninstalling Language Lens.\n\n"
-                 "File removal starts after the uninstaller exits.")
+                 "File removal starts after the uninstaller exits. Unrelated files in the release folder are kept.")
         return 0
     except Exception as exc:
         if not self_test:

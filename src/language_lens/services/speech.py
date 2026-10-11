@@ -6,6 +6,7 @@ from pathlib import Path
 from PySide6.QtCore import QByteArray, QBuffer, QIODevice, QObject, QTimer, QUrl, Signal
 from PySide6.QtMultimedia import QAudioOutput, QMediaDevices, QMediaPlayer
 
+from language_lens.runtime import recovery_instruction
 from language_lens.services.process_job import ProcessJob
 from language_lens.services.voices import Voice, runtime_ready, voice_runtime_ready, voice_present, voices_root
 

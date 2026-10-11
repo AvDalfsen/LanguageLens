@@ -87,6 +87,11 @@ the check. The second command prepares the three default Stanza tokenizers and
 writes `stanza-comparison.json`. These larger legacy fixtures are development
 assets only. Neither command changes users' installed models.
 
+Legacy Stanza comparisons require PyTorch 2.6 or newer and force weights-only
+checkpoint loading before importing Stanza. Do not disable this guard to make a
+comparison pass. Argos 1.11.0 pins Stanza 1.10.1, so a direct Stanza upgrade would
+break its dependency contract. The portable runtime excludes both packages.
+
 Run `scripts/verify-release.py` with the sentence fixtures and case file to check
 the same inputs in the actual executable; see the release-building guide. The
 base check also asserts that Torch/Stanza/spaCy modules are unavailable.

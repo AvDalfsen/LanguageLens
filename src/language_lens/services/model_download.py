@@ -9,12 +9,25 @@ from pathlib import Path
 import time
 from http.client import HTTPException
 from urllib.parse import urlparse
-from urllib.request import Request, urlopen
+from urllib.request import HTTPRedirectHandler, Request, build_opener
 from uuid import uuid4
 import zipfile
 import zlib
 
 from language_lens.config import settings_path
+
+
+class _HttpsRedirects(HTTPRedirectHandler):
+    def redirect_request(self, request, response, code, message, headers, new_url):
+        if urlparse(new_url).scheme.lower() != "https":
+            raise ValueError("Model downloads cannot redirect to an insecure URL.")
+        return super().redirect_request(request, response, code, message, headers, new_url)
+
+
+def urlopen(request, *, timeout):
+    if urlparse(request.full_url).scheme.lower() != "https":
+        raise ValueError("Model downloads require HTTPS.")
+    return build_opener(_HttpsRedirects()).open(request, timeout=timeout)
 
 
 def configure_cache(package, scratch: Path) -> None:
@@ -67,6 +80,9 @@ def download_model(model, package, label: str, report: Callable[[str], None],
     its progress visibly on retry. All network work runs in the install worker.
     """
     notify = progress or (lambda _event: None)
+    links = [url for url in model.links if urlparse(url).scheme.lower() == "https"]
+    if not links:
+        raise ValueError(f"No HTTPS download link is available for {label}.")
     name = package.argospm_package_name(model) + ".argosmodel"
     if Path(name).name != name or "\\" in name:
         raise ValueError("The model index contains an invalid package filename.")
@@ -88,9 +104,6 @@ def download_model(model, package, label: str, report: Callable[[str], None],
                 _prune_cache(directory, destination)
             return destination
 
-    links = [url for url in model.links if urlparse(url).scheme in ("http", "https")]
-    if not links:
-        raise ValueError(f"No supported download link is available for {label}.")
     last_error: Exception | None = None
     attempts = len(links) * 2
     for attempt, url in enumerate((url for url in links for _ in range(2)), 1):

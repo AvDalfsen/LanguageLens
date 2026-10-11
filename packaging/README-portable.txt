@@ -31,12 +31,14 @@ If the runtime is incomplete, extract a fresh copy of the complete ZIP.
 Diagnostic files: %LOCALAPPDATA%\LanguageLens\logs
 
 To remove Language Lens, close it from the tray icon and open
-LanguageLensUninstall.exe. It removes this complete portable folder and Language
+LanguageLensUninstall.exe. It removes shipped app files and Language
 Lens settings, logs, caches, OCR/sentence models, voices and optional packs. A
 second confirmation controls removal of the shared Argos translation directory;
 choose No if another Argos-based application uses those models. Cancellation
 does not remove anything. The uninstaller validates the release folder before
-scheduling deletion and does not need administrator access.
+scheduling deletion and does not need administrator access. Files you added to
+the portable folder are kept; folders are removed only when empty. A missing or
+damaged shipped-file inventory requires a fresh complete release.
 
 This is an unsigned local preview, not a published installer. See LICENSE,
 THIRD_PARTY_SPEECH.md and notices for dependency provenance and notices.

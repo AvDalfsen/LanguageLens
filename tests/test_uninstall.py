@@ -17,6 +17,7 @@ def release_folder(tmp_path):
         json.dumps({"product": uninstall.PRODUCT, "layout": 1}), encoding="utf-8")
     for name in ("LanguageLens.exe", "LanguageLensWorker.exe", "LanguageLensUninstall.exe"):
         (root / name).write_bytes(b"test")
+    uninstall.write_install_inventory(root)
     return root
 
 

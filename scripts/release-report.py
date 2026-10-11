@@ -74,6 +74,8 @@ def main():
         "whose code is excluded from the portable bundle. Consult THIRD_PARTY_SPEECH.md for speech "
         "runtime and model provenance. This unsigned preview has not been cleared for public redistribution.\n",
         encoding="utf-8")
+    from language_lens.uninstall import write_install_inventory
+    write_install_inventory(bundle)
     buckets = defaultdict(int)
     files = []
     for path in sorted(bundle.rglob("*")):

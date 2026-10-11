@@ -57,6 +57,9 @@ Use **Check required files** under **Manage local files** if an update asks for 
 
 ## Uninstall
 
-Quit Lens, then open **LanguageLensUninstall.exe** from its portable folder. Confirm the cleanup of the app folder and Language Lens data. A separate confirmation covers shared Argos translation models; keep those if another Argos-based app uses them.
+Quit Lens, then open **LanguageLensUninstall.exe** from its portable folder. Confirm the cleanup of shipped app files and Language Lens data. Files you added to the portable folder are kept; folders are removed only when empty. A separate confirmation covers shared Argos translation models; keep those if another Argos-based app uses them.
+
+The uninstaller needs the release's file inventory. If it is missing or damaged, extract a fresh complete release into a new folder before using its uninstaller.
+That can clean application data; older app files still need separate removal after keeping anything you added.
 
 Deleting only the portable folder leaves downloaded data on disk. See [privacy and local files](privacy.md) for storage details.

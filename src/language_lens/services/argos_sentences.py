@@ -30,11 +30,16 @@ class UnsupportedSentencizer(ISentenceBoundaryDetectionModel):
         raise RuntimeError("Language Lens requires its local MiniSBD sentence splitter.")
 
 
-def install():
+def check_compatibility():
+    """Check the adapter contract without importing engines or loading models."""
     if version("argostranslate") != "1.11.0":
         raise ImportError("The sentence adapter requires Argos Translate 1.11.0.")
     if version("minisbd") != "0.9.5":
         raise ImportError("The sentence adapter requires MiniSBD 0.9.5.")
+
+
+def install():
+    check_compatibility()
     import argostranslate
     name = "argostranslate.sbd"
     current = sys.modules.get(name)

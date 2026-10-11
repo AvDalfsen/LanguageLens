@@ -35,7 +35,11 @@ def main():
     command = [sys.executable, "-m", "PyInstaller", "--noconfirm", "--distpath", str(output / "dist"),
                "--workpath", str(output / "work"), str(root / "packaging/LanguageLens.spec")]
     with (output / "build.log").open("w", encoding="utf-8") as log:
-        return subprocess.run(command, cwd=root, env=env, stdout=log, stderr=subprocess.STDOUT).returncode
+        result = subprocess.run(command, cwd=root, env=env, stdout=log, stderr=subprocess.STDOUT).returncode
+    if result == 0:
+        from language_lens.uninstall import write_install_inventory
+        write_install_inventory(output / "dist/LanguageLens")
+    return result
 
 
 if __name__ == "__main__":

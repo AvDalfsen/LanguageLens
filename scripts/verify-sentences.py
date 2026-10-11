@@ -29,6 +29,8 @@ def main():
     from language_lens.services import sentence_models
     corpus = json.loads((Path(__file__).resolve().parents[1] / "tests/data/sentence-boundaries.json").read_text("utf-8"))
     if args.legacy:
+        from stanza_safety import require_safe_checkpoint_loading
+        require_safe_checkpoint_loading()
         import stanza
         import argostranslate.translate as backend
         from argostranslate import package, settings

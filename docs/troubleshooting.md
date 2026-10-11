@@ -6,6 +6,7 @@
 | --- | --- |
 | Capture buttons are disabled | Choose the language pair, then Download required files and wait for Ready to capture. An installed translation model alone is insufficient. Finish/cancel file or voice maintenance first. |
 | Installed files appear unverified | Open Manage local files → Check required files. If inspection failed, use Retry file check; an unknown state does not mean files are missing. |
+| Damaged translation model metadata was found | Under Manage local files, choose Move damaged models to backup and review the listed folders. Shared language pairs may be affected. Backups are retained. Then Check required files and download any missing models. |
 | F8 does nothing | Choose Start listening, then switch to another app. Settings/review temporarily suspend the shortcut. If Windows reports a conflict, Pause listening and choose a different combination. |
 | The capture is black | Switch the application to borderless-windowed mode. Exclusive fullscreen and protected video can prevent capture. |
 | The game kept running | Pause it manually before capture. The screenshot is frozen; the underlying app is not paused. |

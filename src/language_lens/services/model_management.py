@@ -106,6 +106,58 @@ def _package_identity(path: Path) -> tuple[str, str] | None:
     return None
 
 
+def _damaged_metadata(package, path: Path) -> bool:
+    metadata = path / "metadata.json"
+    _not_link(path)
+    _not_link(metadata)
+    try:
+        data = json.loads(metadata.read_text(encoding="utf-8"))
+        if not isinstance(data, dict):
+            return True
+        if data.get("type", "translate") == "translate" and not all(
+                isinstance(data.get(key), str) and data[key] for key in ("from_code", "to_code")):
+            return True
+        package.AvailablePackage(data)  # Validate metadata structure without loading a tokenizer/model.
+        return False
+    except (FileNotFoundError, ValueError, UnicodeError, AttributeError, TypeError, KeyError):
+        return True
+
+
+def damaged_metadata(package) -> list[dict]:
+    """Diagnose parser failures; permission and link errors remain unknown status."""
+    damaged = []
+    for directory in package.settings.package_dirs:
+        root = Path(directory).absolute()
+        _not_link(root)
+        for path in sorted(root.iterdir()):
+            _not_link(path)
+            if path.is_dir() and _damaged_metadata(package, path):
+                damaged.append({"root": str(root), "name": path.name})
+    return damaged
+
+
+def quarantine_damaged(package, entries: list[dict], report) -> None:
+    """Explicit maintenance action: recheck every candidate, then preserve backups."""
+    if not isinstance(entries, list) or not entries or len(entries) > 1000:
+        raise ValueError("Invalid damaged-model selection.")
+    roots = {Path(path).absolute() for path in package.settings.package_dirs}
+    paths = []
+    for entry in entries:
+        root = Path(entry["root"]).absolute()
+        if root not in roots:
+            raise ValueError("Model directory is outside the installed package roots.")
+        _not_link(root)
+        path = root / _leaf(entry["name"])
+        if path in paths or not path.is_dir() or not _damaged_metadata(package, path):
+            raise ValueError("The damaged-model selection changed. Check files again before recovery.")
+        paths.append(path)
+    # Validate all candidates before moving any of them; each move is on one volume.
+    for path in paths:
+        retire(path, path.parent)
+    # Readiness records compare the package catalog and become stale after moves.
+    report("Checking local capabilities…")
+
+
 def _matching_packages(root: Path, identities: set[tuple[str, str]]) -> list[Path]:
     matches = []
     for path in sorted(root.iterdir()):
