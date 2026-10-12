@@ -51,7 +51,7 @@ def test_native_ocr_cross_monitor_mapping_and_reading_order(monkeypatch, qapp):
                 ), ((0, 5),))]
             return [OcrLine("left", .99, ((10, 10), (40, 10), (40, 20), (10, 20)))]
 
-    monkeypatch.setattr(review_module, "RapidOcrEngine", Engine)
+    monkeypatch.setattr(review_module, "create_engine", Engine)
     task = review_module.NativeOcrTask(capture, QRect(700, 100, 200, 40), Settings(source_language="en"))
     results = []
     task.signals.result.connect(results.append)
@@ -81,7 +81,7 @@ def test_native_retry_maps_fractional_crop_padding_and_word_boxes(monkeypatch, q
             return [OcrLine("word", .99, polygon, (OcrSpanBox(0, 4, polygon),), ((0, 4),)),
                     OcrLine("outside", .99, ((0, 0), (10, 0), (10, 10), (0, 10)))]
 
-    monkeypatch.setattr(review_module, "RapidOcrEngine", Engine)
+    monkeypatch.setattr(review_module, "create_engine", Engine)
     task = review_module.NativeOcrTask(capture, QRect(101, 99, 80, 20), Settings())
     results = []
     task.signals.result.connect(results.append)
@@ -171,7 +171,7 @@ def test_native_selection_in_gap_never_initializes_ocr(monkeypatch, qapp):
     capture = native_capture((QRect(0, 0, 800, 600), 1.25), (QRect(1000, 0, 800, 600), 2))
     def no_engine(*args):
         pytest.fail("A blank desktop gap must not initialize OCR")
-    monkeypatch.setattr(review_module, "RapidOcrEngine", no_engine)
+    monkeypatch.setattr(review_module, "create_engine", no_engine)
     task = review_module.NativeOcrTask(capture, QRect(850, 100, 100, 40), Settings())
     results = []
     task.signals.result.connect(results.append)
@@ -283,7 +283,7 @@ def test_ocr_task_retries_with_padding_and_maps_results_back(monkeypatch, qapp):
                 ),
             ]
 
-    monkeypatch.setattr(review_module, "RapidOcrEngine", RetryEngine)
+    monkeypatch.setattr(review_module, "create_engine", RetryEngine)
     task = OcrTask(
         QImage(100, 30, QImage.Format.Format_RGB888),
         Settings(),
@@ -319,7 +319,7 @@ def test_ocr_task_does_not_retry_after_a_successful_first_scan(monkeypatch, qapp
             calls.append(image.shape)
             return [expected]
 
-    monkeypatch.setattr(review_module, "RapidOcrEngine", SuccessfulEngine)
+    monkeypatch.setattr(review_module, "create_engine", SuccessfulEngine)
     task = OcrTask(
         QImage(100, 30, QImage.Format.Format_RGB888),
         Settings(),

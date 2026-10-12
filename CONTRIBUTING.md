@@ -50,6 +50,11 @@ compares identical line crops, including a public challenge corpus with small
 print, blur, compression and mixed text. `scripts/report-ocr-models.py` balances
 rendering scenarios and excludes the original reported heading from ranking.
 
+[Upright screen OCR adoption](docs/ocr-upright-selection.md) records the current
+accuracy-first production policy and its real-screen evidence. With the retained
+benchmark corpus, `scripts/audit-ocr-upright.py` checks every adopted policy
+through production inference without downloads or changes to user assets.
+
 [OCR settings selection](docs/ocr-settings-selection.md) records fixed-model
 pipeline tuning against disjoint development and validation passages, multiple
 layouts, negative controls and additional colored text. Run

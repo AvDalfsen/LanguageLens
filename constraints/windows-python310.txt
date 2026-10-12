@@ -89,6 +89,7 @@ sudachidict-core==20260723.1
 SudachiPy==0.7.0
 sympy==1.14.0
 thinc==8.3.13
+tesserocr==2.10.0
 tomli==2.4.1
 torch==2.14.1
 tqdm==4.70.1

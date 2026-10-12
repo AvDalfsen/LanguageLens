@@ -8,14 +8,15 @@ from PySide6.QtGui import QImage
 from language_lens.config import Settings
 from language_lens.domain import OcrLine, reading_order
 from language_lens.services.capture import DesktopCapture
-from language_lens.services.ocr import RapidOcrEngine
+from language_lens.services.ocr import create_engine
+from language_lens.services.ocr_settings import confidence_for
 from language_lens.services.translation import ArgosTranslator
 from language_lens.services.offline import local_ocr_parameters
 from language_lens.services.errors import describe_failure
 
 
 def create_ocr_engine(settings, engine_factory=None):
-    return (engine_factory or RapidOcrEngine)(settings.source_language,
+    return (engine_factory or create_engine)(settings.source_language,
         params=local_ocr_parameters(settings.source_language))
 
 
@@ -80,10 +81,11 @@ class OcrTask(QRunnable):
         return mapped
 
     def recognize(self, engine, progress) -> list[OcrLine]:
+        confidence = confidence_for(self.settings.source_language, self.settings.min_ocr_confidence)
         lines = engine.recognize(
-            qimage_to_bgr_array(self.image), self.settings.min_ocr_confidence
+            qimage_to_bgr_array(self.image), confidence
         )
-        if not lines and self.retry_image is not None:
+        if not lines and self.retry_image is not None and getattr(engine, "supports_empty_retry", True):
             progress(
                 "Nothing found on the first scan. Retrying with padding and enlargement…"
             )
@@ -97,7 +99,7 @@ class OcrTask(QRunnable):
                 Qt.TransformationMode.SmoothTransformation,
             )
             retry_lines = engine.recognize(
-                qimage_to_bgr_array(enlarged), self.settings.min_ocr_confidence
+                qimage_to_bgr_array(enlarged), confidence
             )
             lines = self._map_retry_lines(retry_lines)
         return lines

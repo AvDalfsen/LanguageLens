@@ -11,7 +11,14 @@ requires-python = ">=3.10,<3.13"
 license = { text = "MIT" }
 dependencies = [
   "PySide6>=6.7,<7",
-  "rapidocr>=3.9.2,<4",
+  # Keep the model catalogue used by the upright benchmark reproducible.
+  "rapidocr==3.9.2",
+  # The project's recommended Windows builds bundle the tested native runtime.
+  "tesserocr @ https://github.com/simonflueckiger/tesserocr-windows_build/releases/download/tesserocr-v2.10.0-tesseract-5.5.2/tesserocr-2.10.0-cp310-cp310-win_amd64.whl#sha256=9d94b45219f180ec8db552297d68e79c750aec803a818a2c939a7a99903a7464 ; sys_platform == 'win32' and python_version == '3.10'",
+  "tesserocr @ https://github.com/simonflueckiger/tesserocr-windows_build/releases/download/tesserocr-v2.10.0-tesseract-5.5.2/tesserocr-2.10.0-cp311-cp311-win_amd64.whl#sha256=02f75202a13804dacaac111cc4375cdb7b0194217f7f36add30cbb57c37c002c ; sys_platform == 'win32' and python_version == '3.11'",
+  "tesserocr @ https://github.com/simonflueckiger/tesserocr-windows_build/releases/download/tesserocr-v2.10.0-tesseract-5.5.2/tesserocr-2.10.0-cp312-cp312-win_amd64.whl#sha256=e05d41a2b0e6f38f3a5195d05a73674d72152a775d1b8ebe481ca9306f94d27a ; sys_platform == 'win32' and python_version == '3.12'",
+  "tesserocr==2.10.0 ; sys_platform != 'win32'",
+  "pillow>=11.3,<13",
   "python-bidi==0.6.11",
   "onnxruntime>=1.20,<2",
   "argostranslate==1.11.0",

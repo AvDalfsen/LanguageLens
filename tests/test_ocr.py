@@ -15,7 +15,8 @@ from language_lens.services.ocr_settings import OcrSettings, SETTINGS_BY_LANGUAG
 from language_lens.domain import OcrLine, build_word_hits
 
 
-@pytest.mark.parametrize("source_language", [code for _name, code in LANGUAGES])
+@pytest.mark.parametrize("source_language", [code for _name, code in LANGUAGES
+                                          if PROFILES_BY_LANGUAGE[code].backend == "rapidocr"])
 def test_offered_language_resolves_to_an_available_recognition_model(
     monkeypatch, source_language
 ):
@@ -108,7 +109,7 @@ def test_japanese_uses_the_tested_multilingual_ppocrv6_recognizer(monkeypatch):
             model_type=params["Rec.model_type"],
         )
     )
-    assert PurePosixPath(model["model_dir"]).name == "PP-OCRv6_rec_medium.onnx"
+    assert PurePosixPath(model["model_dir"]).name == "PP-OCRv6_rec_small.onnx"
 
 
 def polygon(x, y, width, height=20):

@@ -21,13 +21,14 @@ datas += collect_data_files("rapidocr", excludes=["models/**", "**/*.onnx"])
 # Version checks and offline readiness depend on installed distribution metadata.
 datas += copy_metadata("language-lens", recursive=True)
 binaries = collect_dynamic_libs("piper")
+binaries += collect_dynamic_libs("tesserocr")
 
 a = Analysis(
     [str(root / "packaging" / "entry.py")],
     pathex=[str(root / "src")],
     datas=datas,
     binaries=binaries,
-    hiddenimports=["rapidocr.main", "bidi.algorithm", "pydantic"],
+    hiddenimports=["rapidocr.main", "bidi.algorithm", "pydantic", "tesserocr.cysignals.signals"],
     # Lens installs its version-checked SBD adapter before importing Argos.
     # OCR and sentence models both use ONNX; CTranslate2 runs translation.
     excludes=["janome", "jieba", "pyopenjtalk", "sudachipy", "sudachidict_core",

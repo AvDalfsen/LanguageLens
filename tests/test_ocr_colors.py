@@ -85,6 +85,9 @@ def test_ocr_boundary_gets_correct_bgr_on_normal_native_and_retry_paths(
     # independent of any models downloaded into the developer's app-data folder.
     monkeypatch.setenv("LOCALAPPDATA", str(tmp_path))
     monkeypatch.setattr(domain_tasks, "local_ocr_parameters", lambda _language: {})
+    # Isolate channel conversion from language-specific grayscale/inversion.
+    from language_lens.services.ocr_settings import OcrSettings, SETTINGS_BY_LANGUAGE
+    monkeypatch.setitem(SETTINGS_BY_LANGUAGE, "en", OcrSettings())
     monkeypatch.setattr(rapidocr, "RapidOCR", lambda **kwargs: backend)
     image = QImage(80, 60, QImage.Format.Format_ARGB32_Premultiplied)
     image.fill(QColor(241, 17, 83))

@@ -1,7 +1,7 @@
 """Recognition policy shared by inference, asset preparation and readiness.
 
-Selection evidence and limits: docs/ocr-joint-selection.md, with earlier
-recognition-only evidence in docs/ocr-model-selection.md. Keep this module
+Selection evidence and limits: docs/ocr-upright-selection.md, with earlier
+evidence in docs/ocr-joint-selection.md. Keep this module
 free of native imports: the GUI checks readiness without loading OCR models.
 """
 from __future__ import annotations
@@ -22,6 +22,7 @@ class OcrProfile:
     generation: str
     script: str
     size: str
+    backend: str = "rapidocr"
 
     @property
     def character_boxes(self) -> bool:
@@ -29,6 +30,9 @@ class OcrProfile:
         return self.script in {"LATIN", "CH", "EN"}
 
     def parameters(self) -> dict:
+        if self.backend == "tesseract":
+            from language_lens.services.tesseract_ocr import russian_parameters
+            return russian_parameters()
         from rapidocr import EngineType, LangCls, LangDet, LangRec, ModelType, OCRVersion
 
         parameters = {"Rec.lang_type": getattr(LangRec, self.script),
@@ -52,6 +56,7 @@ LATIN_V5 = OcrProfile("latin-v5", "PPOCRV5", "LATIN", "MOBILE")
 MULTILINGUAL_SMALL = OcrProfile("multilingual-v6-small", "PPOCRV6", "CH", "SMALL")
 MULTILINGUAL_MEDIUM = OcrProfile("multilingual-v6-medium", "PPOCRV6", "CH", "MEDIUM")
 CYRILLIC_V5 = OcrProfile("cyrillic-v5", "PPOCRV5", "CYRILLIC", "MOBILE")
+TESSERACT_RUSSIAN = OcrProfile("tesseract-best-rus-eng", "TESSERACT5", "RUS_ENG", "BEST", "tesseract")
 
 # Explicit language assignments, including the app's nb and pb aliases. CH is
 # the catalogue key for the unified v6 recognizer, not a Chinese-only alphabet.
@@ -61,7 +66,7 @@ PROFILES_BY_LANGUAGE = {
     "cs": MULTILINGUAL_SMALL,
     "da": MULTILINGUAL_SMALL,
     "nl": MULTILINGUAL_SMALL,
-    "en": LATIN_V5,
+    "en": MULTILINGUAL_SMALL,
     "fi": MULTILINGUAL_SMALL,
     "fr": LATIN_V5,
     "de": LATIN_V5,
@@ -69,14 +74,14 @@ PROFILES_BY_LANGUAGE = {
     "hi": OcrProfile("hindi-v5", "PPOCRV5", "DEVANAGARI", "MOBILE"),
     "hu": MULTILINGUAL_MEDIUM,
     "it": LATIN_V5,
-    "ja": MULTILINGUAL_MEDIUM,
+    "ja": MULTILINGUAL_SMALL,
     "ko": OcrProfile("korean-v5", "PPOCRV5", "KOREAN", "MOBILE"),
     "nb": MULTILINGUAL_SMALL,
     "pl": MULTILINGUAL_SMALL,
     "pt": LATIN_V5,
-    "pb": LATIN_V5,
-    "ro": MULTILINGUAL_MEDIUM,
-    "ru": CYRILLIC_V5,
+    "pb": MULTILINGUAL_SMALL,
+    "ro": MULTILINGUAL_SMALL,
+    "ru": TESSERACT_RUSSIAN,
     "es": LATIN_V5,
     "sv": MULTILINGUAL_SMALL,
     "tr": MULTILINGUAL_SMALL,
@@ -91,14 +96,19 @@ def profile_for(language: str) -> OcrProfile:
 def parameters_for(language: str) -> dict:
     """Combine the fixed recognizer with this language's measured settings."""
     from language_lens.services.ocr_settings import settings_for
-    return {**profile_for(language).parameters(), **settings_for(language).parameters()}
+    profile = profile_for(language)
+    if profile.backend == "tesseract":
+        return profile.parameters()
+    return {**profile.parameters(), **settings_for(language).parameters()}
 
 
 def policy_identity() -> str:
     """Invalidate prepared markers when models or measured settings change."""
     from language_lens.services.ocr_settings import settings_for
-    assignments = {language: {"model": [profile.generation, profile.script, profile.size],
+    assignments = {language: {"model": asdict(profile),
                               "settings": asdict(settings_for(language))}
                    for language, profile in sorted(PROFILES_BY_LANGUAGE.items())}
-    policy = {"shared_models": SHARED_MODELS, "languages": assignments}
+    from language_lens.services.tesseract_ocr import MODEL_SHA256, russian_parameters
+    policy = {"shared_models": SHARED_MODELS, "languages": assignments,
+              "tesseract": {"parameters": russian_parameters(), "models": MODEL_SHA256}}
     return hashlib.sha256(json.dumps(policy, sort_keys=True).encode()).hexdigest()

@@ -1,0 +1,879 @@
+{
+  "benchmark_policy_sha256": "c69257b7536c06943ace40c2129298f901aba23186380941d4eddbe2ef6b0f8f",
+  "corpus_sha256": "256e66b609092f9cd06e39204f334155ce8b4cffd3002220a87aee88950a4889",
+  "selection": "validation defaults; retain four final regressions; accept English broader final evidence despite one game-font regression; latency is not a veto",
+  "languages": [
+    {
+      "language": "ar",
+      "name": "Arabic",
+      "selected": "default",
+      "profile": {
+        "engine": "rapidocr",
+        "phase": "pipeline",
+        "model": "arabic-v5",
+        "detector": "multi_PP-OCRv6_det_small",
+        "settings": {
+          "det_limit_type": "min",
+          "det_limit_side_len": 256,
+          "unclip_ratio": 1.8,
+          "det_thresh": 0.3,
+          "box_thresh": 0.5,
+          "dilation": true,
+          "score_mode": "fast",
+          "vertical_padding": false,
+          "width_height_ratio": 16,
+          "cls_thresh": 0.9,
+          "use_cls": false,
+          "rec_min_width": 640,
+          "text_score": 0.3,
+          "preprocessing": "contrast"
+        },
+        "scale": 2,
+        "floor": 0.6,
+        "parameter_overrides": {
+          "Global.min_height": 30,
+          "Global.min_side_len": 30
+        }
+      },
+      "current_source_cer": 0.3415064854917662,
+      "adopted_source_cer": 0.04470330615507698
+    },
+    {
+      "language": "zh",
+      "name": "Chinese",
+      "selected": "current",
+      "profile": {
+        "engine": "rapidocr",
+        "phase": "pipeline",
+        "model": "multilingual-v6-small",
+        "detector": "multi_PP-OCRv6_det_small",
+        "settings": {
+          "det_limit_type": "min",
+          "det_limit_side_len": 128,
+          "unclip_ratio": 1.3,
+          "det_thresh": 0.3,
+          "box_thresh": 0.5,
+          "dilation": true,
+          "score_mode": "fast",
+          "vertical_padding": true,
+          "width_height_ratio": 8,
+          "cls_thresh": 0.9,
+          "use_cls": true,
+          "rec_min_width": 320,
+          "text_score": 0.35,
+          "preprocessing": "dark-invert"
+        },
+        "scale": 1,
+        "floor": 0.45,
+        "parameter_overrides": {}
+      },
+      "current_source_cer": 0.015133194039447354,
+      "adopted_source_cer": 0.015133194039447354
+    },
+    {
+      "language": "cs",
+      "name": "Czech",
+      "selected": "default",
+      "profile": {
+        "engine": "rapidocr",
+        "phase": "pipeline",
+        "model": "multilingual-v6-small",
+        "detector": "multi_PP-OCRv6_det_small",
+        "settings": {
+          "det_limit_type": "min",
+          "det_limit_side_len": 64,
+          "unclip_ratio": 1.8,
+          "det_thresh": 0.4,
+          "box_thresh": 0.6,
+          "dilation": true,
+          "score_mode": "fast",
+          "vertical_padding": false,
+          "width_height_ratio": 16,
+          "cls_thresh": 0.9,
+          "use_cls": true,
+          "rec_min_width": 160,
+          "text_score": 0.3,
+          "preprocessing": "dark-invert"
+        },
+        "scale": 1.5,
+        "floor": 0.45,
+        "parameter_overrides": {
+          "Global.min_height": 30,
+          "Global.min_side_len": 30,
+          "Rec.rec_img_shape": [
+            3,
+            48,
+            160
+          ]
+        },
+        "rec_batch_num": 1
+      },
+      "current_source_cer": 0.04657000131828507,
+      "adopted_source_cer": 0.007631649574822725
+    },
+    {
+      "language": "da",
+      "name": "Danish",
+      "selected": "default",
+      "profile": {
+        "engine": "rapidocr",
+        "phase": "pipeline",
+        "model": "multilingual-v6-small",
+        "detector": "multi_PP-OCRv6_det_small",
+        "settings": {
+          "det_limit_type": "min",
+          "det_limit_side_len": 128,
+          "unclip_ratio": 1.0,
+          "det_thresh": 0.4,
+          "box_thresh": 0.5,
+          "dilation": true,
+          "score_mode": "fast",
+          "vertical_padding": true,
+          "width_height_ratio": 8,
+          "cls_thresh": 0.9,
+          "use_cls": true,
+          "rec_min_width": 320,
+          "text_score": 0.35,
+          "preprocessing": "none"
+        },
+        "scale": 1,
+        "floor": 0.45,
+        "parameter_overrides": {
+          "Rec.rec_img_shape": [
+            3,
+            48,
+            320
+          ]
+        },
+        "rec_batch_num": 1
+      },
+      "current_source_cer": 0.022526083313282562,
+      "adopted_source_cer": 0.022326880126031567
+    },
+    {
+      "language": "nl",
+      "name": "Dutch",
+      "selected": "current",
+      "profile": {
+        "engine": "rapidocr",
+        "phase": "pipeline",
+        "model": "multilingual-v6-small",
+        "detector": "multi_PP-OCRv6_det_small",
+        "settings": {
+          "det_limit_type": "min",
+          "det_limit_side_len": 736,
+          "unclip_ratio": 1.6,
+          "det_thresh": 0.3,
+          "box_thresh": 0.5,
+          "dilation": true,
+          "score_mode": "fast",
+          "vertical_padding": true,
+          "width_height_ratio": 8,
+          "cls_thresh": 0.9,
+          "use_cls": true,
+          "rec_min_width": 320,
+          "text_score": 0.35,
+          "preprocessing": "none"
+        },
+        "scale": 1,
+        "floor": 0.45,
+        "parameter_overrides": {}
+      },
+      "current_source_cer": 0.010290148448043185,
+      "adopted_source_cer": 0.010290148448043185
+    },
+    {
+      "language": "en",
+      "name": "English",
+      "selected": "default",
+      "profile": {
+        "engine": "rapidocr",
+        "phase": "pipeline",
+        "model": "multilingual-v6-small",
+        "detector": "multi_PP-OCRv6_det_small",
+        "settings": {
+          "det_limit_type": "min",
+          "det_limit_side_len": 256,
+          "unclip_ratio": 1.8,
+          "det_thresh": 0.4,
+          "box_thresh": 0.6,
+          "dilation": false,
+          "score_mode": "fast",
+          "vertical_padding": true,
+          "width_height_ratio": 16,
+          "cls_thresh": 0.8,
+          "use_cls": false,
+          "rec_min_width": 320,
+          "text_score": 0.3,
+          "preprocessing": "gray"
+        },
+        "scale": 1,
+        "floor": 0.6,
+        "parameter_overrides": {
+          "Global.min_height": 30,
+          "Global.min_side_len": 30,
+          "Rec.rec_img_shape": [
+            3,
+            48,
+            320
+          ]
+        },
+        "rec_batch_num": 1
+      },
+      "current_source_cer": 0.010526315789473684,
+      "adopted_source_cer": 0.0020676691729323306
+    },
+    {
+      "language": "fi",
+      "name": "Finnish",
+      "selected": "default",
+      "profile": {
+        "engine": "rapidocr",
+        "phase": "pipeline",
+        "model": "multilingual-v6-small",
+        "detector": "multi_PP-OCRv6_det_small",
+        "settings": {
+          "det_limit_type": "max",
+          "det_limit_side_len": 736,
+          "unclip_ratio": 1.5,
+          "det_thresh": 0.3,
+          "box_thresh": 0.6,
+          "dilation": false,
+          "score_mode": "fast",
+          "vertical_padding": true,
+          "width_height_ratio": 8,
+          "cls_thresh": 0.9,
+          "use_cls": false,
+          "rec_min_width": 320,
+          "text_score": 0.35,
+          "preprocessing": "none"
+        },
+        "scale": 1,
+        "floor": 0.45,
+        "parameter_overrides": {
+          "Rec.rec_img_shape": [
+            3,
+            48,
+            320
+          ]
+        }
+      },
+      "current_source_cer": 0.01394403560751273,
+      "adopted_source_cer": 0.001736446073702489
+    },
+    {
+      "language": "fr",
+      "name": "French",
+      "selected": "default",
+      "profile": {
+        "engine": "rapidocr",
+        "phase": "pipeline",
+        "model": "latin-v5",
+        "detector": "multi_PP-OCRv6_det_small",
+        "settings": {
+          "det_limit_type": "min",
+          "det_limit_side_len": 384,
+          "unclip_ratio": 1.6,
+          "det_thresh": 0.3,
+          "box_thresh": 0.5,
+          "dilation": true,
+          "score_mode": "fast",
+          "vertical_padding": true,
+          "width_height_ratio": 8,
+          "cls_thresh": 0.9,
+          "use_cls": true,
+          "rec_min_width": 320,
+          "text_score": 0.35,
+          "preprocessing": "none"
+        },
+        "scale": 1,
+        "floor": 0.45,
+        "parameter_overrides": {}
+      },
+      "current_source_cer": 0.015593611472426026,
+      "adopted_source_cer": 0.015593611472426026
+    },
+    {
+      "language": "de",
+      "name": "German",
+      "selected": "current",
+      "profile": {
+        "engine": "rapidocr",
+        "phase": "pipeline",
+        "model": "latin-v5",
+        "detector": "multi_PP-OCRv6_det_small",
+        "settings": {
+          "det_limit_type": "min",
+          "det_limit_side_len": 736,
+          "unclip_ratio": 1.6,
+          "det_thresh": 0.3,
+          "box_thresh": 0.5,
+          "dilation": true,
+          "score_mode": "fast",
+          "vertical_padding": true,
+          "width_height_ratio": 8,
+          "cls_thresh": 0.9,
+          "use_cls": true,
+          "rec_min_width": 320,
+          "text_score": 0.35,
+          "preprocessing": "none"
+        },
+        "scale": 1,
+        "floor": 0.45,
+        "parameter_overrides": {}
+      },
+      "current_source_cer": 0.005970497693143231,
+      "adopted_source_cer": 0.005970497693143231
+    },
+    {
+      "language": "el",
+      "name": "Greek",
+      "selected": "default",
+      "profile": {
+        "engine": "rapidocr",
+        "phase": "pipeline",
+        "model": "greek-v5",
+        "detector": "multi_PP-OCRv6_det_small",
+        "settings": {
+          "det_limit_type": "min",
+          "det_limit_side_len": 736,
+          "unclip_ratio": 1.6,
+          "det_thresh": 0.3,
+          "box_thresh": 0.5,
+          "dilation": true,
+          "score_mode": "fast",
+          "vertical_padding": true,
+          "width_height_ratio": 8,
+          "cls_thresh": 0.9,
+          "use_cls": true,
+          "rec_min_width": 320,
+          "text_score": 0.35,
+          "preprocessing": "none"
+        },
+        "scale": 1,
+        "floor": 0.45,
+        "parameter_overrides": {}
+      },
+      "current_source_cer": 0.03513577417487662,
+      "adopted_source_cer": 0.03513577417487662
+    },
+    {
+      "language": "hi",
+      "name": "Hindi",
+      "selected": "default",
+      "profile": {
+        "engine": "rapidocr",
+        "phase": "pipeline",
+        "model": "hindi-v5",
+        "detector": "multi_PP-OCRv6_det_small",
+        "settings": {
+          "det_limit_type": "min",
+          "det_limit_side_len": 64,
+          "unclip_ratio": 1.4,
+          "det_thresh": 0.2,
+          "box_thresh": 0.45,
+          "dilation": false,
+          "score_mode": "fast",
+          "vertical_padding": false,
+          "width_height_ratio": 8,
+          "cls_thresh": 0.9,
+          "use_cls": false,
+          "rec_min_width": 320,
+          "text_score": 0.35,
+          "preprocessing": "none"
+        },
+        "scale": 1,
+        "floor": 0.45,
+        "parameter_overrides": {}
+      },
+      "current_source_cer": 0.02937149237610101,
+      "adopted_source_cer": 0.02937149237610101
+    },
+    {
+      "language": "hu",
+      "name": "Hungarian",
+      "selected": "default",
+      "profile": {
+        "engine": "rapidocr",
+        "phase": "pipeline",
+        "model": "multilingual-v6-medium",
+        "detector": "multi_PP-OCRv6_det_small",
+        "settings": {
+          "det_limit_type": "min",
+          "det_limit_side_len": 736,
+          "unclip_ratio": 1.4000000000000001,
+          "det_thresh": 0.3,
+          "box_thresh": 0.5,
+          "dilation": true,
+          "score_mode": "fast",
+          "vertical_padding": true,
+          "width_height_ratio": 8,
+          "cls_thresh": 0.9,
+          "use_cls": true,
+          "rec_min_width": 320,
+          "text_score": 0.5,
+          "preprocessing": "none"
+        },
+        "scale": 1,
+        "floor": 0.45,
+        "parameter_overrides": {
+          "Rec.rec_img_shape": [
+            3,
+            48,
+            320
+          ]
+        }
+      },
+      "current_source_cer": 0.06681710246623838,
+      "adopted_source_cer": 0.001388888888888889
+    },
+    {
+      "language": "it",
+      "name": "Italian",
+      "selected": "current",
+      "profile": {
+        "engine": "rapidocr",
+        "phase": "pipeline",
+        "model": "latin-v5",
+        "detector": "multi_PP-OCRv6_det_small",
+        "settings": {
+          "det_limit_type": "min",
+          "det_limit_side_len": 128,
+          "unclip_ratio": 1.0,
+          "det_thresh": 0.3,
+          "box_thresh": 0.5,
+          "dilation": true,
+          "score_mode": "fast",
+          "vertical_padding": true,
+          "width_height_ratio": 8,
+          "cls_thresh": 0.9,
+          "use_cls": true,
+          "rec_min_width": 320,
+          "text_score": 0.35,
+          "preprocessing": "none"
+        },
+        "scale": 1,
+        "floor": 0.45,
+        "parameter_overrides": {}
+      },
+      "current_source_cer": 0.007574010472547465,
+      "adopted_source_cer": 0.007574010472547465
+    },
+    {
+      "language": "ja",
+      "name": "Japanese",
+      "selected": "default",
+      "profile": {
+        "engine": "rapidocr",
+        "phase": "pipeline",
+        "model": "multilingual-v6-small",
+        "detector": "multi_PP-OCRv6_det_small",
+        "settings": {
+          "det_limit_type": "min",
+          "det_limit_side_len": 128,
+          "unclip_ratio": 1.5,
+          "det_thresh": 0.3,
+          "box_thresh": 0.5,
+          "dilation": false,
+          "score_mode": "fast",
+          "vertical_padding": true,
+          "width_height_ratio": 8,
+          "cls_thresh": 0.9,
+          "use_cls": false,
+          "rec_min_width": 320,
+          "text_score": 0.35,
+          "preprocessing": "none"
+        },
+        "scale": 1,
+        "floor": 0.45,
+        "parameter_overrides": {
+          "Rec.rec_img_shape": [
+            3,
+            48,
+            320
+          ]
+        }
+      },
+      "current_source_cer": 0.07733025552059285,
+      "adopted_source_cer": 0.025435389727491417
+    },
+    {
+      "language": "ko",
+      "name": "Korean",
+      "selected": "default",
+      "profile": {
+        "engine": "rapidocr",
+        "phase": "pipeline",
+        "model": "korean-v5",
+        "detector": "multi_PP-OCRv6_det_small",
+        "settings": {
+          "det_limit_type": "min",
+          "det_limit_side_len": 64,
+          "unclip_ratio": 1.3,
+          "det_thresh": 0.4,
+          "box_thresh": 0.6,
+          "dilation": false,
+          "score_mode": "fast",
+          "vertical_padding": false,
+          "width_height_ratio": 8,
+          "cls_thresh": 0.8,
+          "use_cls": false,
+          "rec_min_width": 160,
+          "text_score": 0.3,
+          "preprocessing": "contrast"
+        },
+        "scale": 1.5,
+        "floor": 0.3,
+        "parameter_overrides": {
+          "Global.min_height": 60,
+          "Global.min_side_len": 60
+        }
+      },
+      "current_source_cer": 0.05290441264826907,
+      "adopted_source_cer": 0.026367158891104324
+    },
+    {
+      "language": "nb",
+      "name": "Norwegian",
+      "selected": "default",
+      "profile": {
+        "engine": "rapidocr",
+        "phase": "pipeline",
+        "model": "multilingual-v6-small",
+        "detector": "multi_PP-OCRv6_det_small",
+        "settings": {
+          "det_limit_type": "min",
+          "det_limit_side_len": 64,
+          "unclip_ratio": 2.0,
+          "det_thresh": 0.2,
+          "box_thresh": 0.5,
+          "dilation": true,
+          "score_mode": "fast",
+          "vertical_padding": true,
+          "width_height_ratio": 16,
+          "cls_thresh": 0.8,
+          "use_cls": false,
+          "rec_min_width": 640,
+          "text_score": 0.3,
+          "preprocessing": "none"
+        },
+        "scale": 1,
+        "floor": 0.6,
+        "parameter_overrides": {
+          "Global.min_height": 60,
+          "Global.min_side_len": 60,
+          "Rec.rec_img_shape": [
+            3,
+            48,
+            640
+          ]
+        }
+      },
+      "current_source_cer": 0.02266219808348648,
+      "adopted_source_cer": 0.008239121160409556
+    },
+    {
+      "language": "pl",
+      "name": "Polish",
+      "selected": "default",
+      "profile": {
+        "engine": "rapidocr",
+        "phase": "pipeline",
+        "model": "multilingual-v6-small",
+        "detector": "multi_PP-OCRv6_det_small",
+        "settings": {
+          "det_limit_type": "min",
+          "det_limit_side_len": 128,
+          "unclip_ratio": 1.6,
+          "det_thresh": 0.3,
+          "box_thresh": 0.5,
+          "dilation": true,
+          "score_mode": "fast",
+          "vertical_padding": true,
+          "width_height_ratio": 8,
+          "cls_thresh": 0.9,
+          "use_cls": true,
+          "rec_min_width": 320,
+          "text_score": 0.35,
+          "preprocessing": "none"
+        },
+        "scale": 1,
+        "floor": 0.45,
+        "parameter_overrides": {}
+      },
+      "current_source_cer": 0.0010964912280701754,
+      "adopted_source_cer": 0.0010964912280701754
+    },
+    {
+      "language": "pt",
+      "name": "Portuguese (Portugal)",
+      "selected": "default",
+      "profile": {
+        "engine": "rapidocr",
+        "phase": "pipeline",
+        "model": "latin-v5",
+        "detector": "multi_PP-OCRv6_det_small",
+        "settings": {
+          "det_limit_type": "min",
+          "det_limit_side_len": 256,
+          "unclip_ratio": 1.8,
+          "det_thresh": 0.4,
+          "box_thresh": 0.6,
+          "dilation": false,
+          "score_mode": "fast",
+          "vertical_padding": false,
+          "width_height_ratio": 16,
+          "cls_thresh": 0.9,
+          "use_cls": false,
+          "rec_min_width": 320,
+          "text_score": 0.3,
+          "preprocessing": "none"
+        },
+        "scale": 1,
+        "floor": 0.6,
+        "parameter_overrides": {
+          "Global.min_height": 30,
+          "Global.min_side_len": 30
+        }
+      },
+      "current_source_cer": 0.048273408226576595,
+      "adopted_source_cer": 0.0030658983451536644
+    },
+    {
+      "language": "pb",
+      "name": "Portuguese (Brazil)",
+      "selected": "default",
+      "profile": {
+        "engine": "rapidocr",
+        "phase": "pipeline",
+        "model": "multilingual-v6-small",
+        "detector": "multi_PP-OCRv6_det_small",
+        "settings": {
+          "det_limit_type": "min",
+          "det_limit_side_len": 64,
+          "unclip_ratio": 1.8,
+          "det_thresh": 0.4,
+          "box_thresh": 0.6,
+          "dilation": false,
+          "score_mode": "fast",
+          "vertical_padding": false,
+          "width_height_ratio": 8,
+          "cls_thresh": 0.8,
+          "use_cls": false,
+          "rec_min_width": 160,
+          "text_score": 0.3,
+          "preprocessing": "none"
+        },
+        "scale": 2,
+        "floor": 0.6,
+        "parameter_overrides": {
+          "Global.min_height": 60,
+          "Global.min_side_len": 60,
+          "Rec.rec_img_shape": [
+            3,
+            48,
+            160
+          ]
+        }
+      },
+      "current_source_cer": 0.001736111111111111,
+      "adopted_source_cer": 0.00040064102564102563
+    },
+    {
+      "language": "ro",
+      "name": "Romanian",
+      "selected": "default",
+      "profile": {
+        "engine": "rapidocr",
+        "phase": "pipeline",
+        "model": "multilingual-v6-small",
+        "detector": "multi_PP-OCRv6_det_small",
+        "settings": {
+          "det_limit_type": "max",
+          "det_limit_side_len": 736,
+          "unclip_ratio": 1.5,
+          "det_thresh": 0.3,
+          "box_thresh": 0.5,
+          "dilation": true,
+          "score_mode": "fast",
+          "vertical_padding": true,
+          "width_height_ratio": 8,
+          "cls_thresh": 0.9,
+          "use_cls": false,
+          "rec_min_width": 320,
+          "text_score": 0.35,
+          "preprocessing": "none"
+        },
+        "scale": 1,
+        "floor": 0.45,
+        "parameter_overrides": {}
+      },
+      "current_source_cer": 0.023130491057789016,
+      "adopted_source_cer": 0.011910451015153695
+    },
+    {
+      "language": "ru",
+      "name": "Russian",
+      "selected": "default",
+      "profile": {
+        "engine": "tesseract",
+        "phase": "pipeline",
+        "scale": 2,
+        "family": "best",
+        "psm": 11,
+        "plus_english": true,
+        "variables": {
+          "load_system_dawg": "true",
+          "load_freq_dawg": "true",
+          "thresholding_method": "2"
+        },
+        "border": 0,
+        "preprocessing": "dark-invert"
+      },
+      "current_source_cer": 0.01628301909256658,
+      "adopted_source_cer": 0.010085227272727273
+    },
+    {
+      "language": "es",
+      "name": "Spanish",
+      "selected": "default",
+      "profile": {
+        "engine": "rapidocr",
+        "phase": "pipeline",
+        "model": "latin-v5",
+        "detector": "multi_PP-OCRv6_det_small",
+        "settings": {
+          "det_limit_type": "min",
+          "det_limit_side_len": 128,
+          "unclip_ratio": 1.3,
+          "det_thresh": 0.3,
+          "box_thresh": 0.5,
+          "dilation": false,
+          "score_mode": "fast",
+          "vertical_padding": true,
+          "width_height_ratio": 8,
+          "cls_thresh": 0.9,
+          "use_cls": false,
+          "rec_min_width": 320,
+          "text_score": 0.35,
+          "preprocessing": "none"
+        },
+        "scale": 1,
+        "floor": 0.45,
+        "parameter_overrides": {}
+      },
+      "current_source_cer": 0.0029023607970976393,
+      "adopted_source_cer": 0.0013986013986013986
+    },
+    {
+      "language": "sv",
+      "name": "Swedish",
+      "selected": "default",
+      "profile": {
+        "engine": "rapidocr",
+        "phase": "pipeline",
+        "model": "multilingual-v6-small",
+        "detector": "multi_PP-OCRv6_det_small",
+        "settings": {
+          "det_limit_type": "min",
+          "det_limit_side_len": 256,
+          "unclip_ratio": 1.3,
+          "det_thresh": 0.2,
+          "box_thresh": 0.4,
+          "dilation": true,
+          "score_mode": "fast",
+          "vertical_padding": false,
+          "width_height_ratio": 16,
+          "cls_thresh": 0.9,
+          "use_cls": false,
+          "rec_min_width": 320,
+          "text_score": 0.3,
+          "preprocessing": "gray"
+        },
+        "scale": 2,
+        "floor": 0.3,
+        "parameter_overrides": {
+          "Global.min_height": 30,
+          "Global.min_side_len": 30,
+          "Rec.rec_img_shape": [
+            3,
+            48,
+            320
+          ]
+        }
+      },
+      "current_source_cer": 0.0,
+      "adopted_source_cer": 0.0
+    },
+    {
+      "language": "tr",
+      "name": "Turkish",
+      "selected": "default",
+      "profile": {
+        "engine": "rapidocr",
+        "phase": "pipeline",
+        "model": "multilingual-v6-small",
+        "detector": "multi_PP-OCRv6_det_small",
+        "settings": {
+          "det_limit_type": "min",
+          "det_limit_side_len": 64,
+          "unclip_ratio": 1.8,
+          "det_thresh": 0.2,
+          "box_thresh": 0.6,
+          "dilation": true,
+          "score_mode": "fast",
+          "vertical_padding": true,
+          "width_height_ratio": 8,
+          "cls_thresh": 0.9,
+          "use_cls": false,
+          "rec_min_width": 160,
+          "text_score": 0.3,
+          "preprocessing": "dark-invert"
+        },
+        "scale": 1.5,
+        "floor": 0.6,
+        "parameter_overrides": {
+          "Global.min_height": 30,
+          "Global.min_side_len": 30
+        }
+      },
+      "current_source_cer": 0.06649548368214425,
+      "adopted_source_cer": 0.0236656220444044
+    },
+    {
+      "language": "uk",
+      "name": "Ukrainian",
+      "selected": "default",
+      "profile": {
+        "engine": "rapidocr",
+        "phase": "pipeline",
+        "model": "cyrillic-v5",
+        "detector": "multi_PP-OCRv6_det_small",
+        "settings": {
+          "det_limit_type": "min",
+          "det_limit_side_len": 128,
+          "unclip_ratio": 1.7,
+          "det_thresh": 0.4,
+          "box_thresh": 0.5,
+          "dilation": true,
+          "score_mode": "fast",
+          "vertical_padding": true,
+          "width_height_ratio": 8,
+          "cls_thresh": 0.8,
+          "use_cls": false,
+          "rec_min_width": 640,
+          "text_score": 0.3,
+          "preprocessing": "contrast"
+        },
+        "scale": 1.5,
+        "floor": 0.6,
+        "parameter_overrides": {
+          "Global.min_height": 60,
+          "Global.min_side_len": 60
+        }
+      },
+      "current_source_cer": 0.11126568723745685,
+      "adopted_source_cer": 0.10753849212043758
+    }
+  ]
+}

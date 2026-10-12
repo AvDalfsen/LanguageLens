@@ -38,7 +38,7 @@ from PySide6.QtWidgets import (
 from language_lens.config import Settings
 from language_lens.domain import OcrLine, Rect, WordHit, WordTranslation, build_word_hits
 from language_lens.services.capture import DesktopCapture
-from language_lens.services.ocr import RapidOcrEngine
+from language_lens.services.ocr import create_engine
 from language_lens.services.translation import ArgosTranslator
 from language_lens.services.speech import SpeechJob, SpeechPlayer
 from language_lens.services.jobs import TaskPool
@@ -134,7 +134,7 @@ from language_lens.services.tasks import TaskSignals, qimage_to_bgr_array, MoreC
 
 class _OcrFactory:
     def _create_engine(self):
-        return domain_tasks.create_ocr_engine(self.settings, engine_factory=RapidOcrEngine)
+        return domain_tasks.create_ocr_engine(self.settings, engine_factory=create_engine)
 
 
 class OcrTask(_OcrFactory, domain_tasks.OcrTask):

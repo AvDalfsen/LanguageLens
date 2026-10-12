@@ -14,6 +14,14 @@ class OcrUnavailable(RuntimeError):
     pass
 
 
+def create_engine(source_language: str, *, params: dict):
+    """Use the same selected backend as offline asset preparation."""
+    if profile_for(source_language).backend == "tesseract":
+        from language_lens.services.tesseract_ocr import TesseractOcrEngine
+        return TesseractOcrEngine(source_language, params=params)
+    return RapidOcrEngine(source_language, params=params)
+
+
 def _aligned_boxes(text: str, raw_boxes) -> tuple[OcrSpanBox, ...]:
     """Accept only an exact, complete textual alignment to the recognizer output."""
     normalized, offsets = normalized_offsets(text)
@@ -93,14 +101,22 @@ class RapidOcrEngine:
         configuration = parameters_for(source_language) if params is None else params
         self._use_classifier = configuration.get("Global.use_cls", True)
         self._preprocessing = settings_for(source_language).preprocessing
+        self._scale = settings_for(source_language).scale
+        self._confidence = settings_for(source_language).confidence
         self._engine = RapidOCR(params=configuration)
 
-    def recognize(self, image: Any, min_confidence: float = 0.45) -> list[OcrLine]:
+    def recognize(self, image: Any, min_confidence: float | None = None) -> list[OcrLine]:
         """Recognize a uint8 BGR numpy array and return filtered, ordered lines.
 
         RapidOCR treats three-channel NumPy input as OpenCV/BGR and does not
         swap channels. Qt images must use qimage_to_bgr_array before this call.
         """
+        if min_confidence is None:
+            min_confidence = self._confidence
+        if self._scale != 1:
+            import cv2
+            image = cv2.resize(image, None, fx=self._scale, fy=self._scale,
+                               interpolation=cv2.INTER_CUBIC)
         result = self._engine(
             preprocess_image(image, self._preprocessing),
             use_det=True, use_cls=self._use_classifier, use_rec=True,
@@ -123,5 +139,8 @@ class RapidOcrEngine:
         word_results = getattr(result, "word_results", None)
         if word_results is not None:
             lines = _attach_boxes(lines, word_results)
-        return suppress_contained_ocr_fragments(lines, self.source_language)
+        lines = suppress_contained_ocr_fragments(lines, self.source_language)
+        if self._scale != 1:
+            lines = [line.map_geometry(lambda x, y: (x / self._scale, y / self._scale)) for line in lines]
+        return lines
 

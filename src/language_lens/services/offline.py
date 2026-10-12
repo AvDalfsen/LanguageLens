@@ -38,6 +38,13 @@ def ocr_parameters(language: str) -> dict:
 
 
 def ocr_models(language: str) -> list[tuple[str, Path, str, str, Path]]:
+    from language_lens.services.ocr_profiles import profile_for
+    if profile_for(language).backend == "tesseract":
+        from language_lens.services.tesseract_ocr import MODEL_REVISION, MODEL_SHA256
+        directory = assets_root() / "ocr" / "tessdata-best"
+        return [(code, directory / f"{code}.traineddata",
+                 f"https://raw.githubusercontent.com/tesseract-ocr/tessdata_best/{MODEL_REVISION}/{code}.traineddata",
+                 digest, directory / f"{code}.traineddata") for code, digest in MODEL_SHA256.items()]
     from rapidocr.main import DEFAULT_CFG_PATH, root_dir
     from rapidocr.utils.parse_parameters import ParseParams
     from rapidocr.inference_engine.base import FileInfo, InferSession
@@ -65,11 +72,15 @@ def matches(path: Path, digest: str) -> bool:
 
 
 def local_ocr_parameters(language: str) -> dict:
+    from language_lens.services.ocr_profiles import profile_for
     params = ocr_parameters(language)
     for section, path, _url, digest, _existing in ocr_models(language):
         if not matches(path, digest):
             raise KnownTaskError("missing_assets")
-        params[f"{section}.model_path"] = str(path)
+        if profile_for(language).backend == "tesseract":
+            params["tessdata_path"] = str(path.parent)
+        else:
+            params[f"{section}.model_path"] = str(path)
     return params
 
 
@@ -83,7 +94,7 @@ def marker_path(source: str, target: str) -> Path:
 def runtime_identity() -> dict:
     identity = {}
     for name in ("rapidocr", "onnxruntime", "python-bidi", "argostranslate", "ctranslate2", "sentencepiece", "sacremoses",
-                 "minisbd", "regex"):
+                 "minisbd", "regex", "tesserocr", "pillow"):
         try:
             identity[name] = version(name)
         except PackageNotFoundError:
@@ -220,9 +231,9 @@ def prepare(source: str, target: str, report, progress) -> None:
     with no_network():
         from language_lens.text import word_spans
         list(word_spans(sample, source))
-        from language_lens.services.ocr import RapidOcrEngine
+        from language_lens.services.ocr import create_engine
         import numpy as np
-        engine = RapidOcrEngine(source, params=local_ocr_parameters(source))
+        engine = create_engine(source, params=local_ocr_parameters(source))
         engine.recognize(np.full((64, 256, 3), 255, dtype=np.uint8))
         translator.translate.cache_clear()
         translator.translate(sample, source, target)
