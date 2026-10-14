@@ -21,6 +21,8 @@ def main():
     parser.add_argument("--sentence-cases", type=Path, help="Fixed sentence cases to check offline in the bundle.")
     args = parser.parse_args()
     bundle = args.bundle.resolve()
+    if any(bundle.rglob("_translation_assets")):
+        raise RuntimeError("Word weights must be separate downloads, not portable package resources")
     args.output = args.output.resolve()
     args.output.parent.mkdir(parents=True, exist_ok=True)
     result = {"bundle": str(bundle), "ok": False}

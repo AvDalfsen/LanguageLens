@@ -4,7 +4,6 @@ from importlib.resources import files
 import hashlib
 import json
 from pathlib import Path
-import shutil
 import stat
 import tarfile
 import time
@@ -43,9 +42,6 @@ def model_ids(source,target):
     choice=selection(source,target)
     return list(dict.fromkeys([*( [choice['full']['model']] if choice['full'] else []),
                               *( [choice['word']] if choice['word'] else [])]))
-
-
-def bundled_root():return Path(__file__).parents[1]/'_translation_assets'
 
 
 def _owned_path(path,base):
@@ -97,6 +93,7 @@ def verified_model(model_id):
 
 def _download(item,temporary,progress):
     count=0; hasher=hashlib.sha256(); last=0.
+    progress(DownloadProgress(0,item.get('bytes')))
     with urlopen(Request(item['url'],headers={'User-Agent':'LanguageLens','Accept-Encoding':'identity'}),timeout=30) as response, temporary.open('xb') as output:
         while chunk:=response.read(256*1024):
             count+=len(chunk)
@@ -107,12 +104,22 @@ def _download(item,temporary,progress):
                 progress(DownloadProgress(count,item.get('bytes')));last=time.monotonic()
     if (item.get('bytes') and count!=item['bytes']) or hasher.hexdigest()!=item['sha256']:
         raise KnownTaskError('integrity')
+    progress(DownloadProgress(count,item.get('bytes')))
 
 
-def _copy_bundled(destination,item,model_id):
-    source=bundled_root()/model_id/item['name']
-    if not valid(source,item):raise KnownTaskError('runtime')
-    shutil.copyfile(source,destination)
+def _decompress(packed,destination,item):
+    """Stream large weights without retaining compressed/decompressed copies in RAM."""
+    import zstandard
+    count=0
+    try:
+        with packed.open('rb') as source, destination.open('xb') as output:
+            with zstandard.ZstdDecompressor().stream_reader(source) as reader:
+                while chunk:=reader.read(1024*1024):
+                    count+=len(chunk)
+                    if count>item['bytes']:raise KnownTaskError('integrity')
+                    output.write(chunk)
+    except zstandard.ZstdError as exc:
+        raise KnownTaskError('integrity') from exc
 
 
 def prepare(source,target,report,progress,*,force=False):
@@ -130,12 +137,8 @@ def prepare(source,target,report,progress,*,force=False):
                 temporary=path.with_name('.'+path.name+'.'+uuid4().hex+'.part')
                 packed=temporary.with_suffix('.download')
                 try:
-                    if item.get('bundled'):_copy_bundled(temporary,item,model_id)
-                    else:
-                        _download({'url':item['url'],'bytes':item['compressed_bytes'],'sha256':item['compressed_sha256']},packed,progress)
-                        import zstandard
-                        data=zstandard.ZstdDecompressor().decompress(packed.read_bytes(),max_output_size=item['bytes'])
-                        temporary.write_bytes(data)
+                    _download({'url':item['url'],'bytes':item['compressed_bytes'],'sha256':item['compressed_sha256']},packed,progress)
+                    _decompress(packed,temporary,item)
                     if not valid(temporary,item):raise KnownTaskError('integrity')
                     temporary.replace(path)
                 finally:

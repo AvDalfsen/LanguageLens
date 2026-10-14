@@ -31,14 +31,6 @@ if (-not $UseExistingEnvironment) {
 }
 & $Python -m pip check
 if ($LASTEXITCODE -ne 0) { throw "Dependency consistency check failed." }
-& $Python -m pip install -r (Join-Path $ProjectRoot "packaging\requirements-translation-build.txt")
-if ($LASTEXITCODE -ne 0) { throw "Could not install the translation asset build tools." }
-& $Python (Join-Path $PSScriptRoot "prepare-translation-assets.py")
-if ($LASTEXITCODE -ne 0) { throw "Could not prepare the pinned translation model resources." }
-# Refresh package resources after preparation; conversion libraries are excluded
-# from the portable runtime by the spec.
-& $Python -m pip install --no-deps --no-build-isolation --no-index $ProjectRoot
-if ($LASTEXITCODE -ne 0) { throw "Could not refresh the prepared translation resources." }
 $DistRoot = Join-Path $RunRoot "dist"
 & $Python (Join-Path $PSScriptRoot "freeze-release.py") --output $RunRoot
 if ($LASTEXITCODE -ne 0) { throw "Build failed. See $RunRoot\build.log" }

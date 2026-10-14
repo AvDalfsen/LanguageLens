@@ -12,7 +12,7 @@ def pair_file_summary(settings, translator, route):
         rows.append({"name": model_id, "size": sum(item["bytes"] for item in model["files"]),
                      "installed": all(assets.valid(assets.model_path(model_id) / item["name"], item) for item in model["files"])})
         for item in model["files"]:
-            if not assets.valid(assets.model_path(model_id) / item["name"], item) and not item.get("bundled"):
+            if not assets.valid(assets.model_path(model_id) / item["name"], item):
                 download += item["compressed_bytes"]
     if assets.selection(settings.source_language, settings.target_language)["full"]:
         for kind in ("node_runtime", "bergamot_runtime"):

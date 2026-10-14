@@ -795,25 +795,37 @@
           "name": "config.json",
           "bytes": 233,
           "sha256": "72901fbd8abd89fb5cf4a388f26fc681f5c4c58a1e1a88b30b879f107270e7ee",
-          "bundled": true
+          "url": "https://github.com/AvDalfsen/LanguageLens/releases/download/translation-models-2026-10-13-v1/m2m-config.json.zst",
+          "compression": "zstd",
+          "compressed_bytes": 133,
+          "compressed_sha256": "5fc72a52f65b0dbf72b5a59a65ffd2620e9d9aba84e575dd702abe14e55edf41"
         },
         {
           "name": "model.bin",
           "bytes": 490667752,
           "sha256": "a1826980fc5c037e69c7ac94fcb56c03001a66f380eb71863cc0a3879e71421b",
-          "bundled": true
+          "url": "https://github.com/AvDalfsen/LanguageLens/releases/download/translation-models-2026-10-13-v1/m2m-model.bin.zst",
+          "compression": "zstd",
+          "compressed_bytes": 458130655,
+          "compressed_sha256": "50a4207273c0573b4dcbacadee4ec0190649fb532093bc3ffb6449e558183692"
         },
         {
           "name": "shared_vocabulary.json",
           "bytes": 2924622,
           "sha256": "18916ac68f9ac8fbd5250ca603dcb3861aac8672924d93a8dadc82eb3147f941",
-          "bundled": true
+          "url": "https://github.com/AvDalfsen/LanguageLens/releases/download/translation-models-2026-10-13-v1/m2m-shared_vocabulary.json.zst",
+          "compression": "zstd",
+          "compressed_bytes": 711324,
+          "compressed_sha256": "5a7b7bb9724996ce4bf45b0bf659d26583a33680462ee0fd6d9e368bfd02e10c"
         },
         {
           "name": "sentencepiece.bpe.model",
           "bytes": 2423393,
           "sha256": "d8f7c76ed2a5e0822be39f0a4f95a55eb19c78f4593ce609e2edbc2aea4d380a",
-          "bundled": true
+          "url": "https://github.com/AvDalfsen/LanguageLens/releases/download/translation-models-2026-10-13-v1/m2m-sentencepiece.bpe.model.zst",
+          "compression": "zstd",
+          "compressed_bytes": 1140195,
+          "compressed_sha256": "84ea4ddfa6109dace8ad1681907ca237b556bee93e5b450d9b13b17abca27e39"
         }
       ],
       "license": "MIT",
@@ -870,25 +882,37 @@
           "name": "config.json",
           "bytes": 233,
           "sha256": "72901fbd8abd89fb5cf4a388f26fc681f5c4c58a1e1a88b30b879f107270e7ee",
-          "bundled": true
+          "url": "https://github.com/AvDalfsen/LanguageLens/releases/download/translation-models-2026-10-13-v1/small-config.json.zst",
+          "compression": "zstd",
+          "compressed_bytes": 133,
+          "compressed_sha256": "5fc72a52f65b0dbf72b5a59a65ffd2620e9d9aba84e575dd702abe14e55edf41"
         },
         {
           "name": "model.bin",
           "bytes": 338727246,
           "sha256": "24e8b51720b7267cfd8faacedce50128bf11c4327f039632a494deb5e1c421f6",
-          "bundled": true
+          "url": "https://github.com/AvDalfsen/LanguageLens/releases/download/translation-models-2026-10-13-v1/small-model.bin.zst",
+          "compression": "zstd",
+          "compressed_bytes": 273551984,
+          "compressed_sha256": "88199b02acac2a3352bbcec4354f6be459021457ac9cc13ab47da38dbd8e9a4f"
         },
         {
           "name": "shared_vocabulary.json",
           "bytes": 2924622,
           "sha256": "18916ac68f9ac8fbd5250ca603dcb3861aac8672924d93a8dadc82eb3147f941",
-          "bundled": true
+          "url": "https://github.com/AvDalfsen/LanguageLens/releases/download/translation-models-2026-10-13-v1/small-shared_vocabulary.json.zst",
+          "compression": "zstd",
+          "compressed_bytes": 711324,
+          "compressed_sha256": "5a7b7bb9724996ce4bf45b0bf659d26583a33680462ee0fd6d9e368bfd02e10c"
         },
         {
           "name": "sentencepiece.bpe.model",
           "bytes": 2423393,
           "sha256": "d8f7c76ed2a5e0822be39f0a4f95a55eb19c78f4593ce609e2edbc2aea4d380a",
-          "bundled": true
+          "url": "https://github.com/AvDalfsen/LanguageLens/releases/download/translation-models-2026-10-13-v1/small-sentencepiece.bpe.model.zst",
+          "compression": "zstd",
+          "compressed_bytes": 1140195,
+          "compressed_sha256": "84ea4ddfa6109dace8ad1681907ca237b556bee93e5b450d9b13b17abca27e39"
         }
       ],
       "license": "MIT",
@@ -975,5 +999,9 @@
     ],
     "license": "MIT",
     "publisher": "https://nodejs.org/"
+  },
+  "word_model_release": {
+    "repository": "AvDalfsen/LanguageLens",
+    "tag": "translation-models-2026-10-13-v1"
   }
 }

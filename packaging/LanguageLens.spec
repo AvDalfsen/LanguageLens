@@ -7,7 +7,8 @@ from PyInstaller.utils.hooks import collect_data_files, collect_dynamic_libs, co
 from PyInstaller.config import CONF
 
 root = Path(SPECPATH).parent
-datas = collect_data_files("language_lens")
+# Exclude old source-install resources too, when reusing a build environment.
+datas = collect_data_files("language_lens", excludes=["_translation_assets/**"])
 datas += [(str(root / "docs"), "language_lens/help/docs"),
           (str(root / "README.md"), "language_lens/help"),
           (str(root / "CONTRIBUTING.md"), "language_lens/help"),

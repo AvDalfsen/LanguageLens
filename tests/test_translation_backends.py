@@ -38,8 +38,9 @@ def test_selected_models_have_complete_fixed_download_integrity_metadata():
     for model in assets.catalog()['models'].values():
         for file in model['files']:
             assert file['bytes']>0 and len(file['sha256'])==64
-            if not file.get('bundled'):
-                assert file['url'].startswith('https://') and len(file['compressed_sha256'])==64
+            assert not file.get('bundled')
+            assert file['url'].startswith('https://') and len(file['compressed_sha256'])==64
+            assert file['compressed_bytes']>0 and file['compression']=='zstd'
     assert all(m['license']=='MPL-2.0' for m in assets.catalog()['models'].values() if m['kind']=='firefox')
 
 def test_full_text_decodes_all_sentences_and_preserves_paragraphs(monkeypatch):

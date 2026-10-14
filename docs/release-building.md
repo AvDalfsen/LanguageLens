@@ -22,13 +22,34 @@ development extra. Building needs an internet connection or populated pip cache.
 It records the Python patch version; this is a version-pinned build recipe, not a
 claim of byte-for-byte reproducibility across machines.
 
-The build also prepares two pinned CTranslate2 int8 word models using
-`packaging/requirements-translation-build.txt` and
-`scripts/prepare-translation-assets.py`. Their verified converted files are
-bundled; the raw weights and conversion tools stay outside the portable runtime.
-PyTorch and Transformers are excluded from the bundle. Firefox models and their
-local Bergamot/Node runtime download only during preparation of a selected pair.
+App builds omit both CTranslate2 int8 word models and do not run conversion or
+install translation conversion tools. **Download required files** downloads the
+selected pair's pinned word model, Firefox weights and local Bergamot/Node runtime.
+PyTorch and Transformers are excluded from the bundle. Old source-build model
+resources are explicitly excluded even when a build environment is reused.
 See [translation notices](../THIRD_PARTY_TRANSLATION.md).
+
+### Separate word-model releases
+
+The catalog pins an immutable GitHub model-resource release, separate from app
+versions. Its assets are Zstandard-compressed files with both compressed and
+decoded byte counts and SHA-256 checksums. Existing verified user files are reused.
+The catalog's provider version stays unchanged when only delivery changes.
+
+To reproduce a pinned model release, use the **Publish pinned translation models**
+manual GitHub workflow. It installs `packaging/requirements-translation-build.txt`,
+converts the pinned publisher checkpoints into `build/translation-word-models`,
+checks the benchmark hashes, and packages the downloads with
+`scripts/package-translation-assets.py`. Compression uses pinned Zstandard 0.25.0
+at level 6. Packaging must match the catalog's existing download hashes. The
+workflow refuses to replace an existing release and publishes model resources as
+a prerelease so they do not become the latest application release.
+
+When deliberately changing model resources, first prepare and verify the new
+converted files, then package them with `--output <directory> --update-catalog
+--tag <new-model-release-tag>`. Review the catalog and its manifest, publish those
+exact assets and translation notices, and verify public downloads before shipping
+an app that references them. Do not replace assets at an already-pinned URL.
 
 Each run has its own directory; existing release folders are never deleted or
 overwritten. Outputs include:

@@ -9,7 +9,7 @@ from language_lens.services import local_files, offline, voices, task_worker, tr
 @pytest.fixture
 def preview(monkeypatch, tmp_path):
     model = {"files": [{"name": "remote", "bytes": 100, "compressed_bytes": 40},
-                       {"name": "bundled", "bytes": 200, "bundled": True}]}
+                       {"name": "word-model", "bytes": 200, "compressed_bytes": 75}]}
     catalog = {"models": {"model": model},
                "node_runtime": {"files": [{"name": "node.exe", "bytes": 500}]},
                "bergamot_runtime": {"files": [{"name": "worker.wasm", "bytes": 250}]}}
@@ -31,7 +31,7 @@ def preview(monkeypatch, tmp_path):
 def test_runtime_archive_unknowns_do_not_discard_known_downloads(preview):
     translator, _ = preview
     result = local_files.pair_file_summary(Settings(source_language="en", target_language="nl"), translator, [])
-    assert result["download_bytes"] == 52  # compressed remote model + sentence; bundled data is not a download
+    assert result["download_bytes"] == 127  # both compressed models and the sentence model
     assert result["download_unknown"]
     assert [item["size"] for item in result["files"]] == [300, 500, 250, 12]
     assert all(not item["installed"] for item in result["files"])
@@ -51,7 +51,7 @@ def test_known_runtime_archive_size_is_counted_once(preview):
     catalog["node_runtime"]["bytes"] = 80
     catalog["bergamot_runtime"]["bytes"] = 60
     result = local_files.pair_file_summary(Settings(source_language="en", target_language="nl"), translator, [])
-    assert result["download_bytes"] == 192 and not result["download_unknown"]
+    assert result["download_bytes"] == 267 and not result["download_unknown"]
 
 
 def test_failed_preview_does_not_change_capture_readiness(monkeypatch, tmp_path):

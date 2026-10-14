@@ -18,9 +18,11 @@ model preparation downloads public model assets, never captured text.
 The production catalogue, `language_lens/data/translation-providers.json`, pins
 publisher revisions, download URLs, lengths and SHA-256 checksums. Firefox
 model files are downloaded unmodified during explicit preparation. The two word
-models are converted to CTranslate2 int8 by the reproducible build script and
-included as local package resources; their tokenizer and converted file hashes
-match the benchmark assets. Conversion dependencies are build-only.
+models are converted to CTranslate2 int8 by a separate model-release build and
+distributed as versioned Zstandard downloads on GitHub. Their tokenizer and
+converted file hashes match the benchmark assets. **Download required files**
+fetches only the selected pair's model and verifies both compressed and decoded
+files. Conversion dependencies are model-build-only; app releases omit weights.
 
 The Bergamot runtime and model sources are available through the links above.
 The unmodified publisher JavaScript and WASM files are checksummed after

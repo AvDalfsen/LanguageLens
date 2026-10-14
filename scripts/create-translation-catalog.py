@@ -12,6 +12,7 @@ def read(path):return json.loads(path.read_text('utf-8'))
 def digest(path):return hashlib.sha256(path.read_bytes()).hexdigest()
 
 def main():
+    previous=read(OUT)
     selected=read(BENCH/'best-effort-selection/best-effort-model-selections.json')
     models={}; full={}; words={}
     for item in selected['full_text_exceptions']:
@@ -35,15 +36,21 @@ def main():
         if kind=='small':
             receipt=read(BENCH/'receipts/alirezamsh--small100-conversion.json')
             revision=receipt['source']['revision']; repo=receipt['source']['model']
-            files=[{'name':Path(f['path']).name,'bytes':f['bytes'],'sha256':f['sha256'],'bundled':True} for f in receipt['files']]
+            files=[{'name':Path(f['path']).name,'bytes':f['bytes'],'sha256':f['sha256']} for f in receipt['files']]
             tokenizer=BENCH/'downloads/alirezamsh--small100/sentencepiece.bpe.model'
             sources=[{'name':Path(f['path']).name,'bytes':f['bytes'],'sha256':f['sha256']} for f in receipt['source']['files']]
         else:
             receipt=read(OLD/'models/m2m100_418M-conversion.json');revision=receipt['revision'];repo=receipt['model']
-            files=[{'name':name,'bytes':(OLD/'models/m2m100_418M-ct2-int8'/name).stat().st_size,'sha256':value,'bundled':True} for name,value in receipt['converted_files'].items()]
+            files=[{'name':name,'bytes':(OLD/'models/m2m100_418M-ct2-int8'/name).stat().st_size,'sha256':value} for name,value in receipt['converted_files'].items()]
             tokenizer=OLD/'downloads/m2m100_418M/sentencepiece.bpe.model'
             sources=[{'name':f['name'],'bytes':f['bytes'],'sha256':f['sha256']} for f in receipt['source_files']]
-        files.append({'name':'sentencepiece.bpe.model','bytes':tokenizer.stat().st_size,'sha256':digest(tokenizer),'bundled':True})
+        files.append({'name':'sentencepiece.bpe.model','bytes':tokenizer.stat().st_size,'sha256':digest(tokenizer)})
+        downloads={f['name']:f for f in previous['models'][kind]['files']}
+        for file in files:
+            pinned=downloads[file['name']]
+            if any(file[key]!=pinned[key] for key in ('bytes','sha256')):
+                raise RuntimeError('Changed word weights require a new packaged, pinned model release.')
+            file.update({key:pinned[key] for key in ('url','compression','compressed_bytes','compressed_sha256')})
         models[kind]={'kind':kind,'files':files,'license':'MIT','repo':repo,'revision':revision,
             'source_files':sources,'publisher':'https://huggingface.co/'+repo}
     backend=ROOT/'artifacts/translation-production-integration-2026-10-13/backend'
@@ -53,7 +60,8 @@ def main():
     catalog={'version':'2026-10-13-v1','default':'argos','full_text':full,'words':words,'models':models,
         'bergamot_runtime':{'url':package['publisher']['dist']['tarball'],'sha256':package['tar_sha256'],'files':runtime,
             'license':'MPL-2.0','publisher':'https://github.com/browsermt/bergamot-translator'},
-        'node_runtime':read(backend/'node-receipt.json')}
+        'node_runtime':read(backend/'node-receipt.json'),
+        'word_model_release':previous['word_model_release']}
     OUT.write_text(json.dumps(catalog,ensure_ascii=False,indent=2)+'\n','utf-8')
     print({'full_text_routes':len(full),'word_routes':len(words),'model_assets':len(models)})
 

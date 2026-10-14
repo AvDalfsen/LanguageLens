@@ -1,7 +1,7 @@
-"""Build the two pinned word-model resources shipped with source/portable Lens.
+"""Build pinned word-model resources for the separate translation-model release.
 
 Conversion runs only here, never in a capture process. Firefox weights and the
-isolated runtime are downloaded on demand by explicit file preparation.
+isolated runtime and word models download on demand by explicit file preparation.
 """
 import argparse
 import hashlib
@@ -37,7 +37,8 @@ def download(url,path,item):
 
 def main():
     parser=argparse.ArgumentParser();parser.add_argument('--reuse-benchmark',action='store_true')
-    args=parser.parse_args();out=ROOT/'src/language_lens/_translation_assets';out.mkdir(exist_ok=True)
+    parser.add_argument('--output',type=Path,default=ROOT/'build/translation-word-models')
+    args=parser.parse_args();out=args.output;out.mkdir(parents=True,exist_ok=True)
     for kind in ('small','m2m'):
         model=CATALOG['models'][kind];destination=out/kind
         if all(matches(destination/item['name'],item) for item in model['files']):

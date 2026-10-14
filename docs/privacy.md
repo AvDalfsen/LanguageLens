@@ -14,6 +14,11 @@ During capture and speech, workers disable Python outbound socket connections an
 
 Requested file preparation/download/repair operations contact model/package hosts. They verify local inference using fixed sample text rather than screenshots.
 
+The selected SMaLL-100 or M2M100 word model downloads from a pinned Language Lens
+GitHub model-resource release only through **Download required files** or an
+explicit repair. The app download and source launcher omit both models. Prepared
+weights stay local and can be reused by other supported language pairs.
+
 External documentation, bug-report, and **Voice details and licence** links open in your browser. Opening these pages does not attach your selected screenshot or recognized text; their hosts receive an ordinary browser request.
 
 ## Stored and temporary data
