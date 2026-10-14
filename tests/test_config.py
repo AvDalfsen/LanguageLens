@@ -53,3 +53,19 @@ def test_invalid_window_size_falls_back_to_content_fitting(tmp_path, size):
     settings = load_settings(path)
     assert settings.settings_window_size is None
     assert settings.settings_window_maximized is False
+
+
+def test_language_feature_preferences_round_trip_and_keep_legacy_defaults(tmp_path):
+    path = tmp_path / "settings.json"
+    settings = Settings(source_language="ja", japanese_word_lookup=False,
+                        chinese_word_lookup=False, show_ipa=True)
+    save_settings(settings, path)
+    restored = load_settings(path)
+    assert restored == settings
+    assert not restored.word_lookup_enabled
+    assert restored.speech_enabled and restored.show_ipa
+    restored.source_language = "en"
+    assert restored.word_lookup_enabled and restored.speech_enabled and restored.show_ipa
+    path.write_text('{"source_language": "ja", "japanese_word_lookup": "false"}', encoding="utf-8")
+    legacy = load_settings(path)
+    assert legacy.japanese_word_lookup and legacy.chinese_word_lookup

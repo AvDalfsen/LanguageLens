@@ -9,7 +9,8 @@ from PySide6.QtWidgets import (
 )
 
 from language_lens import __version__
-from language_lens.i18n import tr, translate_ui, ui_item, ui_text, ui_widget
+from language_lens.i18n import tr, translate_ui, ui_item, ui_text, ui_widget, language
+from language_lens.ui.controls import ChoiceBox
 from language_lens.services.diagnostics import open_folder
 from language_lens.ui.identity import app_icon
 
@@ -53,11 +54,19 @@ class HelpDialog(QDialog):
         heading.addWidget(title)
         heading.addStretch()
         layout.addLayout(heading)
-        self.topics = QComboBox()
+        self.topics = ChoiceBox()
         ui_text(self.topics, tr("Help topic"), property="accessibleName")
         for title, name in TOPICS:
             ui_item(self.topics, tr(title), name)
         layout.addWidget(self.topics)
+        self.quick_start = QLabel()
+        self.quick_start.setWordWrap(True)
+        self.quick_start._lens_untranslated_text = True
+        layout.addWidget(self.quick_start)
+        self.guide_language = QLabel()
+        self.guide_language.setObjectName("note")
+        self.guide_language._lens_untranslated_text = True
+        layout.addWidget(self.guide_language)
         self.browser = QTextBrowser()
         ui_text(self.browser, tr("User guide"), property="accessibleName")
         self.browser.setOpenLinks(False)
@@ -81,6 +90,17 @@ class HelpDialog(QDialog):
         self.topics.currentIndexChanged.connect(self._topic_changed)
         self._topic_changed()
         translate_ui(self)
+        self.refresh_language()
+
+    def refresh_language(self) -> None:
+        self.quick_start.setText("\n".join((
+            "1. " + tr("Text language") + " → " + tr("Translate into"),
+            "2. " + tr("Download required files") + " → " + tr("Ready to capture — required local files verified"),
+            "3. " + tr("Try a capture now") + " → " + tr("Drag around the text • Esc cancels"),
+            "4. " + tr("Close and return   Esc"),
+        )))
+        self.quick_start.setVisible(language() != "en")
+        self.guide_language.setText(tr("User guide") + " · English")
 
     def _topic_changed(self, *_args):
         self._load(self.root / "docs" / self.topics.currentData())

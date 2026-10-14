@@ -13,6 +13,14 @@ The upcoming interface calls the checkbox **Enable read aloud**; earlier preview
 
 Voices usually need about 63–114 MB each; Japanese pronunciation also needs a separate pack. Settings displays missing components and progress. Downloads can be cancelled and retried; completed files are retained. **Check voice files** verifies installed data and fetches missing/damaged files.
 
+For Japanese source text, **Enable read aloud** and **Show pronunciation notation
+(IPA)** independently control audio and visible phonetic notation. They share a
+pronunciation pack that produces Japanese readings. The voice model turns those
+readings into audio; downloading it also prepares the pack. Notation needs the
+pack but works without the voice model. With audio disabled and notation enabled,
+**Download pronunciation** prepares only that shared data. With both controls off,
+neither audio nor notation is prepared, and downloaded files are retained.
+
 No Windows voice packs, cloud API keys, or paid speech service are required. Runtime and model terms are separate from the app's MIT licence. Some voices have noncommercial terms or incomplete licence information; see [speech notices](../THIRD_PARTY_SPEECH.md).
 
 ## Play words and sentences
@@ -21,7 +29,7 @@ Capture text and choose **Read selection** to hear the original OCR text, even b
 
 **Cancel audio** stops preparation; **Stop audio** stops playback. Closing the screenshot cancels both. The first playback prepares audio locally; subsequent playback of the same text, voice, and speed within that review reuses it. Selections are limited to 2,000 characters for speech.
 
-**Pronunciation speed** ranges from 0.5× to 1.5× without changing pitch. Adjusting it stops current audio; play again at the new speed. The choice is remembered and also applies to samples.
+**Pronunciation speed** ranges from 0.5× to 1.5× without changing pitch. Set it beside the voice in Settings, or adjust it in a review. Adjusting it stops current audio; play again at the new speed. The choice is remembered and also applies to samples.
 
 ## Optional phonetic notation
 

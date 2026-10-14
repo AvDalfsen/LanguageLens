@@ -175,3 +175,38 @@ def test_japanese_ipa_only_can_download_pack_without_voice(qapp, monkeypatch):
     widget.set_maintenance_blocked(True)
     assert not widget.install.isEnabled()
     widget.shutdown()
+
+
+def test_disabled_word_lookup_does_not_require_a_pack(tmp_path, monkeypatch, offline_record):
+    from language_lens.services import offline
+    monkeypatch.setattr(offline, "assets_root", lambda: tmp_path)
+    monkeypatch.setattr(offline, "runtime_identity", lambda: {"runtime": "fixture"})
+    monkeypatch.setattr(packs, "ready", lambda _pack: False)
+    model = tmp_path / "model"
+    model.write_bytes(b"model")
+    offline.marker_path("ja", "en").write_text(json.dumps(offline_record("ja", "en", model)))
+    assert offline.offline_ready("ja", "en", False)
+    assert not offline.offline_ready("ja", "en", True)
+
+
+@pytest.mark.parametrize("audio,notation", [(False, False), (True, False), (False, True), (True, True)])
+def test_japanese_pronunciation_download_follows_audio_and_notation(qapp, monkeypatch, audio, notation):
+    from language_lens.config import Settings
+    from language_lens.ui import pronunciation
+    monkeypatch.setattr(pronunciation, "runtime_ready", lambda: True)
+    monkeypatch.setattr(pronunciation, "voice_present", lambda _voice: False)
+    monkeypatch.setattr(packs, "ready", lambda _pack: False)
+    widget = pronunciation.PronunciationSettings(Settings(source_language="ja", speech_enabled=audio, show_ipa=notation))
+    assert not hasattr(widget, "japanese_pronunciation")
+    assert widget.enabled.isEnabled() and widget.show_ipa.isEnabled()
+    assert widget.install.isEnabled() == (audio or notation)
+    assert not widget.preview.isEnabled()
+    commands = []
+    monkeypatch.setattr(widget.download, "start", lambda *args: commands.append(args))
+    widget.install.click()
+    if audio or notation:
+        assert commands[0][0] == ("download" if audio else "download-pronunciation")
+        assert widget.install.text().startswith("Download voice" if audio else "Download pronunciation")
+    else:
+        assert not commands
+    widget.shutdown()

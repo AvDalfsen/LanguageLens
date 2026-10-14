@@ -7,6 +7,7 @@ from PySide6.QtCore import QCollator, QEvent, QLocale, QSize, Qt, QTimer, Signal
 from PySide6.QtGui import QCursor, QGuiApplication, QKeySequence
 from PySide6.QtWidgets import (
     QComboBox,
+    QCheckBox,
     QBoxLayout,
     QFormLayout,
     QGridLayout,
@@ -25,7 +26,8 @@ from PySide6.QtWidgets import (
 )
 
 from language_lens.config import LANGUAGES, Settings
-from language_lens.i18n import UI_LANGUAGES, language, set_language, translate_ui, tr, tr_message, question, ui_item, ui_text, ui_widget
+from language_lens.i18n import UI_LANGUAGES, language, language_name, set_language, translate_ui, tr, tr_message, question, ui_item, ui_text, ui_widget
+from language_lens.ui.controls import ChoiceBox
 from language_lens.services.hotkey import normalize_hotkey, display_hotkey
 from language_lens.services.model_download import DownloadProgress
 from language_lens.services.jobs import ServiceJob
@@ -68,9 +70,13 @@ class SetupWindow(QMainWindow):
         ) else None
         self._remembered_maximized = settings.settings_window_maximized is True
         self._auto_width: int | None = None
+        self._auto_size: QSize | None = None
         self._sizing_timer = QTimer(self)
         self._sizing_timer.setSingleShot(True)
         self._sizing_timer.timeout.connect(self._fit_or_restore_size)
+        self._position_timer = QTimer(self)
+        self._position_timer.setSingleShot(True)
+        self._position_timer.timeout.connect(self._fit_or_restore_size)
         self._preference_timer = QTimer(self)
         self._preference_timer.setSingleShot(True)
         self._preference_timer.setInterval(300)
@@ -107,8 +113,9 @@ class SetupWindow(QMainWindow):
         self._progress_timer.timeout.connect(self._update_download_metrics)
 
         title = ui_widget(QLabel, "Language Lens")
+        self._title = title
         title.setObjectName("title")
-        self.ui_language = QComboBox()
+        self.ui_language = ChoiceBox()
         self.ui_language.setObjectName("uiLanguage")
         ui_text(self.ui_language, tr("UI language"), property="accessibleName")
         self.ui_language.setMaximumWidth(220)
@@ -139,16 +146,17 @@ class SetupWindow(QMainWindow):
             "Everything is processed on your computer."))
         intro.setWordWrap(True)
         intro.setObjectName("intro")
+        self._intro = intro
 
         card = QFrame()
         card.setObjectName("card")
         form = QFormLayout(card)
-        form.setContentsMargins(24, 22, 24, 22)
-        form.setVerticalSpacing(16)
+        form.setContentsMargins(18, 16, 18, 16)
+        form.setVerticalSpacing(12)
         form.setRowWrapPolicy(QFormLayout.RowWrapPolicy.WrapLongRows)
 
-        self.source = QComboBox()
-        self.target = QComboBox()
+        self.source = ChoiceBox()
+        self.target = ChoiceBox()
         self.source.setObjectName("textLanguage")
         self.target.setObjectName("targetLanguage")
         for name, code in LANGUAGES:
@@ -179,10 +187,17 @@ class SetupWindow(QMainWindow):
         self.hotkey_note.setWordWrap(True)
         hotkey_layout.addWidget(self.hotkey_note)
 
-        self.capture_scope = QComboBox()
+        self.capture_scope = ChoiceBox()
         ui_item(self.capture_scope, tr("All monitors"), "all")
         ui_item(self.capture_scope, tr("Monitor under the pointer"), "current")
         self._select_data(self.capture_scope, settings.capture_scope)
+        self.keep_translation_models_loaded = ui_widget(
+            QCheckBox, tr("Keep translation models loaded between captures"))
+        self.keep_translation_models_loaded.setChecked(settings.keep_translation_models_loaded)
+        set_help(self.keep_translation_models_loaded,
+            "Keep the active translation models in memory for faster repeated captures. "
+            "This uses memory while Lens is idle. Turn this off to reload models for each capture "
+            "and release their memory when you close its review. Models use the CPU only while translating.")
         set_help(self.source,
             "Choose the language written in the screenshot. This controls OCR, word segmentation, "
             "and the original-language pronunciation and IPA. It is independent of the language "
@@ -213,7 +228,31 @@ class SetupWindow(QMainWindow):
             "memory, and reduces screenshot/rendering work."
         )
 
-        form.addRow(tr("Text language"), self.source)
+        self.japanese_word_lookup = ui_widget(QCheckBox, tr("Japanese word lookup"))
+        self.japanese_word_lookup.setChecked(settings.japanese_word_lookup)
+        set_help(self.japanese_word_lookup,
+            "Split Japanese text into individual words for word popups and translations. "
+            "This helps you inspect words in text that has no spaces. Turn it off to treat each "
+            "unbroken text segment as one lookup; whole-selection translation still works. "
+            "Download the required dictionary once with 'Download required files'. "
+            "Turning this off keeps its files for later use.")
+        self.chinese_word_lookup = ui_widget(QCheckBox, tr("Chinese word lookup"))
+        self.chinese_word_lookup.setChecked(settings.chinese_word_lookup)
+        set_help(self.chinese_word_lookup,
+            "Split Chinese text into individual words for word popups and translations. "
+            "This helps you inspect words in text that has no spaces. Turn it off to treat each "
+            "unbroken text segment as one lookup; whole-selection translation still works. "
+            "Download the required dictionary once with 'Download required files'. "
+            "Turning this off keeps its files for later use.")
+        source_field = QWidget()
+        source_row = QHBoxLayout(source_field)
+        self._source_row = source_row
+        source_row.setContentsMargins(0, 0, 0, 0)
+        source_row.addWidget(self.source, 1)
+        source_row.addWidget(self.japanese_word_lookup)
+        source_row.addWidget(self.chinese_word_lookup)
+        form.addRow(tr("Text language"), source_field)
+        form.labelForField(source_field).setBuddy(self.source)
         form.addRow(tr("Translate into"), self.target)
         form.addRow(tr("Capture hotkey"), hotkey_field)
         form.addRow(tr("Capture area"), self.capture_scope)
@@ -255,13 +294,8 @@ class SetupWindow(QMainWindow):
         self.diagnostics_button = ui_widget(QPushButton, tr("Open diagnostics folder"))
         self.diagnostics_button.clicked.connect(open_folder)
         self.diagnostics_button.hide()
-        set_help(self.repair_button, "Optional troubleshooting: download and validate replacement translation packages "
-            "for this direction if translation keeps failing. This button does not mean a problem has been detected. "
-            "Existing packages stay usable until replacements are ready; replaced packages are kept as recoverable backups. "
-            "A route via English may share models with other pairs. Use 'Check required files' afterwards.")
-        set_help(self.remove_button, "Move every translation package used by this direction to a recoverable backup "
-            "beside the Argos packages directory. Shared pivot packages may also be needed by other language pairs. "
-            "OCR assets and voices are not removed. This does not reclaim the backup's disk space.")
+        set_help(self.repair_button, "Download and verify replacement files for this pair.")
+        set_help(self.remove_button, "Models may be shared by other language pairs.")
         set_help(self.cancel_button, "Stop the current model operation, including a stalled download or preparation. "
             "Previously installed models are retained. A completed package stays installed; an interrupted replacement "
             "is recovered on the next model operation. You can retry without restarting Lens.")
@@ -277,23 +311,32 @@ class SetupWindow(QMainWindow):
         self._maintenance_layout.addWidget(self.repair_button, 1, 0)
         self._maintenance_layout.addWidget(self.remove_button, 1, 1)
         self._maintenance_layout.addWidget(self.quarantine_button, 2, 0, 1, 2)
-        from language_lens.services import language_packs as packs
-        self.pack_choice = QComboBox()
-        ui_text(self.pack_choice, tr("Optional language pack"), property="accessibleName")
-        for key, item in packs.catalog()["packs"].items():
-            self.pack_choice.addItem(item["name"], key)
-        self.pack_status = QLabel()
-        self.pack_status.setWordWrap(True)
-        self.pack_install = ui_widget(QPushButton, tr("Download pack"))
-        self.pack_remove = ui_widget(QPushButton, tr("Remove pack"))
         self._pack_inventory = []
-        self._maintenance_layout.addWidget(self.pack_choice, 3, 0, 1, 2)
-        self._maintenance_layout.addWidget(self.pack_status, 4, 0, 1, 2)
-        self._maintenance_layout.addWidget(self.pack_install, 5, 0)
-        self._maintenance_layout.addWidget(self.pack_remove, 5, 1)
-        self.pack_choice.currentIndexChanged.connect(self._refresh_packs)
-        self.pack_install.clicked.connect(lambda: self._start_model_job("pack-install", pack=self.pack_choice.currentData()))
-        self.pack_remove.clicked.connect(self._remove_pack)
+        self.file_inventory = QLabel()
+        self.file_inventory.setTextFormat(Qt.TextFormat.PlainText)
+        self.file_inventory.setWordWrap(True)
+        self.file_inventory.setObjectName("note")
+        self._maintenance_layout.addWidget(self.file_inventory, 3, 0, 1, 2)
+        self.backup_note = QLabel()
+        self.backup_note.setWordWrap(True)
+        self.backup_note.setTextFormat(Qt.TextFormat.PlainText)
+        self.backup_note.setObjectName("note")
+        self._maintenance_layout.addWidget(self.backup_note, 4, 0, 1, 2)
+        self.backups_button = ui_widget(QPushButton, tr("Open local files folder"))
+        self.backups_button.clicked.connect(self._open_backups)
+        self._maintenance_layout.addWidget(self.backups_button, 5, 0, 1, 2)
+        self.performance = ExpandableSection(tr("Performance"))
+        performance_layout = QVBoxLayout(self.performance.content)
+        performance_layout.setContentsMargins(8, 4, 8, 4)
+        performance_layout.addWidget(self.keep_translation_models_loaded)
+        performance_note = ui_widget(QLabel, tr("Faster repeated captures; uses memory between captures."))
+        performance_note.setObjectName("note")
+        performance_note.setWordWrap(True)
+        performance_layout.addWidget(performance_note)
+        self.download_estimate = QLabel()
+        self.download_estimate.setWordWrap(True)
+        self.download_estimate.setObjectName("note")
+        self.download_estimate.hide()
         self._required_actions = QHBoxLayout()
         self._required_actions.addWidget(self.prepare_button)
         self._required_actions.addWidget(self.cancel_button)
@@ -337,8 +380,8 @@ class SetupWindow(QMainWindow):
 
         container = QWidget()
         layout = QVBoxLayout(container)
-        layout.setContentsMargins(32, 30, 32, 30)
-        layout.setSpacing(18)
+        layout.setContentsMargins(24, 22, 24, 22)
+        layout.setSpacing(12)
         layout.setSizeConstraint(QLayout.SizeConstraint.SetNoConstraint)
         layout.addWidget(header)
         layout.addWidget(intro)
@@ -349,20 +392,22 @@ class SetupWindow(QMainWindow):
         content = QWidget()
         body = QVBoxLayout(content)
         body.setContentsMargins(0, 0, 8, 0)
-        body.setSpacing(16)
+        body.setSpacing(12)
         body.addWidget(card)
         body.addWidget(self.model_status)
         body.addWidget(self.model_progress)
         body.addWidget(self.model_details)
+        body.addWidget(self.download_estimate)
         body.addLayout(self._required_actions)
         body.addWidget(self.diagnostics_button)
-        body.addWidget(self.maintenance)
-        body.addWidget(self.technical_details)
         self.pronunciation = PronunciationSettings(settings)
         self.pronunciation.activity_changed.connect(self._refresh_availability)
         self.pronunciation.download.succeeded.connect(lambda _path: self.refresh_model_status())
         self.pronunciation.preferences_changed.connect(self.preferences_changed)
         body.addWidget(self.pronunciation)
+        body.addWidget(self.performance)
+        body.addWidget(self.maintenance)
+        body.addWidget(self.technical_details)
         body.addWidget(note)
         body.addStretch()
         content.installEventFilter(self)
@@ -372,12 +417,18 @@ class SetupWindow(QMainWindow):
         self.setCentralWidget(container)
 
         self.source.currentIndexChanged.connect(self.refresh_model_status)
+        self.source.currentIndexChanged.connect(self._refresh_language_options)
         self.source.currentIndexChanged.connect(
             lambda: self.pronunciation.set_language(self.source.currentData())
         )
         self.target.currentIndexChanged.connect(self.refresh_model_status)
         for combo in (self.source, self.target, self.capture_scope):
             combo.currentIndexChanged.connect(self.preferences_changed)
+        self.keep_translation_models_loaded.toggled.connect(self.preferences_changed)
+        for toggle in (self.japanese_word_lookup, self.chinese_word_lookup):
+            toggle.toggled.connect(self.refresh_model_status)
+            toggle.toggled.connect(self.preferences_changed)
+        self._refresh_language_options()
         self.refresh_model_status()
         set_language(self.ui_language.currentData())
         translate_ui(self, "en")
@@ -385,12 +436,17 @@ class SetupWindow(QMainWindow):
         self.ui_language.currentIndexChanged.connect(self._ui_language_changed)
 
     def _language_names(self) -> None:
-        names = dict((code, name) for name, code in (LANGUAGES if language() == "en" else UI_LANGUAGES))
+        collator = QCollator(QLocale("pt_BR" if language() == "pb" else language()))
+        names = [(language_name(code), code) for _name, code in LANGUAGES]
+        names.sort(key=lambda item: collator.sortKey(item[0]))
         for combo in (self.source, self.target):
+            selected = combo.currentData()
             blocked = combo.blockSignals(True)
             try:
-                for index in range(combo.count()):
-                    combo.setItemText(index, names[combo.itemData(index)])
+                combo.clear()
+                for name, code in names:
+                    combo.addItem(name, code)
+                self._select_data(combo, selected)
             finally:
                 combo.blockSignals(blocked)
 
@@ -400,13 +456,14 @@ class SetupWindow(QMainWindow):
         translate_ui(self, previous)
         self._language_names()
         self.pronunciation.refresh()
+        if self._help_dialog:
+            self._help_dialog.refresh_language()
         if not self._installing and self._last_model_status is not None:
             self._apply_model_status(self._last_model_status)
         if self._installing and self._model_stage_source:
             ui_text(self.model_status, tr_message(self._model_stage_source))
         self._update_download_metrics()
-        self._auto_width = None
-        self._sizing_timer.start(0)
+        self._adapt_footer(self.width())
         self.ui_language_changed.emit(previous)
         self.preferences_changed.emit()
 
@@ -427,15 +484,17 @@ class SetupWindow(QMainWindow):
         self.prepare_button.show()
         # Reparenting the optional check changes Qt's default focus chain.
         # Keep Tab in visual order in both ready and not-ready layouts.
-        order = [self.ui_language, self.source, self.target, self.hotkey, self.reset_hotkey, self.capture_scope]
+        order = [self.ui_language, self.source, self.japanese_word_lookup, self.chinese_word_lookup,
+                 self.target, self.hotkey, self.reset_hotkey, self.capture_scope]
         if not optional:
             order.append(self.prepare_button)
-        order.extend((self.cancel_button, self.diagnostics_button, self.maintenance.toggle))
+        order.extend((self.cancel_button, self.diagnostics_button, self.pronunciation.enabled,
+                      self.pronunciation.show_ipa, self.pronunciation.voices, self.pronunciation.speed_slider,
+                      self.pronunciation.install, self.pronunciation.preview, self.pronunciation.details,
+                      self.performance.toggle, self.keep_translation_models_loaded, self.maintenance.toggle))
         if optional:
             order.append(self.prepare_button)
-        order.extend((self.repair_button, self.remove_button, self.quarantine_button, self.pack_choice, self.pack_install, self.pack_remove, self.technical_details.toggle,
-                      self.pronunciation.enabled, self.pronunciation.show_ipa, self.pronunciation.voices,
-                      self.pronunciation.install, self.pronunciation.preview, self.pronunciation.details,
+        order.extend((self.repair_button, self.remove_button, self.quarantine_button, self.backups_button, self.technical_details.toggle,
                       self.try_button, self.help_button, self.start_button))
         for before, after in zip(order, order[1:]):
             QWidget.setTabOrder(before, after)
@@ -459,9 +518,12 @@ class SetupWindow(QMainWindow):
             target_language=self.target.currentData(),
             hotkey=self._hotkey_value,
             capture_scope=self.capture_scope.currentData(),
+            keep_translation_models_loaded=self.keep_translation_models_loaded.isChecked(),
             min_ocr_confidence=self._min_ocr_confidence,
             speech_enabled=self.pronunciation.enabled.isChecked(),
             show_ipa=self.pronunciation.show_ipa.isChecked(),
+            japanese_word_lookup=self.japanese_word_lookup.isChecked(),
+            chinese_word_lookup=self.chinese_word_lookup.isChecked(),
             speech_voices=dict(self.pronunciation.preferences),
             speech_speed=self.pronunciation.speech_speed,
             settings_window_size=list(self._remembered_size) if self._remembered_size else None,
@@ -476,31 +538,12 @@ class SetupWindow(QMainWindow):
         return screen.availableGeometry()
 
     def _preferred_size(self, maximum: QSize) -> QSize:
-        """Measure wrapped content, bypassing QScrollArea's limited size hint."""
-        layout = self.centralWidget().layout()
-        content_layout = self.scroll.widget().layout()
-        margins = layout.contentsMargins()
-        frame = self.scroll.frameWidth() * 2
-        if self._auto_width is None:
-            self._auto_width = max(
-                layout.minimumSize().width(),
-                content_layout.sizeHint().width() + margins.left() + margins.right() + frame,
-            )
-        width = min(maximum.width(), max(
-            self._auto_width,
-            self.minimumWidth(),
-            content_layout.minimumSize().width() + margins.left() + margins.right() + frame
-            + self.style().pixelMetric(QStyle.PixelMetric.PM_ScrollBarExtent),
-        ))
-        height = self._height_at_width(width)
-        if height > maximum.height():
-            # Find the narrowest wider layout that fits. Qt forms can change
-            # row wrapping at discrete widths, so measure actual candidate widths.
-            while width < maximum.width() and height > maximum.height():
-                width = min(maximum.width(), width + 24)
-                height = self._height_at_width(width)
-        self._adapt_footer(width)
-        return QSize(width, min(maximum.height(), height))
+        """Choose a readable opening size; disclosures scroll within that size."""
+        if self._auto_size is None:
+            width = min(maximum.width(), 820)
+            height = min(maximum.height(), max(560, self._height_at_width(width)))
+            self._auto_size = QSize(width, height)
+        return self._auto_size.boundedTo(maximum)
 
     def _height_at_width(self, width: int) -> int:
         layout = self.centralWidget().layout()
@@ -535,10 +578,25 @@ class SetupWindow(QMainWindow):
     def _adapt_footer(self, width: int) -> None:
         # Apply this to saved/manual sizes too, especially on a smaller monitor.
         margins = self.centralWidget().layout().contentsMargins()
+        compact = self.height() < 500
+        inset = 12 if compact else 24
+        self.centralWidget().layout().setContentsMargins(inset, inset, inset, inset)
+        self.centralWidget().layout().setSpacing(8 if compact else 12)
+        self._intro.setVisible(not compact)
+        self._title.setVisible(not compact)
+        name = "compactTitle" if compact else "title"
+        if self._title.objectName() != name:
+            self._title.setObjectName(name)
+            self._title.style().unpolish(self._title)
+            self._title.style().polish(self._title)
+        margins = self.centralWidget().layout().contentsMargins()
         inner_width = max(1, width - margins.left() - margins.right())
+        self._source_row.setDirection(QBoxLayout.Direction.TopToBottom
+            if inner_width < 720 and (not self.japanese_word_lookup.isHidden() or not self.chinese_word_lookup.isHidden())
+            else QBoxLayout.Direction.LeftToRight)
         header_minimum = sum(self._header_row.itemAt(i).widget().minimumSizeHint().width() for i in (0, 2)) + 2 * max(0, self._header_row.spacing())
         self._header_row.setDirection(
-            QBoxLayout.Direction.TopToBottom if inner_width < header_minimum
+            QBoxLayout.Direction.TopToBottom if not compact and inner_width < header_minimum
             else QBoxLayout.Direction.LeftToRight)
         row_margins = self._button_row.contentsMargins()
         horizontal_minimum = (
@@ -575,7 +633,7 @@ class SetupWindow(QMainWindow):
             else:
                 frame.moveLeft(max(area.left(), min(frame.left(), area.right() - frame.width() + 1)))
                 frame.moveTop(max(area.top(), min(frame.top(), area.bottom() - frame.height() + 1)))
-            self.move(frame.topLeft())
+            self.move(self.pos() + frame.topLeft() - self.frameGeometry().topLeft())
         finally:
             self._auto_sizing = False
 
@@ -591,7 +649,10 @@ class SetupWindow(QMainWindow):
                 self._auto_sizing = True
                 self.showMaximized()
                 self._auto_sizing = False
-        self._sizing_timer.start(0)
+        self._sizing_timer.start(25)
+        # The platform can finish assigning native frame offsets after show.
+        # Clamp once more during startup; content changes never schedule this.
+        self._position_timer.start(60)
         self.visibility_changed.emit()
 
     def resizeEvent(self, event) -> None:  # noqa: N802
@@ -614,9 +675,8 @@ class SetupWindow(QMainWindow):
             self._preference_timer.start()
 
     def eventFilter(self, watched, event) -> bool:  # noqa: N802
-        if (event.type() == QEvent.Type.LayoutRequest and self._size_initialized
-                and not self._auto_sizing and self._remembered_size is None and self.isVisible()):
-            self._sizing_timer.start(0)
+        # Content changes do not resize the top-level window. This prevents a
+        # temporary scroll range followed by an asynchronous resize/hide.
         return super().eventFilter(watched, event)
 
     def hideEvent(self, event) -> None:  # noqa: N802
@@ -647,6 +707,8 @@ class SetupWindow(QMainWindow):
         self.repair_button.setEnabled(False)
         self.remove_button.setEnabled(False)
         ui_text(self.model_status, tr("Checking local capabilities…"))
+        self._status_style("statusLabel")
+        self.download_estimate.hide()
         self._place_file_check(False)
         self._status_check_failed = False
         self._show_model_task_error()
@@ -665,7 +727,9 @@ class SetupWindow(QMainWindow):
     def _status_event(self, message) -> None:
         if "result" in message and not self._installing:
             result = message["result"]
-            if (result["source"], result["target"]) == (self.source.currentData(), self.target.currentData()):
+            if ((result["source"], result["target"]) == (self.source.currentData(), self.target.currentData())
+                    and result.get("word_lookup_enabled", self.current_settings().word_lookup_enabled)
+                        == self.current_settings().word_lookup_enabled):
                 self._apply_model_status(result)
 
     def _status_failed(self, message: str) -> None:
@@ -677,11 +741,24 @@ class SetupWindow(QMainWindow):
             self._set_files_ready(False)
             self._status_check_failed = True
             ui_text(self.model_status, tr("Could not check models: {error}", error=message))
-            self.model_status.setObjectName("modelMissing")
+            self._status_style("modelMissing")
+            self._place_file_check(False)
             ui_text(self.prepare_button, tr("Retry file check"))
             ui_text(self.capabilities, tr("Installation status is unknown because the check failed. No local files were removed."))
             self.diagnostics_button.show()
             self._refresh_availability()
+
+    def _status_style(self, name: str) -> None:
+        self.model_status.setObjectName(name)
+        self.model_status.style().unpolish(self.model_status)
+        self.model_status.style().polish(self.model_status)
+        self.model_status.update()
+
+    def _open_backups(self) -> None:
+        from PySide6.QtCore import QUrl
+        from PySide6.QtGui import QDesktopServices
+        from language_lens.config import settings_path
+        QDesktopServices.openUrl(QUrl.fromLocalFile(str(settings_path().parent)))
 
     def _prepare_files(self) -> None:
         if self._status_check_failed:
@@ -703,6 +780,22 @@ class SetupWindow(QMainWindow):
         self.quarantine_button.hide()
         self._last_model_status = result
         self._pack_inventory = result.get("packs", [])
+        rows = result.get("files", [])
+        ui_text(self.file_inventory, "\n".join(
+            f"{item['name']} · {item['size'] / 1_000_000:.1f} MB · " +
+            (tr("Missing") if not item.get("installed") else tr("checked and ready") if result['prepared'] else tr("Check required files"))
+            for item in rows))
+        self.file_inventory.setVisible(bool(rows))
+        ui_text(self.backup_note, tr("Backups are retained; removing models does not free disk space.") + "\n" +
+            "\n".join(result.get("backup_locations", [])))
+        estimate = result.get("download_bytes")
+        if estimate is not None:
+            amount = ("≥ " if result.get("download_unknown") else "") + f"{estimate / 1_000_000:.1f}"
+            text = tr("Download: {size} MB", size=amount)
+            if result.get("download_unknown"):
+                text += " · " + tr("Additional download size is unknown.")
+            ui_text(self.download_estimate, text)
+        self.download_estimate.setVisible(not result['prepared'] and estimate is not None)
         self.pronunciation.refresh()
         self._status_check_failed = False
         self.diagnostics_button.setVisible(bool(self._model_task_error))
@@ -724,12 +817,12 @@ class SetupWindow(QMainWindow):
         self.remove_button.setEnabled(self.repair_button.isEnabled())
         source = self.source.currentData()
         from language_lens.services import language_packs as packs
-        required = packs.text_pack(source)
+        required = packs.text_pack(source, self.current_settings().word_lookup_enabled)
         if required and any(item["id"] == required and not item["ready"] for item in self._pack_inventory):
             ui_text(self.model_status, self.model_status.text() +
                 " " + tr("{pack} adds a {size} MB download.", pack=packs.definition(required)['name'],
                          size=f"{packs.download_bytes(required) / 1_000_000:.1f}"))
-        segmentation = tr("Offline dictionary segmentation") if source in {"ja", "zh"} else tr("Unicode word boundaries; not a morphological parser")
+        segmentation = tr("Offline dictionary segmentation") if required else tr("Unicode word boundaries; not a morphological parser")
         route_text = " → ".join(result["route"]) if result["route"] else tr("Same language") if ready else tr("Missing")
         notation = tr("Audited estimated IPA") if source in {"en", "pt", "pb"} else tr("Engine phonetic notation (not conventionally formatted IPA)")
         if language() == "en":
@@ -746,29 +839,12 @@ class SetupWindow(QMainWindow):
         self._show_model_task_error()
         self.set_capture_busy(self._capture_busy)
 
-    def _refresh_packs(self) -> None:
-        from language_lens.services import language_packs as packs
-        key = self.pack_choice.currentData()
-        item = next((item for item in self._pack_inventory if item["id"] == key), {})
-        installed = item.get("ready", False)
-        label = tr("Installed") if installed else tr("Not installed or needs updating")
-        size = packs.download_bytes(key) / 1_000_000
-        ui_text(self.pack_status, label + tr(" · Download: {size} MB. Shared by all language pairs.", size=f"{size:.1f}"))
-        ui_text(self.pack_install, tr("Check pack files") if installed else tr("Download pack"))
-        allowed = self.availability.maintenance_enabled
-        self.pack_choice.setEnabled(allowed)
-        self.pack_install.setEnabled(allowed)
-        self.pack_remove.setEnabled(allowed and item.get("managed", False))
-
-    def _remove_pack(self) -> None:
-        if not self.availability.maintenance_enabled:
-            return
-        answer = question(self, tr("Remove language pack"),
-            tr("Remove this optional pack for all language pairs? Its word lookup or pronunciation will need a new download. "
-            "Translation models and voices are kept. Files currently in use may be freed after restarting and removing again."),
-            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
-        if answer == QMessageBox.StandardButton.Yes:
-            self._start_model_job("pack-remove", pack=self.pack_choice.currentData())
+    def _refresh_language_options(self) -> None:
+        source = self.source.currentData()
+        self.japanese_word_lookup.setVisible(source == "ja")
+        self.chinese_word_lookup.setVisible(source == "zh")
+        if self._size_initialized:
+            self._adapt_footer(self.width())
 
     def _quarantine_models(self) -> None:
         if not self.availability.maintenance_enabled or not self._damaged_models:
@@ -784,11 +860,15 @@ class SetupWindow(QMainWindow):
     def _manage_model(self, command: str) -> None:
         if not self.availability.maintenance_enabled:
             return
-        action = (tr("Validated replacements are installed only after downloading; previous versions are kept as backups. ")
+        action = (tr("Download and verify replacement files for this pair.")
                   if command == "repair" else tr("Removing shared packages may stop other language pairs working. "))
+        from language_lens.config import settings_path
+        locations = (self._last_model_status or {}).get("backup_locations",
+            [str(settings_path().parent / "removed-translation-models")])
         answer = question(self, tr("Manage local translation models"),
-            tr("This affects every package in this pair's translation route, including shared English pivot models. ")
-            + action + tr("Backups are kept beside the Argos packages directory. Continue?"),
+            tr("Models may be shared by other language pairs.") + "\n\n" + action + "\n\n" +
+            tr("Backups are kept in the locations below. Disk space is not reclaimed. Continue?")
+            + "\n" + "\n".join(locations),
             QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
         if answer == QMessageBox.StandardButton.Yes:
             self._start_model_job(command)
@@ -824,6 +904,7 @@ class SetupWindow(QMainWindow):
     def _model_stage_changed(self, message: str) -> None:
         self._model_stage_source = message
         ui_text(self.model_status, tr_message(message))
+        self._status_style("statusLabel")
         self._transfer_metrics.reset(monotonic())
         self._download_snapshot = None
         self.model_progress.setRange(0, 0)
@@ -934,7 +1015,8 @@ class SetupWindow(QMainWindow):
         self.remove_button.setEnabled(state.maintenance_enabled and managed)
         self.quarantine_button.setEnabled(state.maintenance_enabled and bool(self._damaged_models))
         self.pronunciation.set_maintenance_blocked(state.capture_busy or state.model_busy or state.shutting_down)
-        self._refresh_packs()
+        self.japanese_word_lookup.setEnabled(state.maintenance_enabled)
+        self.chinese_word_lookup.setEnabled(state.maintenance_enabled)
         self._refresh_listening()
         if state != self._last_availability:
             self._last_availability = state

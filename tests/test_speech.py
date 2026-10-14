@@ -38,7 +38,7 @@ def test_preferences_keep_accents_and_never_use_another_language(tmp_path):
 
 def test_remembered_review_speed_applies_to_settings_voice_sample(qapp, monkeypatch):
     widget = pronunciation.PronunciationSettings(Settings(speech_speed=.65))
-    assert not hasattr(widget, "speed")  # speed is controlled in the screenshot, not Settings
+    assert widget.speed_slider.value() == 65
     assert widget.speech_speed == widget.player.speed == .65
     widget.set_speech_speed(.8)
     requests = []
@@ -101,7 +101,7 @@ def test_installed_voice_offers_optional_file_check_not_repair(qapp, monkeypatch
     try:
         assert widget.install.text() == "Check voice files"
         assert "Voice installed" in widget.status.text() and "'Hear sample'" in widget.status.text()
-        assert "optional integrity check" in unescape(widget.install.toolTip())
+        assert "optional integrity check" in widget.install.accessibleDescription()
         widget.install.click()
         assert calls == [("download", widget.voice.id)]  # same checksum/download recovery, neutral label
         monkeypatch.setattr(pronunciation, "voice_present", lambda _voice: False)

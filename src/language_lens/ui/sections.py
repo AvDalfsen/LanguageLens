@@ -1,7 +1,7 @@
 
 from language_lens.i18n import tr, ui_text, ui_widget
 """Small keyboard-operable disclosures and read-only text inspection helpers."""
-from PySide6.QtCore import Qt, Signal
+from PySide6.QtCore import QEvent, Qt, Signal
 from PySide6.QtWidgets import QApplication, QLabel, QMenu, QToolButton, QVBoxLayout, QWidget
 
 
@@ -15,7 +15,6 @@ class ExpandableSection(QWidget):
         ui_text(self.toggle, title, property="accessibleName")
         self.toggle.setCheckable(True)
         self.toggle.setToolButtonStyle(Qt.ToolButtonStyle.ToolButtonTextBesideIcon)
-        self.toggle.setArrowType(Qt.ArrowType.RightArrow)
         self.content = QWidget()
         ui_text(self.content, title, property="accessibleName")
         self.content.hide()
@@ -24,10 +23,20 @@ class ExpandableSection(QWidget):
         layout.addWidget(self.toggle)
         layout.addWidget(self.content)
         self.toggle.toggled.connect(self._toggle)
+        self._update_arrow()
+
+    def _update_arrow(self):
+        self.toggle.setArrowType(Qt.ArrowType.DownArrow if self.toggle.isChecked() else
+            Qt.ArrowType.LeftArrow if self.layoutDirection() == Qt.LayoutDirection.RightToLeft else Qt.ArrowType.RightArrow)
+
+    def changeEvent(self, event):  # noqa: N802
+        super().changeEvent(event)
+        if event.type() == QEvent.Type.LayoutDirectionChange and hasattr(self, "toggle"):
+            self._update_arrow()
 
     def _toggle(self, expanded: bool) -> None:
         self.content.setVisible(expanded)
-        self.toggle.setArrowType(Qt.ArrowType.DownArrow if expanded else Qt.ArrowType.RightArrow)
+        self._update_arrow()
         self.expanded.emit(expanded)
 
 

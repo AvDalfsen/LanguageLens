@@ -15,6 +15,8 @@ To run the scripts directly from PowerShell in the checkout:
 
 The app's **Download required files** button manages OCR/translation readiness; voices are separate downloads. Source dependencies are larger than the portable runtime because upstream Argos declares dependencies omitted from the shipped bundle.
 
+The normal launcher also prepares the two pinned, quantized word-model resources on the first source installation. If using the scripts directly, run `.\scripts\ensure-translation-assets.ps1` after setup. This build step downloads publisher weights and converts them with the pinned tools in `packaging/requirements-translation-build.txt`; capture workers use the resulting CTranslate2 files without loading PyTorch or Transformers. Portable releases include those resources. Other selected translation models download only when the chosen language pair is prepared. See [translation integration](docs/translation-production-integration.md) and [third-party notices](THIRD_PARTY_TRANSLATION.md).
+
 Source setup uses the pinned Windows Python 3.10 constraints on that runtime; Python 3.11/3.12 use the declared dependency ranges. Pull requests run tests on all three versions. See [release building](docs/release-building.md) for the snapshot and packaging decisions.
 
 ## Tests and previews

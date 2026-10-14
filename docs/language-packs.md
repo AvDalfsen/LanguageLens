@@ -11,9 +11,14 @@ existing separate downloads.
 | Japanese pronunciation | OpenJTalk, SudachiPy and Sudachi dictionary; speech and phonetic notation | 103.5 |
 
 Select Japanese or Chinese as **Text language**, then use **Download required
-files** to prepare its word lookup pack along with OCR/translation. Merely choosing
-a language does not download anything. Other source languages do not need these
-word lookup packs, even when translating *into* Japanese or Chinese.
+files** to prepare its enabled word lookup pack along with OCR/translation.
+**Japanese word lookup** appears only for Japanese source text; **Chinese word
+lookup** appears only for Chinese source text. These remembered toggles split text
+without spaces into individual words for word popups and translations. Turn one
+off to use each unbroken text segment as one lookup without its dictionary pack;
+whole-selection translation still works. Merely choosing a language or enabling
+a toggle does not download anything. Other source languages do not show these
+settings, even when translating *into* Japanese or Chinese.
 
 Downloading a Japanese voice also prepares the pronunciation pack. For phonetic
 notation without audio, leave audio disabled, enable **Show IPA in word popups**,
@@ -21,13 +26,19 @@ and use **Download pronunciation**. The roughly 103.5 MB pack does not include t
 audio model. The speech button shows the combined size of missing components when
 audio is enabled.
 
-**Manage local files** offers individual pack checks/downloads and removal. Packs
-are shared across language pairs in `%LOCALAPPDATA%\LanguageLens\language-packs`.
-Removing one affects its capability only; translation models and voices are kept.
-If a Windows process still has a dictionary or DLL open, removal disables the pack
-immediately but some disk space may remain occupied. Restart Lens and remove the
-pack again to reclaim those files. Maintenance is blocked during capture and other
-file operations in the app.
+The Japanese pronunciation pack is shared by **Enable read aloud** and **Show
+pronunciation notation (IPA)**. The pack converts Japanese writing into readings
+and phonetic notation; the selected voice uses those readings to generate audio.
+The voice model therefore requires the pack, while notation can use the pack
+without the voice. The two controls work independently; there is no separate
+Japanese pronunciation switch. Both word lookup toggles are enabled by default
+to preserve existing behavior; disabling them keeps downloaded files for reuse.
+
+The global pack dropdown has been replaced by these contextual settings. Use
+**Check required files** to verify an enabled word lookup pack and the pronunciation
+section's download/check button to verify Japanese pronunciation data. Packs are
+shared across language pairs in `%LOCALAPPDATA%\LanguageLens\language-packs`.
+Changing these settings is blocked during capture and other file operations.
 
 ## Integrity and updates
 

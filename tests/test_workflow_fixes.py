@@ -271,7 +271,7 @@ def test_large_selection_keeps_full_controls_visible_and_movable(monkeypatch, qa
     assert window._action_columns in (1, 2, 3)
     assert window._actions_body.minimumSizeHint().width() <= window._actions_scroll.viewport().width()
     if height == 360:
-        assert window._actions_scroll.verticalScrollBar().maximum() > 0, (
+        assert window._actions_scroll.verticalScrollBar().maximum() == 0, (
             window._actions_scroll.size(), window._actions_body.size(),
             window._actions_body.minimumSizeHint(), window._actions_body.layout().sizeHint(),
             window._footer.geometry(), window.canvas.monitor_display_rect(window.canvas.selection_display_rect()))

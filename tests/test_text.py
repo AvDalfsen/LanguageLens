@@ -80,3 +80,15 @@ def test_pack_activation_is_once_per_segmentation_operation(monkeypatch, languag
     assert checks == [pack, pack]  # Revalidate on the next operation.
     list(word_spans("only Latin words", language))
     assert checks == [pack, pack]
+
+
+@pytest.mark.parametrize("source,passage", [("ja", "私は本を読みます。"), ("zh", "我喜欢学习中文。")])
+def test_disabled_dictionary_lookup_preserves_text_without_loading_pack(monkeypatch, source, passage):
+    from language_lens.services import language_packs
+    from language_lens.domain import OcrLine, build_word_hits
+    monkeypatch.setattr(language_packs, "activate", lambda *_: pytest.fail("Disabled lookup loaded a dictionary"))
+    spans = list(word_spans(passage, source, dictionary_lookup=False))
+    assert [passage[start:end] for start, end in spans] == [passage[:-1]]
+    line = OcrLine(passage, .99, ((0, 0), (200, 0), (200, 20), (0, 20)))
+    hits = build_word_hits([line], source, dictionary_lookup=False)
+    assert [hit.lookup_text for hit in hits] == [passage[:-1]]

@@ -14,6 +14,7 @@ datas += [(str(root / "docs"), "language_lens/help/docs"),
           (str(root / "prototypes" / "pronunciation" / "README.md"), "language_lens/help/prototypes/pronunciation"),
           (str(root / "LICENSE"), "language_lens/help"),
           (str(root / "THIRD_PARTY_SPEECH.md"), "language_lens/help")]
+datas += [(str(root / "THIRD_PARTY_TRANSLATION.md"), "language_lens/help")]
 datas += [(str(root / "packaging" / "portable-release.json"), ".")]
 for package in ("piper", "minisbd"):
     datas += collect_data_files(package)
@@ -32,7 +33,7 @@ a = Analysis(
     # Lens installs its version-checked SBD adapter before importing Argos.
     # OCR and sentence models both use ONNX; CTranslate2 runs translation.
     excludes=["janome", "jieba", "pyopenjtalk", "sudachipy", "sudachidict_core",
-              "argostranslate.sbd", "stanza", "torch", "spacy", "thinc", "blis",
+              "argostranslate.sbd", "stanza", "torch", "transformers", "accelerate", "safetensors", "spacy", "thinc", "blis",
               "pytest", "_pytest", "IPython", "notebook",
               "tkinter", "matplotlib", "PySide6.QtQml", "PySide6.QtQuick",
               "PySide6.QtWebEngineCore", "PySide6.QtWebEngineWidgets", "PySide6.QtTest"],

@@ -38,6 +38,9 @@ class ServiceJob(ProcessJob):
         self._scratch = value
 
     def start(self, command: str, payload: dict, images: dict | None = None) -> None:
+        if command in ("install", "prepare", "remove", "repair", "quarantine"):
+            from language_lens.services.translation_session import invalidate
+            invalidate()
         timeout = 300000 if command in ("install", "prepare", "remove", "repair", "quarantine", "pack-install", "pack-remove") else 120000
         if command == "status":
             timeout = 30000
@@ -62,7 +65,11 @@ class TaskPool:
     def start(self, task):
         from language_lens.services.tasks import encode_task
         command, payload, images = encode_task(task)
-        job = ServiceJob(task.signals)
+        if command in ("translate", "more"):
+            from language_lens.services.translation_session import session_for
+            job = session_for(payload["settings"],task.signals.parent()).submit(command,payload,task.signals)
+        else:
+            job = ServiceJob(task.signals)
         def event(message):
             if "progress" in message:
                 task.signals.progress.emit(message["progress"])
@@ -88,5 +95,5 @@ class TaskPool:
         if command == "more":
             job.failed.connect(lambda message: task.signals.result.emit((task.word, None, message)))
             job.cancelled.connect(lambda: task.signals.result.emit((task.word, None, "Search cancelled. Choose 'Retry wider search'.")))
-        job.start(command, payload, images)
+        if isinstance(job,ServiceJob):job.start(command, payload, images)
         return job

@@ -178,3 +178,13 @@ def test_ocr_prepares_dictionary_spans_before_ui_work(monkeypatch, source, text,
     recognized = RapidOcrEngine(source).recognize(np.zeros((32, 96, 3), dtype=np.uint8))[0]
     assert recognized.token_spans is not None
     assert [text[start:end] for start, end in recognized.token_spans] == expected
+
+
+@pytest.mark.parametrize("source,text", [("ja", "私は本を読みます。"), ("zh", "我喜欢学习中文。")])
+def test_ocr_skips_dictionary_when_lookup_is_disabled(monkeypatch, source, text):
+    from language_lens.services import language_packs
+    result = SimpleNamespace(boxes=[polygon(10, 20, 300)], txts=[text], scores=[.99])
+    monkeypatch.setattr(rapidocr, "RapidOCR", lambda **kwargs: lambda *a, **kw: result)
+    monkeypatch.setattr(language_packs, "activate", lambda *_: pytest.fail("Disabled lookup loaded a dictionary"))
+    recognized = RapidOcrEngine(source, dictionary_lookup=False).recognize(np.zeros((32, 96, 3), dtype=np.uint8))[0]
+    assert [text[start:end] for start, end in recognized.token_spans] == [text[:-1]]

@@ -14,6 +14,7 @@ from PySide6.QtWidgets import QMenu, QWidget
 from language_lens.config import LANGUAGES, Settings, load_settings, save_settings, validate_settings
 from language_lens.i18n import UI_LANGUAGES, catalogs, language, set_language, tr, translate_ui
 from language_lens.ui.setup import SetupWindow
+from language_lens.ui.style import help_markup
 
 
 @pytest.fixture(autouse=True)
@@ -85,7 +86,8 @@ def test_live_switch_keeps_pair_voice_hotkey_readiness_and_job_objects(window, c
         if hasattr(widget, "_lens_help_source"):
             source = widget._lens_help_source
             assert source in catalogs()["sources"]
-            assert widget.toolTip() == '<div style="max-width: 420px">' + escape(tr(source)) + '</div>'
+            assert widget.toolTip() == help_markup(tr(source))
+            assert widget.accessibleDescription() == tr(source)
     assert window.start_button.text() == tr("Start listening")
     assert window.model_status.text() == tr("Ready to capture — required local files verified")
     assert window.ui_language.accessibleName() == tr("UI language")
@@ -223,12 +225,12 @@ def test_start_and_pause_help_keep_english_sources_across_language_switches(wind
     pause = window.start_button._lens_help_source
     window.ui_language.setCurrentIndex(window.ui_language.findData(code))
     assert window.start_button._lens_help_source == pause
-    assert escape(tr(pause)) in window.start_button.toolTip()
+    assert window.start_button.toolTip() == help_markup(tr(pause))
     window.set_listening(None)
     assert window.start_button._lens_help_source == start
-    assert escape(tr(start)) in window.start_button.toolTip()
+    assert window.start_button.toolTip() == help_markup(tr(start))
     window.ui_language.setCurrentIndex(window.ui_language.findData("en"))
-    assert escape(start) in window.start_button.toolTip()
+    assert window.start_button.toolTip() == help_markup(start)
 
 
 def test_pronunciation_tooltips_translate_explanations_without_changing_phonemes(review_factory):

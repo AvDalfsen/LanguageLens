@@ -174,7 +174,7 @@ def test_translation_progress_counts_unique_lookups_and_failures(reader):
                                                "other": WordTranslation((), "failed")}))
     assert "pending" not in reader.status.text()
     assert "1 word lookup unavailable" in reader.status.text()
-    assert "Use the left and right arrow keys" in reader.status.text()
+    assert "Use the left and right arrow keys" in reader.status.toolTip()
 
 
 def test_source_and_translation_copy_exact_text_without_changing_alignment(reader, qapp):
@@ -220,5 +220,9 @@ def test_readonly_text_focus_order_and_selection_copy(reader, qapp):
     menu.actions()[0].trigger()
     assert QApplication.clipboard().text() == "word"
     menu.deleteLater()
+    QTest.keyClick(qapp.focusWidget(), Qt.Key.Key_Tab)
+    assert reader.words.hasFocus()
+    QTest.keyClick(qapp.focusWidget(), Qt.Key.Key_Tab)
+    assert reader.edit_source.hasFocus()
     QTest.keyClick(qapp.focusWidget(), Qt.Key.Key_Tab)
     assert reader.translation.hasFocus()

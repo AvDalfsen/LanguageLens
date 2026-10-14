@@ -70,7 +70,8 @@ def offline_record(tmp_path):
         (directory / "metadata.json").write_text(json.dumps({"from_code": source, "to_code": target}), "utf-8")
         package = SimpleNamespace(settings=SimpleNamespace(package_dirs=[root]))
         route = [SimpleNamespace(from_code=source, to_code=target, package_path=directory)] if source != target else []
-        return {"version": 3, "runtime": offline.runtime_identity(), "sentence_models": {},
+        from language_lens.services.translation_assets import identity
+        return {"version": 3, "runtime": offline.runtime_identity(), "sentence_models": {}, "translation_policy":identity(source,target),
                 "translation": offline.translation_state(package, route),
                 "files": [[str(path), path.stat().st_size, path.stat().st_mtime_ns] for path in files]}
     return create

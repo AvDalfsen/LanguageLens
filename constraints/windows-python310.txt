@@ -100,3 +100,4 @@ urllib3==2.8.0
 wasabi==1.1.3
 weasel==1.0.0
 wrapt==2.5.0
+zstandard==0.25.0

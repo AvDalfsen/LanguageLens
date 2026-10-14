@@ -136,6 +136,8 @@ def main():
             env["LANGUAGE_LENS_STARTUP_FILE"] = str(startup)
             process = subprocess.Popen([str(bundle / "LanguageLens.exe")], cwd=root, env=env,
                                        creationflags=subprocess.CREATE_NO_WINDOW)
+            from language_lens.services.worker_children import own_child
+            ownership=own_child(process)
             result["gui_test_pid"] = process.pid
             try:
                 deadline = time.monotonic() + 45
@@ -153,7 +155,11 @@ def main():
                     raise RuntimeError("Second launch failed")
                 result["single_instance"] = True
             finally:
-                if process.poll() is None:
+                if ownership is not None:
+                    # Own this verifier's entire process tree without depending
+                    # on taskkill or leaving an active status worker behind.
+                    ownership.close()
+                elif process.poll() is None:
                     # The GUI can still own a status worker. Stop only this
                     # isolated test's process tree before removing its fixtures.
                     stopped = subprocess.run(

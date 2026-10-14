@@ -42,6 +42,10 @@ The app offers 25 text-language choices, including English, Dutch, French, Germa
 
 Translation models are directional. Some pairs use two local models through English; availability and quality vary by pair. Japanese/Chinese word dictionaries and Japanese pronunciation use additional packs. Settings checks what your chosen pair needs.
 
+Translation uses Argos by default, with benchmarked alternatives for selected directions and separate choices for whole text and word suggestions. European Portuguese → English and English → Dutch retain Argos. See the [model selection results](docs/translation-model-selection.md).
+
+By default, translation models are released when you close a capture's review. For faster repeated captures, enable **Keep translation models loaded between captures** under **Settings → Performance**. This retains model memory until you change languages, disable the setting, or quit; idle models do not continuously translate.
+
 The current distribution targets **Windows x64**. Windows 10 22H2 has been exercised during development; Windows 11 is the intended primary target, with clean-machine validation still pending. Native ARM64, Windows 7/8/Vista, macOS, and Linux are not supported by this build. The portable preview is unsigned.
 
 ## Things to know
@@ -61,6 +65,6 @@ Start with the [documentation index](docs/README.md) for the user guide, pronunc
 
 ## Licence and credits
 
-Application code is [MIT licensed](LICENSE). Third-party runtimes and downloaded models have their own terms; see [speech and voice notices](THIRD_PARTY_SPEECH.md), and check **Voice details and licence** before using a voice.
+Application code is [MIT licensed](LICENSE). Third-party runtimes and downloaded models have their own terms; see [translation notices](THIRD_PARTY_TRANSLATION.md) and [speech and voice notices](THIRD_PARTY_SPEECH.md), and check **Voice details and licence** before using a voice.
 
 Built with [RapidOCR](https://github.com/RapidAI/RapidOCR), [Argos Translate](https://github.com/argosopentech/argos-translate), [Piper](https://github.com/OHF-Voice/piper1-gpl), and PySide6.

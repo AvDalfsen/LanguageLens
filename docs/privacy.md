@@ -8,7 +8,7 @@ Screenshots, OCR, translations, pronunciation preparation, and speech run locall
 
 The app requires explicit preparation/download actions for OCR/translation models, sentence files, optional language packs, and voices. Changing a language choice alone does not download files. Capture does not silently fetch assets.
 
-During capture and speech, workers disable Python outbound socket connections and automatic Stanza downloads; Argos uses its local provider. This guards against implicit library requests. It is not an operating-system firewall or security sandbox.
+During capture and speech, workers disable Python outbound socket connections and automatic Stanza downloads; Argos uses its local provider. The Firefox translation helper accepts only the pinned local runtime and model files, and disables network fetches. This guards against implicit library requests. It is not an operating-system firewall or security sandbox.
 
 ## When a connection is used
 
@@ -27,11 +27,15 @@ External documentation, bug-report, and **Voice details and licence** links open
 | Voices | %LOCALAPPDATA%/LanguageLens/voices |
 | Optional language packs | %LOCALAPPDATA%/LanguageLens/language-packs |
 | Translation models/backups | Argos's per-user packages directory; models can be shared with other Argos apps |
+| Selected alternative translation models/runtime | %LOCALAPPDATA%/LanguageLens/offline/translators |
+| Removed alternative translation models | %LOCALAPPDATA%/LanguageLens/removed-translation-models; recoverable backups |
 | Replay audio | In memory for the current review; cleared when it closes |
 
 OCR workers briefly save selected/padded image regions to local jobs folders and remove them after completion/cancellation. A hard crash or power loss can leave those images behind. Interrupted voice or model downloads can also leave temporary job folders. Do not share these folders as diagnostics.
 
 There is no permanent screenshot/audio history. Rotating logs record stages, exception types, and stack locations; they omit selected text, screenshot contents, and exception messages.
+
+Translation models stay loaded throughout a capture's review and are released when it closes by default. The optional **Keep translation models loaded between captures** setting retains model memory across captures until disabled, the language pair changes, or Lens exits. Inference threads sleep between requests.
 
 ## Updates and removal
 

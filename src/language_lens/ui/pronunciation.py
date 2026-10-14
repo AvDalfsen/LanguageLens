@@ -1,13 +1,14 @@
 from __future__ import annotations
 
-from language_lens.i18n import tr, tr_message, language, ui_text, ui_widget, runtime_message
+from language_lens.i18n import tr, tr_message, language, voice_name, catalogs, ui_text, ui_widget, runtime_message
 import html
 from time import monotonic
 
 from PySide6.QtCore import Qt, QTimer, Signal
 from PySide6.QtWidgets import (
-    QCheckBox, QComboBox, QFrame, QHBoxLayout, QLabel, QProgressBar, QPushButton, QVBoxLayout,
+    QCheckBox, QComboBox, QFrame, QHBoxLayout, QLabel, QProgressBar, QPushButton, QSlider, QVBoxLayout,
 )
+from language_lens.ui.controls import ChoiceBox
 
 from language_lens.config import Settings
 from language_lens.services.speech import SpeechJob, SpeechPlayer
@@ -30,6 +31,7 @@ class PronunciationSettings(QFrame):
         self.player.speed = settings.speech_speed
         self.speech_speed = settings.speech_speed
         self._maintenance_blocked = False
+        self._download_error = None
         self.download = SpeechJob(self)
         self._download_phase = "downloading"
         self._transfer_metrics = TransferMetrics(monotonic())
@@ -55,7 +57,8 @@ class PronunciationSettings(QFrame):
             "have audited display conventions. Other languages retain clearly labelled engine notation; "
             "Japanese word readings are isolated and do not claim sentence-context pitch accent."
         )
-        self.voices = QComboBox()
+        self.voices = ChoiceBox()
+        self.voices._lens_untranslated_items = True
         ui_text(self.voices, tr("Pronunciation voice"), property="accessibleName")
         set_help(self.voices,
             "Choose the accent and voice for the source text, independently of the translation "
@@ -109,12 +112,34 @@ class PronunciationSettings(QFrame):
         note.setWordWrap(True)
         note.setObjectName("note")
         layout = QVBoxLayout(self)
-        layout.setContentsMargins(24, 18, 24, 18)
+        layout.setContentsMargins(18, 16, 18, 16)
+        heading = ui_widget(QLabel, tr("Pronunciation"))
+        heading.setObjectName("sectionTitle")
+        layout.addWidget(heading)
         layout.addWidget(self.enabled)
         layout.addWidget(self.show_ipa)
         layout.addWidget(note)
+        voice_label = ui_widget(QLabel, tr("Pronunciation voice"))
+        voice_label.setBuddy(self.voices)
+        layout.addWidget(voice_label)
         layout.addWidget(self.voices)
         layout.addWidget(self.ipa_accent_note)
+        self.speed_label = QLabel()
+        self.speed_label.setObjectName("note")
+        self.speed_label.setWordWrap(True)
+        self.speed_slider = QSlider(Qt.Orientation.Horizontal)
+        ui_text(self.speed_slider, tr("Pronunciation speed"), property="accessibleName")
+        speed_help = catalogs()["english"]["speech_speed_tip"]
+        set_help(self.speed_slider, speed_help)
+        self.speed_label.setBuddy(self.speed_slider)
+        self.speed_slider.setRange(50, 150)
+        self.speed_slider.setSingleStep(5)
+        self.speed_slider.setValue(round(self.speech_speed * 100))
+        self.speed_slider.valueChanged.connect(self._speed_changed)
+        speed_row = QHBoxLayout()
+        speed_row.addWidget(self.speed_label)
+        speed_row.addWidget(self.speed_slider, 1)
+        layout.addLayout(speed_row)
         layout.addWidget(self.status)
         layout.addWidget(self.progress)
         layout.addWidget(self.download_details)
@@ -133,7 +158,7 @@ class PronunciationSettings(QFrame):
         self.player.changed.connect(self._playback_changed)
         self.download.progress.connect(self._download_progress)
         self.download.stage_changed.connect(self._download_stage_changed)
-        self.download.succeeded.connect(lambda _path: self.refresh())
+        self.download.succeeded.connect(lambda _path: self._download_succeeded())
         self.download.cancelled.connect(self.refresh)
         self.download.failed.connect(self._download_failed)
         self.download.activity_changed.connect(self._download_activity_changed)
@@ -151,10 +176,11 @@ class PronunciationSettings(QFrame):
         if self.download.active:
             self.download.cancel()
         self.language = language
+        self._download_error = None
         self.voices.blockSignals(True)
         self.voices.clear()
         for voice in voices_for(language):
-            self.voices.addItem(voice.name, voice.id)
+            self.voices.addItem(voice_name(voice), voice.id)
         if self.voice:
             self.voices.setCurrentIndex(self.voices.findData(self.voice.id))
         self.voices.blockSignals(False)
@@ -162,6 +188,7 @@ class PronunciationSettings(QFrame):
 
     def _voice_changed(self) -> None:
         self.player.stop()
+        self._download_error = None
         if self.download.active:
             self.download.cancel()
         if self.voices.currentData():
@@ -177,12 +204,22 @@ class PronunciationSettings(QFrame):
     def refresh(self) -> None:
         voice = self.voice
         enabled = self.enabled.isChecked()
-        self.ipa_accent_note.setVisible(self.show_ipa.isChecked())
-        self.voices.setEnabled((enabled or self.show_ipa.isChecked()) and voice is not None and not self._maintenance_blocked)
+        notation = self.show_ipa.isChecked()
+        blocked = self.voices.blockSignals(True)
+        for index in range(self.voices.count()):
+            selected = next((v for v in voices_for(self.language) if v.id == self.voices.itemData(index)), None)
+            if selected:
+                self.voices.setItemText(index, voice_name(selected))
+        self.voices.blockSignals(blocked)
+        ui_text(self.speed_label, f"{tr('Pronunciation speed')}: {self.speech_speed:g}×")
+        self.speed_label.setFixedWidth(min(260, self.speed_label.fontMetrics().horizontalAdvance(self.speed_label.text()) + 12))
+        self.speed_slider.setEnabled(enabled and not self._maintenance_blocked)
+        self.ipa_accent_note.setVisible(notation)
+        self.voices.setEnabled((enabled or notation) and voice is not None and not self._maintenance_blocked)
         self.progress.setVisible(self.download.active)
         self.download_details.setVisible(self.download.active)
         japanese = voice is not None and voice.phoneme_type == "japanese"
-        pronunciation_only = not enabled and self.show_ipa.isChecked() and japanese
+        pronunciation_only = not enabled and notation and japanese
         pack_missing = japanese and not packs.ready("ja-speech")
         self.install.setEnabled(self.download.active or ((enabled or pronunciation_only) and voice is not None and not self._maintenance_blocked))
         ready = voice is not None and voice_present(voice)
@@ -200,7 +237,7 @@ class PronunciationSettings(QFrame):
         else:
             action = f"{tr('Download voice')} · {size / 1_000_000:.0f} MB" if voice else tr("No voice available")
         ui_text(self.install, action)
-        if not enabled and not self.show_ipa.isChecked():
+        if not enabled and not notation:
             message = tr("Pronunciation is turned off.")
         elif voice is None:
             message = tr("No voice is available for this language.")
@@ -217,10 +254,13 @@ class PronunciationSettings(QFrame):
         else:
             message = tr("Download this voice once to enable pronunciation.")
         ui_text(self.status, tr(message))
+        if self._download_error:
+            ui_text(self.status, tr("Voice download failed: {error}", error=self._download_error))
         if self.download.active:
             self._update_download_metrics()
+        license_note = voice.license_note.replace("(non-commercial)", f"({tr('non-commercial')})") if voice else ""
         ui_text(self.details, f'<a style="color:#5eead4" href="{voice.url("MODEL_CARD", view=True)}">{tr("Voice details and licence")}</a>'
-            f' · {html.escape(voice.license_note)}'
+            + (f' · {html.escape(license_note)}' if not license_note.startswith("See upstream") else '')
             if voice else "")
         if self.player.busy:
             ui_text(self.preview, tr("Stop sample"))
@@ -239,6 +279,7 @@ class PronunciationSettings(QFrame):
             return
         self.player.stop()
         self._download_stage_changed("checking")
+        self._download_error = None
         self.download.start("download" if self.enabled.isChecked() else "download-pronunciation", self.voice)
         if self.download.active:
             self.refresh()
@@ -246,6 +287,14 @@ class PronunciationSettings(QFrame):
     def set_speech_speed(self, speed: float) -> None:
         self.player.stop()
         self.speech_speed = self.player.speed = speed
+        blocked = self.speed_slider.blockSignals(True)
+        self.speed_slider.setValue(round(speed * 100))
+        self.speed_slider.blockSignals(blocked)
+        ui_text(self.speed_label, f"{tr('Pronunciation speed')}: {speed:g}×")
+
+    def _speed_changed(self, value: int) -> None:
+        self.set_speech_speed(value / 100)
+        self.preferences_changed.emit()
 
     def _download_progress(self, done: int, total: int) -> None:
         if self._download_phase == "downloading":
@@ -261,6 +310,8 @@ class PronunciationSettings(QFrame):
         self._update_download_metrics()
 
     def _update_download_metrics(self) -> None:
+        if self._download_error:
+            return
         labels = {"checking": tr("Checking voice files…"), "downloading": tr("Downloading voice…"),
                   "verifying": tr("Verifying voice files…"), "cancelling": tr("Cancelling download…")}
         ui_text(self.status, tr(labels[self._download_phase]))
@@ -277,13 +328,18 @@ class PronunciationSettings(QFrame):
         self.activity_changed.emit()
 
     def _download_failed(self, message: str) -> None:
+        self._download_error = message
+        self._progress_timer.stop()
         self.refresh()
-        ui_text(self.status, tr("Voice download failed: {error}", error=message))
+
+    def _download_succeeded(self) -> None:
+        self._download_error = None
+        self.refresh()
 
     def _preview(self) -> None:
         if self.player.busy:
             self.player.stop()
-        elif self.voice is not None and not self._maintenance_blocked:
+        elif self.voice is not None and not self._maintenance_blocked and self.enabled.isChecked():
             self.player.speak(self.voice.sample, self.voice)
 
     def set_maintenance_blocked(self, blocked: bool) -> None:

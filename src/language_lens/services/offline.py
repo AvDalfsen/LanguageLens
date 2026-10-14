@@ -154,13 +154,16 @@ def _translation_unchanged(record, route=None) -> bool:
             and (route is None or record["route"] == route_identity(route)))
 
 
-def offline_ready(source: str, target: str, *, route=None) -> bool:
+def offline_ready(source: str, target: str, word_lookup: bool = True, *, route=None) -> bool:
     from language_lens.services import language_packs as packs
-    required = packs.text_pack(source)
+    required = packs.text_pack(source, word_lookup)
     if required and not packs.ready(required):
         return False
     try:
         records = json.loads(marker_path(source, target).read_text(encoding="utf-8"))
+        from language_lens.services.translation_assets import identity
+        if records.get("translation_policy",{"version":"argos-v1"}) != identity(source,target):
+            return False
         from language_lens.services import sentence_models
         if not sentence_models.compatible(records["sentence_models"]):
             return False
@@ -179,18 +182,19 @@ def offline_ready(source: str, target: str, *, route=None) -> bool:
         return False
 
 
-def prepare(source: str, target: str, report, progress) -> None:
+def prepare(source: str, target: str, report, progress, word_lookup: bool = True) -> None:
     from language_lens.services import language_packs as packs
-    required = packs.text_pack(source)
+    required = packs.text_pack(source, word_lookup)
     if required:
         packs.install(required, report, progress)
         packs.activate(required)
-    from language_lens.services.translation import ArgosTranslator
+    from language_lens.services.translation_backends import RoutedTranslator
+    from language_lens.services import translation_assets
     from language_lens.services.model_download import DownloadProgress
-    translator = ArgosTranslator()
+    translator = RoutedTranslator()
     if not translator.is_pair_installed(source, target):
         translator.install_pair(source, target, report, progress, staged=True)
-    paths = []
+    paths = [path for path,_item in translation_assets.required_files(source,target)]
     for section, path, url, digest, existing in ocr_models(source):
         report(f"Preparing OCR {section.lower()} model…")
         path.parent.mkdir(parents=True, exist_ok=True)
@@ -218,7 +222,7 @@ def prepare(source: str, target: str, report, progress) -> None:
     package_module, _backend = translator._modules()
     route = translator.route(source, target)
     prepared_translation = translation_state(package_module, route)
-    sentence_languages = [item.from_code for item in route]
+    sentence_languages = list(dict.fromkeys([source,*(item.from_code for item in route)]))
     paths.extend(sentence_models.prepare(sentence_languages, report, progress))
     # All inference, including the fixed warmup sample, is now offline.
     from language_lens.services.voices import selected_voice
@@ -228,23 +232,25 @@ def prepare(source: str, target: str, report, progress) -> None:
     _package, backend = translator._modules()
     backend.get_installed_languages.cache_clear()
     backend.installed_translates.clear()
-    with no_network():
-        from language_lens.text import word_spans
-        list(word_spans(sample, source))
-        from language_lens.services.ocr import create_engine
-        import numpy as np
-        engine = create_engine(source, params=local_ocr_parameters(source))
-        engine.recognize(np.full((64, 256, 3), 255, dtype=np.uint8))
-        translator.translate.cache_clear()
-        translator.translate(sample, source, target)
-        translator.word_candidates(sample.split()[0], source, target)
+    try:
+        with no_network():
+            from language_lens.text import word_spans
+            list(word_spans(sample, source, dictionary_lookup=word_lookup))
+            from language_lens.services.ocr import create_engine
+            import numpy as np
+            engine = create_engine(source, params=local_ocr_parameters(source), dictionary_lookup=word_lookup)
+            engine.recognize(np.full((64, 256, 3), 255, dtype=np.uint8))
+            translator.translate.cache_clear()
+            translator.translate(sample, source, target)
+            translator.word_candidates(sample.split()[0], source, target)
+    finally:translator.close()
     route = translator.route(source, target)
     if translation_state(package_module, route) != prepared_translation:
         raise KnownTaskError("missing_assets")
     for package in route:
         paths.extend(path for path in package.package_path.rglob("*") if path.is_file()
                      and path.relative_to(package.package_path).parts[0] not in ("stanza", "minisbd"))
-    records = {"version": 3, "translation": prepared_translation, "runtime": runtime_identity(), "sentence_models": sentence_models.identities(sentence_languages),
+    records = {"version": 3, "translation": prepared_translation, "translation_policy":translation_assets.identity(source,target), "runtime": runtime_identity(), "sentence_models": sentence_models.identities(sentence_languages),
                "files": [(str(path), path.stat().st_size, path.stat().st_mtime_ns)
                                        for path in sorted(set(paths))]}
     if required:

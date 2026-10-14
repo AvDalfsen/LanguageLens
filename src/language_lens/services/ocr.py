@@ -14,12 +14,12 @@ class OcrUnavailable(RuntimeError):
     pass
 
 
-def create_engine(source_language: str, *, params: dict):
+def create_engine(source_language: str, *, params: dict, dictionary_lookup: bool = True):
     """Use the same selected backend as offline asset preparation."""
     if profile_for(source_language).backend == "tesseract":
         from language_lens.services.tesseract_ocr import TesseractOcrEngine
         return TesseractOcrEngine(source_language, params=params)
-    return RapidOcrEngine(source_language, params=params)
+    return RapidOcrEngine(source_language, params=params, dictionary_lookup=dictionary_lookup)
 
 
 def _aligned_boxes(text: str, raw_boxes) -> tuple[OcrSpanBox, ...]:
@@ -87,7 +87,8 @@ def _attach_boxes(lines: list[OcrLine], word_results) -> list[OcrLine]:
 class RapidOcrEngine:
     """RapidOCR adapter using the selected language's tested recognizer."""
 
-    def __init__(self, source_language: str, *, params: dict | None = None) -> None:
+    def __init__(self, source_language: str, *, params: dict | None = None,
+                 dictionary_lookup: bool = True) -> None:
         try:
             from rapidocr import RapidOCR
         except ImportError as exc:  # pragma: no cover - exercised in installed app
@@ -95,6 +96,7 @@ class RapidOcrEngine:
 
         profile = profile_for(source_language)
         self.source_language = source_language
+        self.dictionary_lookup = dictionary_lookup
         # RapidOCR's supported character-box extraction is for Latin/Chinese
         # recognition; other scripts use the bidi-aware shaped fallback.
         self._return_character_boxes = profile.character_boxes
@@ -131,7 +133,8 @@ class RapidOcrEngine:
                 text=str(text).strip(),
                 confidence=float(score),
                 polygon=tuple((float(x), float(y)) for x, y in box),
-                token_spans=tuple(word_spans(str(text).strip(), self.source_language)),
+                token_spans=tuple(word_spans(str(text).strip(), self.source_language,
+                                            dictionary_lookup=self.dictionary_lookup)),
             )
             for box, text, score in zip(boxes, texts, scores)
             if str(text).strip() and float(score) >= min_confidence

@@ -150,8 +150,10 @@ def test_long_translation_scrolls_but_controls_stay_visible(review_window, qapp)
     window._translation_finished(("long translated sentence " * 300, {}))
     qapp.processEvents()
     assert window._footer_scroll.verticalScrollBar().maximum() > 0
-    for button in (window.retry_ocr, window.reselect, window.read_button):
-        assert window._footer.rect().contains(button.geometry())
+    for button in (window.copy_translation, window.copy_button, window.more_button):
+        assert window._actions_body.rect().contains(button.geometry())
+    assert window._close_button.isVisible()
+    assert window.retry_ocr.isHidden() and window.reselect.isHidden()
     window._toggle_translation()
     assert window.translation.isHidden()
     window._translation_finished(("late update", {}))
@@ -183,7 +185,7 @@ def test_unmodified_arrow_keys_browse_words_including_focused_popup(review_windo
     assert window.canvas._hovered.text == "second"
     QTest.keyClick(window.canvas._bubble, Qt.Key.Key_Left)
     assert window.canvas._hovered.text == "first"
-    assert "Use the left and right arrow keys" in window.status.text()
+    assert "Use the left and right arrow keys" in window.status.toolTip()
 
 
 @pytest.mark.parametrize("clicked,key,expected", [
@@ -196,6 +198,9 @@ def test_click_synchronizes_arrow_navigation_and_wrapping(review_window, qapp, c
     window, _tasks = review_window
     window._ocr_finished([OcrLine("Read and learn a language", .99,
         ((0, 0), (300, 0), (300, 30), (0, 30)))])
+    window.settings.speech_enabled = True
+    window._refresh_speech()
+    window._position_children()
     window.activateWindow()
     qapp.processEvents()
     window._navigate_word(1)  # a later click must replace an existing keyboard position
@@ -254,6 +259,9 @@ def test_review_speed_slider_sits_below_buttons_and_owns_focused_arrows(review_w
     from PySide6.QtCore import Qt
     window, _tasks = review_window
     stopped, changes = [], []
+    window.settings.speech_enabled = True
+    window._refresh_speech()
+    window._position_children()
     monkeypatch.setattr(window.speech, "stop", lambda: stopped.append(True))
     window.speech_speed_changed.connect(changes.append)
     window.speed_slider.setValue(65)
@@ -279,6 +287,8 @@ def test_review_speed_slider_sits_below_buttons_and_owns_focused_arrows(review_w
 @pytest.mark.parametrize("width,height", [(1000, 800), (640, 480)])
 def test_speed_changes_do_not_move_or_resize_slider(review_window, qapp, width, height):
     window, _tasks = review_window
+    window.settings.speech_enabled = True
+    window._refresh_speech()
     window.resize(width, height)
     window.show()
     qapp.processEvents()

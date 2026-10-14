@@ -65,6 +65,37 @@ def test_native_ocr_cross_monitor_mapping_and_reading_order(monkeypatch, qapp):
     assert right.token_spans == ((0, 5),)
 
 
+@pytest.mark.parametrize("audio,notation", [(False, False), (True, False), (False, True), (True, True)])
+@pytest.mark.parametrize("voice_installed", [False, True])
+def test_japanese_audio_and_notation_work_independently(review_factory, monkeypatch, audio, notation, voice_installed):
+    from language_lens.services import language_packs
+    settings = Settings(source_language="ja", japanese_word_lookup=False,
+                        speech_enabled=audio, show_ipa=notation)
+    monkeypatch.setattr(review_module, "runtime_ready", lambda: True)
+    monkeypatch.setattr(review_module, "voice_runtime_ready", lambda _voice: True)
+    monkeypatch.setattr(review_module, "voice_present", lambda _voice: voice_installed)
+    monkeypatch.setattr(language_packs, "activate", lambda *_: pytest.fail("Disabled lookup loaded a dictionary"))
+    window, _ = review_factory(settings=settings)
+    preparation, playback = [], []
+    monkeypatch.setattr(window.pronunciation_job, "start", lambda *args, **kwargs: preparation.append((args, kwargs)))
+    monkeypatch.setattr(window.speech, "speak", lambda *args: playback.append(args))
+    window._ocr_finished([OcrLine("私は猫です。", .99, ((0, 0), (200, 0), (200, 20), (0, 20)))])
+    assert [hit.lookup_text for hit in window._hits] == ["私は猫です"]
+    audible = audio and voice_installed
+    assert window.read_button.isEnabled() == audible
+    assert window.canvas._show_ipa == notation and window.canvas._audio_enabled == audible
+    assert bool(preparation) == (notation or audible)
+    if preparation:
+        assert preparation[0][0][0] == "pronunciation"
+    if audible:
+        window.read_button.click()
+        assert len(playback) == 1
+    elif not audio:
+        window._read_selection()
+        window._read_word(window._hits[0])
+        assert not playback
+
+
 def test_native_retry_maps_fractional_crop_padding_and_word_boxes(monkeypatch, qapp):
     capture = native_capture((QRect(0, 0, 640, 480), 1.5))
     calls = []
@@ -390,8 +421,8 @@ def test_control_panel_stays_inside_screen_edges(monkeypatch, qapp):
 
     panel = window._footer.geometry()
 
-    assert panel.left() >= 22
-    assert panel.right() <= window.width() - 22
+    assert panel.left() >= 14
+    assert panel.right() <= window.width() - 14
     window.close()
 
 
@@ -460,8 +491,8 @@ def test_ranked_word_popup_updates_pinned_word_and_clears_stale_alternatives(qap
     assert popup.translation.text() == "Translating…"
     canvas.set_translations({"courses": WordTranslation(("pratos", "cursos", "percursos", "rumos"))})
     assert canvas._pinned and canvas._hovered.text == "courses"
-    assert popup.translation_order.text() == "Top suggestion · isolated word"
-    assert popup.translation.text() == "1. pratos · Top suggestion"
+    assert popup.translation_order.text() == "Word translation"
+    assert popup.translation.text() == "pratos"
     assert popup.alternatives.isHidden()
     assert popup.search_status.text() == "4 model suggestions available · showing best match"
     assert popup.more.text() == "Show 3 other candidates"

@@ -29,6 +29,22 @@ print(json.dumps({'result':result}),flush=True)
 print(json.dumps({'ok':True}),flush=True)
 """
 
+RESIDENT_WORKER = r"""import json,os,sys,time
+print(json.dumps({'ready':True,'protocol':'translation-v1','pid':os.getpid()}),flush=True)
+for line in sys.stdin:
+ payload=json.loads(line)
+ mode=os.environ.get('LANGUAGE_LENS_JOB_TEST_MODE','success')
+ if mode=='cancel': time.sleep(60)
+ if mode=='failure':
+  print(json.dumps({'id':payload['id'],'error':'Synthetic failure','done':True}),flush=True)
+  continue
+ command=payload['command']
+ if command=='sentence': result={'sentence':'Hallo','words':{}}
+ elif command=='word': result={'sentence':None,'words':{payload['text']:{'candidates':['Hallo'],'note':''}}}
+ else: result={'candidates':['Hallo','Hoi'],'note':''}
+ print(json.dumps({'id':payload['id'],'result':result,'done':True}),flush=True)
+"""
+
 
 def wait(qapp, predicate):
     deadline = time.monotonic()+10
@@ -43,8 +59,13 @@ def wait(qapp, predicate):
 
 @pytest.fixture
 def synthetic_worker(monkeypatch,tmp_path):
+    from language_lens.services import translation_session
+    translation_session.invalidate()
     monkeypatch.setattr(jobs,"settings_path",lambda:tmp_path/"settings.json")
     monkeypatch.setattr(process_job,"worker_command",lambda _module:(sys.executable,['-c',WORKER]))
+    monkeypatch.setattr(translation_session,"worker_command",lambda _module:(sys.executable,['-c',RESIDENT_WORKER]))
+    yield
+    translation_session.invalidate()
 
 
 @pytest.mark.parametrize("kind",["ocr","translate","more"])

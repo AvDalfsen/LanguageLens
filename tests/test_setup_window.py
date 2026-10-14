@@ -77,6 +77,44 @@ def test_default_window_fits_all_settings_without_scrollbars(window_factory):
     assert QRect(0, 0, 1600, 1400).contains(window.frameGeometry())
 
 
+def test_language_feature_toggles_follow_text_language_and_remember_choices(window_factory):
+    window = window_factory(Settings(source_language="en", target_language="nl"))
+    assert not hasattr(window, "pack_choice")
+    assert window.japanese_word_lookup.isHidden() and window.chinese_word_lookup.isHidden()
+    assert not hasattr(window.pronunciation, "japanese_pronunciation")
+    window.target.setCurrentIndex(window.target.findData("ja"))
+    assert window.japanese_word_lookup.isHidden()
+    window.source.setCurrentIndex(window.source.findData("ja"))
+    assert window.japanese_word_lookup.isVisible()
+    assert window.chinese_word_lookup.isHidden()
+    window.japanese_word_lookup.setChecked(False)
+    window.source.setCurrentIndex(window.source.findData("zh"))
+    assert window.chinese_word_lookup.isVisible() and window.japanese_word_lookup.isHidden()
+    window.chinese_word_lookup.setChecked(False)
+    window.source.setCurrentIndex(window.source.findData("ja"))
+    settings = window.current_settings()
+    assert not settings.japanese_word_lookup and not settings.chinese_word_lookup
+    reopened = window_factory(settings)
+    assert not reopened.japanese_word_lookup.isChecked()
+    assert "no spaces" in reopened.japanese_word_lookup.accessibleDescription()
+
+
+def test_word_lookup_change_invalidates_readiness_and_rejects_stale_status(window_factory):
+    window = window_factory(Settings(source_language="ja", target_language="nl"))
+    window._apply_model_status({"ready": True, "prepared": True, "route": []})
+    window.japanese_word_lookup.setChecked(False)
+    assert not window.capture_ready
+    window._status_event({"result": {"source": "ja", "target": "nl", "ready": True,
+                                    "prepared": True, "route": [], "word_lookup_enabled": True}})
+    assert not window.capture_ready
+    window._status_event({"result": {"source": "ja", "target": "nl", "ready": True,
+                                    "prepared": True, "route": [], "word_lookup_enabled": False}})
+    assert window.capture_ready
+    assert "Unicode word boundaries" in window.capabilities.text()
+    window.set_capture_busy(True)
+    assert not window.japanese_word_lookup.isEnabled()
+
+
 @pytest.mark.parametrize("area", [QRect(0, 0, 640, 480), QRect(-400, -100, 400, 480)])
 def test_small_desktop_limits_window_and_keeps_scrollbars(window_factory, area):
     window = window_factory(area=area)
@@ -148,15 +186,15 @@ def test_manual_resize_is_remembered_and_immediately_flushed_on_hide(window_fact
     assert window.size() == QSize(820, 550)
 
 
-def test_layout_growth_auto_fits_but_does_not_override_manual_size(window_factory, qapp):
+def test_layout_growth_preserves_the_window_size(window_factory, qapp):
     window = window_factory()
     initial = window.size()
     window.model_progress.show()
     window.model_details.setText("Download progress and speed")
     window.model_details.show()
     settle(qapp)
-    assert window.height() > initial.height()
-    assert window.scroll.verticalScrollBar().maximum() == 0
+    assert window.size() == initial
+    assert window.scroll.verticalScrollBar().maximum() > 0
     assert window.current_settings().settings_window_size is None
     window.resize(800, 520)
     window.model_details.setText("Additional details " * 100)
@@ -180,15 +218,13 @@ def test_auto_fit_handles_language_and_model_status_changes(
     assert not window._sizing_timer.isActive()
 
 
-def test_auto_fit_remeasures_larger_styled_text(window_factory, qapp):
+def test_larger_styled_text_scrolls_without_resizing_the_window(window_factory, qapp):
     window = window_factory()
     initial_height = window.height()
     window.setStyleSheet(STYLESHEET.replace("14px", "20px").replace("12px", "17px"))
     settle(qapp)
-    assert window.height() > initial_height
-    # A taller layout should use the available width before falling back to scroll.
-    assert window.scroll.verticalScrollBar().maximum() == 0
-    assert window.scroll.horizontalScrollBar().maximum() == 0
+    assert window.height() == initial_height
+    assert window.scroll.verticalScrollBar().maximum() > 0
     assert window.current_settings().settings_window_size is None
 
 
@@ -198,11 +234,11 @@ def test_option_help_covers_behaviour_and_tradeoffs(window_factory):
                 window.start_button, window.try_button, window.prepare_button,
                 window.pronunciation.enabled, window.pronunciation.show_ipa,
                 window.pronunciation.voices, window.pronunciation.install, window.pronunciation.preview]
-    assert all(len(control.toolTip()) > 150 for control in controls)
-    assert all(control.toolTipDuration() == 30_000 for control in controls)
-    assert "less memory" in window.capture_scope.toolTip()
-    assert "other monitors uncovered" in window.capture_scope.toolTip()
-    assert "reduces screenshot/rendering work" in window.capture_scope.toolTip()
+    assert all(control.toolTip() and len(control.accessibleDescription()) > 150 for control in controls)
+    assert all(control.toolTipDuration() == 10_000 for control in controls)
+    assert "less memory" in window.capture_scope.accessibleDescription()
+    assert "other monitors uncovered" in window.capture_scope.accessibleDescription()
+    assert "reduces screenshot/rendering work" in window.capture_scope.accessibleDescription()
 
 
 def test_local_file_and_maintenance_labels_do_not_imply_online_mode_or_detected_fault(window_factory):
@@ -211,12 +247,12 @@ def test_local_file_and_maintenance_labels_do_not_imply_online_mode_or_detected_
     assert window.prepare_button.text() == "Download required files"
     assert "no online translation mode" in window.prepare_button.toolTip()
     assert window.repair_button.text() == "Reinstall translation model"
-    assert "does not mean a problem has been detected" in window.repair_button.toolTip()
+    assert "verify replacement files" in window.repair_button.accessibleDescription()
     window._apply_model_status({"ready": True, "prepared": True, "route": ["pt", "en"]})
     assert window.prepare_button.text() == "Check required files"
     assert "checked and ready" in window.capabilities.text()
     assert window.start_button.text() == "Start listening"
-    assert "'Start listening'" in unescape(window.hotkey.toolTip())
+    assert "'Start listening'" in window.hotkey.accessibleDescription()
 
 
 def test_missing_pair_has_one_setup_action_and_uses_full_preparation(window_factory, monkeypatch):
@@ -487,9 +523,9 @@ def test_recorded_shortcut_is_saved_without_starting_listening(window_factory, m
     assert window._active_hotkey is None and reopened._active_hotkey is None
 
 
-def test_tooltip_style_is_near_instant_and_preserves_other_style_hints(qapp):
+def test_tooltip_style_waits_for_intent_and_preserves_other_style_hints(qapp):
     style = LensStyle(qapp.style().objectName())
-    assert style.styleHint(QStyle.StyleHint.SH_ToolTip_WakeUpDelay) == 50
+    assert style.styleHint(QStyle.StyleHint.SH_ToolTip_WakeUpDelay) == 600
     assert style.styleHint(QStyle.StyleHint.SH_ToolTip_FallAsleepDelay) == (
         style.baseStyle().styleHint(QStyle.StyleHint.SH_ToolTip_FallAsleepDelay)
     )
@@ -511,7 +547,7 @@ app = QApplication([])
 app.setStyle(LensStyle(app.style().objectName()))
 app.setStyleSheet(STYLESHEET)
 widget = QComboBox()
-assert widget.style().styleHint(QStyle.StyleHint.SH_ToolTip_WakeUpDelay) == 50
+assert widget.style().styleHint(QStyle.StyleHint.SH_ToolTip_WakeUpDelay) == 600
 widget.close()
 """
     result = subprocess.run([sys.executable, "-c", script], capture_output=True, timeout=20)

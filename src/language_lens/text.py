@@ -45,7 +45,7 @@ def normalized_offsets(text: str) -> tuple[str, list[tuple[int, int]]]:
     return "".join(parts), offsets
 
 
-def word_spans(text: str, source_language: str | None = None):
+def word_spans(text: str, source_language: str | None = None, *, dictionary_lookup: bool = True):
     """Yield source offsets; dictionary segmentation is selected by source language.
 
     Tokenizers use installed language packs and never download during capture.
@@ -55,7 +55,7 @@ def word_spans(text: str, source_language: str | None = None):
     activated = False
     for match in _WORDS.finditer(text):
         part, start = match.group(), match.start()
-        if source_language == "ja" and _JAPANESE.search(part):
+        if dictionary_lookup and source_language == "ja" and _JAPANESE.search(part):
             from language_lens.services.language_packs import activate
             if not activated:
                 activate("ja-text")
@@ -70,7 +70,7 @@ def word_spans(text: str, source_language: str | None = None):
                 for unit in _WORDS.finditer(surface):
                     yield start + position + unit.start(), start + position + unit.end()
                 cursor = position + len(surface)
-        elif source_language == "zh" and _HAN.search(part):
+        elif dictionary_lookup and source_language == "zh" and _HAN.search(part):
             from language_lens.services.language_packs import activate
             if not activated:
                 activate("zh-text")

@@ -28,6 +28,7 @@ dependencies = [
   "pydantic>=2,<3",
   "regex>=2024.11.6",
   "filelock==4.0.9",
+  "zstandard==0.25.0",
 ]
 
 [project.optional-dependencies]
@@ -42,7 +43,7 @@ language-lens = "language_lens.app:main"
 where = ["src"]
 
 [tool.setuptools.package-data]
-language_lens = ["data/*.json", "assets/*.svg", "assets/*.ico"]
+language_lens = ["data/*.json", "assets/*.svg", "assets/*.ico", "services/*.cjs", "_translation_assets/**/*"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

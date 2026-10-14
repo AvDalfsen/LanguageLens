@@ -33,6 +33,30 @@ def language() -> str:
     return _language
 
 
+@lru_cache(maxsize=1)
+def _language_names():
+    return json.loads((Path(__file__).parent / "data/language-names.json").read_text(encoding="utf-8"))
+
+
+def language_name(code: str) -> str:
+    if language() == "en":
+        from language_lens.config import LANGUAGES
+        return dict((code, name) for name, code in LANGUAGES).get(code, code)
+    return _language_names()[language()]["languages"].get(code, code)
+
+
+def voice_name(voice) -> str:
+    speaker = voice.name.split(" · ")[0]
+    if "_" in speaker:
+        speaker = speaker.replace("_", " ").title()
+    description = language_name(voice.language)
+    region = voice.locale.split("-")[-1].upper()
+    if voice.language == "en" and region in {"US", "GB"}:
+        region_name = _language_names()[language()]["regions"][region] if language() != "en" else region
+        description += " (" + region_name + ")"
+    return speaker + " · " + description
+
+
 def set_language(code: str) -> None:
     global _language
     _language = code if code in {code for _, code in UI_LANGUAGES} else "en"
@@ -226,8 +250,8 @@ def translate_ui(root, previous: str | None = None) -> None:
                         and getter not in getattr(widget, "_lens_ui_sources", {})):
                     continue
                 if getter == "toolTip" and hasattr(widget, "_lens_help_source"):
-                    from html import escape
-                    new = '<div style="max-width: 420px">'+escape(tr(widget._lens_help_source))+'</div>'
+                    from language_lens.ui.style import help_markup
+                    new = help_markup(tr(widget._lens_help_source))
                 else:
                     original = getattr(widget, "_lens_ui_sources", {}).get(getter)
                     if original and old == original[1]:
@@ -243,7 +267,8 @@ def translate_ui(root, previous: str | None = None) -> None:
                         widget._lens_ui_sources[getter] = (original[0], new)
                 if new != old:
                     getattr(widget, setter)(new)
-        if isinstance(widget, QComboBox) and widget.objectName() not in {"uiLanguage", "textLanguage", "targetLanguage"}:
+        if (isinstance(widget, QComboBox) and widget.objectName() not in {"uiLanguage", "textLanguage", "targetLanguage"}
+                and not getattr(widget, "_lens_untranslated_items", False)):
             blocked = widget.blockSignals(True)
             try:
                 for index in range(widget.count()):

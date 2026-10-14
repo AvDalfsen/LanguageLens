@@ -4,7 +4,7 @@
 
 ## Explore the selection
 
-Lens keeps the frozen desktop visible while recognizing the region you selected. Hover over outlined words to see the best translation suggestion. Click a word to pin its popup so you can use its controls. Click another word to switch, or click outside/use × to dismiss the popup. Escape closes the entire screenshot.
+Lens keeps the frozen desktop visible while recognizing the region you selected. Hover over outlined words to see the best translation suggestion. Click a word to pin its popup so you can use its controls. Click another word to switch, or choose **Unpin**, click outside, or use × to dismiss the popup. Escape closes the entire screenshot. On short screens the selected region gets its own space above the controls. Word details can temporarily replace the controls when both cannot fit; dismiss the word to return to the translation.
 
 The sentence translation supplies context. Word candidates are translated **in isolation** and can choose the wrong meaning. They are model suggestions, not a complete dictionary or confidence percentages.
 
@@ -16,6 +16,8 @@ Use **Show other candidates** to reveal the initial alternatives. **Search for m
 | --- | --- |
 | Recognized text | Inspect the original OCR result when a translation looks odd |
 | Copy source text | Copy the recognized selection |
+| Copy translation | Copy the translation without a heading |
+| Edit recognized text | Correct OCR text and translate/read the corrected passage |
 | Retry OCR | Scan the same selected region again; old text and audio are cleared |
 | Select another area | Choose another region in the same frozen screenshot |
 | Retry translation | Repeat translation without recapturing |
@@ -23,7 +25,7 @@ Use **Show other candidates** to reveal the initial alternatives. **Search for m
 | Read selection | Speak the original selection when a voice is ready |
 | Close and return | Close the screenshot and return to the previous app |
 
-Recognized text and the translation support selection/copying; right-click for **Copy selection** or **Copy all**. These views do not alter the OCR outlines. Long text and candidate lists scroll. Drag the review panel's background to reposition it; placement lasts for that screenshot.
+Use **More options** for retry, another-area selection, and hiding/restoring the translation. Recognized text, translations, and pronunciation notation support keyboard selection/copying; right-click for **Copy selection** or **Copy all**. Expanding **Recognized text** also exposes a keyboard-accessible list of words and **Edit recognized text**. Applying corrections clears the original word highlights because their positions no longer reliably match the edited text. **Retry OCR** restores recognized word positions from the screenshot. Long text and candidate lists scroll. Drag the review panel's background to reposition it; placement lasts for that screenshot.
 
 ## Keyboard reference
 
@@ -31,7 +33,7 @@ Recognized text and the translation support selection/copying; right-click for *
 | --- | --- |
 | F8 by default | Capture from another application after Start listening |
 | Escape | Close the selector/review and return |
-| Left / right | Browse and pin words |
+| Left / right | Browse and pin words in visual reading order; focused text fields keep their text-selection keys |
 | Tab / Shift+Tab | Move between controls |
 | Arrow keys on the speed slider | Adjust pronunciation speed |
 
@@ -51,4 +53,4 @@ Start listening enables the shortcut and hides Settings. Pause listening disable
 
 Capture is unavailable during file/voice maintenance or until required files are verified. Changing the language pair or replacing models requires a fresh check and then Start listening again.
 
-**Manage local files** contains optional checks, translation-model replacement/removal, and language pack controls. **Technical details** explains the route and capability state. Translation removal keeps recoverable backups and may affect pairs sharing a model through English; it does not automatically reclaim their disk space.
+**Performance** contains the option to keep translation models loaded between captures. **Manage local files** contains optional checks, selected-file sizes, backup locations, and translation-model replacement/removal. Japanese and Chinese word lookup toggles appear beside **Text language** only for their matching source language. Their tooltips explain the features and required downloads. Disabling them keeps downloaded files. **Enable read aloud** and **Show pronunciation notation (IPA)** control audio and notation independently for every text language, including Japanese. **Technical details** explains the route and capability state. Translation removal keeps recoverable backups and may affect pairs sharing a model; it does not reclaim their disk space.

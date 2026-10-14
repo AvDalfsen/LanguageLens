@@ -35,8 +35,8 @@ def packs_root() -> Path:
     return settings_path().parent / "language-packs"
 
 
-def text_pack(language: str) -> str | None:
-    return {"ja": "ja-text", "zh": "zh-text"}.get(language)
+def text_pack(language: str, enabled: bool = True) -> str | None:
+    return {"ja": "ja-text", "zh": "zh-text"}.get(language) if enabled else None
 
 
 def definition(pack: str) -> dict:

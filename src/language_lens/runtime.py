@@ -6,6 +6,7 @@ import sys
 WORKERS = {
     "language_lens.services.task_worker": "task",
     "language_lens.services.speech_worker": "speech",
+    "language_lens.services.translation_worker": "translation",
 }
 
 

@@ -17,7 +17,7 @@ from language_lens.services.errors import describe_failure
 
 def create_ocr_engine(settings, engine_factory=None):
     return (engine_factory or create_engine)(settings.source_language,
-        params=local_ocr_parameters(settings.source_language))
+        params=local_ocr_parameters(settings.source_language), dictionary_lookup=settings.word_lookup_enabled)
 
 
 class TaskSignals(QObject):

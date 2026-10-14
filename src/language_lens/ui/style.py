@@ -3,19 +3,26 @@ from PySide6.QtWidgets import QProxyStyle, QStyle
 
 
 class LensStyle(QProxyStyle):
-    """Keep the platform appearance with near-instant native Qt tooltips."""
+    """Keep platform behavior with intentional, readable hover help."""
 
     def styleHint(self, hint, option=None, widget=None, returnData=None):  # noqa: N802
         if hint == QStyle.StyleHint.SH_ToolTip_WakeUpDelay:
-            return 50
+            return 600
         return super().styleHint(hint, option, widget, returnData)
 
 
-def set_help(widget, text: str) -> None:
-    """Use readable rich-text wrapping and enough time to read detailed help."""
+def help_markup(text: str) -> str:
+    """Short hover help; the complete explanation is available to accessibility."""
     from html import escape
+    import re
+    first = re.split(r"(?<=[。！？؟])|(?<=[.!?])\s+", str(text), maxsplit=1)[0]
+    return '<div style="max-width: 420px">' + escape(first) + '</div>'
+
+
+def set_help(widget, text: str) -> None:
 
     from language_lens.i18n import tr
     widget._lens_help_source = text
-    ui_text(widget, f'<div style="max-width: 420px">{escape(tr(text))}</div>', property="toolTip")
-    widget.setToolTipDuration(30_000)
+    ui_text(widget, help_markup(tr(text)), property="toolTip")
+    ui_text(widget, tr(text), property="accessibleDescription")
+    widget.setToolTipDuration(10_000)

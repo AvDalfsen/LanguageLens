@@ -6,5 +6,6 @@ if (-not (Test-LensEnvironment $ProjectRoot)) {
     Write-Host "First-time setup or installation recovery is needed. Downloads require an internet connection."
     & (Join-Path $PSScriptRoot "setup.ps1") -ProjectRoot $ProjectRoot
 }
+& (Join-Path $PSScriptRoot "ensure-translation-assets.ps1") -ProjectRoot $ProjectRoot
 Write-Host "Starting Language Lens..."
 & (Join-Path $PSScriptRoot "run.ps1") -ProjectRoot $ProjectRoot

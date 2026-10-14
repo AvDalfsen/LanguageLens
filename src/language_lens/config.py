@@ -43,15 +43,22 @@ class Settings:
     target_language: str = "en"
     hotkey: str = "<f8>"
     capture_scope: str = "all"
+    keep_translation_models_loaded: bool = False
     min_ocr_confidence: float = 0.45
     speech_enabled: bool = True
     show_ipa: bool = False
+    japanese_word_lookup: bool = True
+    chinese_word_lookup: bool = True
     speech_voices: dict[str, str] = field(default_factory=dict)
     settings_window_size: list[int] | None = None
     settings_window_maximized: bool = False
     speech_speed: float = 1.0
     tray_close_notice_shown: bool = False
     ui_language: str = "en"
+
+    @property
+    def word_lookup_enabled(self) -> bool:
+        return {"ja": self.japanese_word_lookup, "zh": self.chinese_word_lookup}.get(self.source_language, True)
 
 
 def settings_path() -> Path:
@@ -93,7 +100,8 @@ def validate_settings(raw: object) -> Settings:
         values["hotkey"] = defaults.hotkey
     if values.get("capture_scope") not in ("all", "current"):
         values["capture_scope"] = defaults.capture_scope
-    for key in ("speech_enabled", "show_ipa", "settings_window_maximized", "tray_close_notice_shown"):
+    for key in ("speech_enabled", "show_ipa", "japanese_word_lookup", "chinese_word_lookup",
+                "settings_window_maximized", "tray_close_notice_shown", "keep_translation_models_loaded"):
         if type(values.get(key)) is not bool:
             values[key] = getattr(defaults, key)
     for key, lower, upper in (("min_ocr_confidence", 0, 1), ("speech_speed", .5, 1.5)):

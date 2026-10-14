@@ -3,10 +3,11 @@ from __future__ import annotations
 from language_lens.i18n import tr, tr_message, language, ui_text, ui_widget
 
 from PySide6.QtCore import Qt, Signal
-from PySide6.QtWidgets import QFrame, QHBoxLayout, QLabel, QPushButton, QScrollArea, QStyle, QVBoxLayout, QWidget
+from PySide6.QtWidgets import QFrame, QHBoxLayout, QLabel, QPushButton, QScrollArea, QSizePolicy, QStyle, QVBoxLayout, QWidget
 
 from language_lens.domain import WordTranslation
 from language_lens.services.translation import EXPANDED_HYPOTHESES
+from language_lens.ui.sections import make_copyable
 
 
 class WordPopup(QFrame):
@@ -17,6 +18,7 @@ class WordPopup(QFrame):
     retry_requested = Signal()
     more_requested = Signal()
     search_requested = Signal()
+    unpin_requested = Signal()
 
     def __init__(self, parent=None) -> None:
         super().__init__(parent)
@@ -26,7 +28,8 @@ class WordPopup(QFrame):
         self._available_height = 560
         self.setStyleSheet("""
             QFrame#wordPopup { background:#07111f; border:1px solid #5eead4; border-radius:7px; }
-            QFrame#wordPopup QLabel { background:transparent; border:0; }
+            QFrame#wordPopup QLabel { background:transparent; border:1px solid transparent; }
+            QFrame#wordPopup QLabel:focus { border-color:#5eead4; }
             QFrame#wordPopup QScrollArea, QWidget#popupBody { background:transparent; border:0; }
             QLabel#popupWord { font-weight:700; font-size:16px; }
             QLabel#popupBestTranslation { font-weight:600; color:#a7f3d0; }
@@ -34,18 +37,25 @@ class WordPopup(QFrame):
             QLabel#popupDetail, QLabel#popupVoice, QLabel#popupTranslationOrder,
             QLabel#popupTranslationNote, QLabel#popupSearchStatus { font-size:12px; color:#b8c6da; }
             QPushButton#dismissWord { padding:0; border:0; background:transparent; font-size:18px; }
+            QPushButton#dismissWord:focus { border:1px solid #5eead4; border-radius:3px; }
         """)
         layout = QVBoxLayout(self)
         layout.setContentsMargins(12, 10, 12, 10)
         layout.setSpacing(7)
         header = QHBoxLayout()
         self.word = self._label("popupWord")
+        self.word.setWordWrap(False)
+        self.word.setSizePolicy(QSizePolicy.Policy.Ignored, QSizePolicy.Policy.Preferred)
+        self._source_word = ""
+        self.pin = ui_widget(QPushButton, tr("Unpin"))
+        self.pin.clicked.connect(self.unpin_requested)
         close = ui_widget(QPushButton, "×")
         close.setObjectName("dismissWord")
         ui_text(close, tr("Dismiss word details"), property="accessibleName")
         close.setFixedSize(24, 24)
         close.clicked.connect(self.dismissed)
         header.addWidget(self.word, 1)
+        header.addWidget(self.pin)
         header.addWidget(close)
         layout.addLayout(header)
         self._body = QWidget()
@@ -66,11 +76,8 @@ class WordPopup(QFrame):
         ui_text(self.translation_note, tr("Ranked by the translation model for this word alone. The selected sentence is not "
             "used to rank these candidates. These are suggestions, not all dictionary meanings "
             "or confidence percentages. A word can translate to several words in another language."), property="toolTip")
-        for label in (self.translation, self.alternatives):
-            label.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
         self.ipa = self._label("popupIpa")
         self.ipa.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
-        self.ipa.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
         ui_text(self.ipa, tr("Estimated pronunciation with display-only stress formatting; not a measurement of the voice's audio."), property="toolTip")
         self.detail = self._label("popupDetail")
         self.voice = self._label("popupVoice")
@@ -80,6 +87,12 @@ class WordPopup(QFrame):
                             (self.alternatives, tr("Other translation candidates")), (self.ipa, tr("Estimated pronunciation")),
                             (self.detail, tr("Pronunciation context")), (self.voice, tr("Pronunciation voice"))):
             ui_text(label, name, property="accessibleName")
+        self._translation_text = ""
+        for label, name, text in ((self.word, tr("Selected source word"), lambda: self._source_word),
+                (self.translation, tr("Word translation"), lambda: self._translation_text),
+                (self.alternatives, tr("Other translation candidates"), lambda: self.alternatives.text()),
+                (self.ipa, tr("Estimated pronunciation"), lambda: self.ipa.text())):
+            make_copyable(label, name, text)
         self.more = ui_widget(QPushButton, tr("More candidates"))
         self.more.clicked.connect(self.more_requested)
         self.search = ui_widget(QPushButton, tr("Search for more candidates"))
@@ -110,11 +123,11 @@ class WordPopup(QFrame):
         all_candidates = result.candidates if result else ()
         candidates = all_candidates if show_all else all_candidates[:1]
         multiple = len(all_candidates) > 1
-        ui_text(self.translation_order, tr("Top suggestion · isolated word") if not show_all else
+        ui_text(self.translation_order, tr("Word translation") if not show_all else
             tr("Possible translations · model order") if multiple else tr("Word translation"))
         self.translation_order.setVisible(bool(candidates))
-        ui_text(self.translation, f"1. {candidates[0]} · {tr('Top suggestion')}" if multiple else
-            candidates[0] if candidates else
+        self._translation_text = candidates[0] if candidates else ""
+        ui_text(self.translation, candidates[0] if candidates else
             tr("Translation unavailable") if result is not None else tr("Translating…"))
         ui_text(self.alternatives, "\n".join(
             f"{rank}. {value}" for rank, value in enumerate(candidates[1:], 2)
@@ -138,15 +151,27 @@ class WordPopup(QFrame):
         ui_text(self.search_status, tr("Searching locally…") if loading else tr_message(error) if error else
             ((f"{count} distinct {'candidate' if count == 1 else 'candidates'} from {EXPANDED_HYPOTHESES} model guesses" if language() == "en" else tr("{count} distinct candidates from {guesses} model guesses", count=count, guesses=EXPANDED_HYPOTHESES)) if searched and count is not None else
              (f"{count} model {'suggestion' if count == 1 else 'suggestions'} available · {'showing all' if showing else 'showing best match'}" if language() == "en" else tr("{count} model suggestions available", count=count)) if count is not None else ""))
-        self.search_status.setVisible(bool(self.search_status.text()))
+        self.search_status.setVisible(bool(self.search_status.text()) and (loading or searched or bool(error)))
+
+    def set_pinned(self, pinned: bool) -> None:
+        self.pin.setVisible(pinned)
+        ui_text(self.pin, tr("Unpin"))
+        ui_text(self, tr("Pinned") if pinned else tr("Word translation"), property="accessibleDescription")
+
+    def set_word(self, text: str) -> None:
+        self._source_word = text
+        ui_text(self.word, text)
 
     def fit_to_height(self, available: int) -> None:
         """Keep the header visible and make long result lists scroll on small screens."""
         self._available_height = min(560, available)
         margins = self.layout().contentsMargins()
-        overhead = margins.top() + margins.bottom() + max(24, self.word.sizeHint().height()) + 7
+        header_height = max(24, self.layout().itemAt(0).layout().sizeHint().height())
+        overhead = margins.top() + margins.bottom() + header_height + self.layout().spacing() + 2
         budget = max(40, self._available_height - overhead)
         width = self.width() - margins.left() - margins.right()
+        self.word.setText(self.word.fontMetrics().elidedText(self._source_word, Qt.TextElideMode.ElideRight,
+            max(24, width - 40 - (self.pin.sizeHint().width() if not self.pin.isHidden() else 0))))
         self._body_layout.invalidate()
         desired = max(self._body_layout.minimumSize().height(), self._body_layout.heightForWidth(width))
         if desired > budget:
@@ -156,7 +181,7 @@ class WordPopup(QFrame):
         self._body.setMinimumHeight(desired)
         self._scroll.setFixedHeight(min(desired, budget))
         self.layout().activate()
-        self.adjustSize()
+        self.setFixedHeight(min(self._available_height, self.layout().sizeHint().height()))
 
     def reset_scroll(self) -> None:
         self._scroll.verticalScrollBar().setValue(0)

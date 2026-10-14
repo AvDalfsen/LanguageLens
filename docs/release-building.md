@@ -22,6 +22,14 @@ development extra. Building needs an internet connection or populated pip cache.
 It records the Python patch version; this is a version-pinned build recipe, not a
 claim of byte-for-byte reproducibility across machines.
 
+The build also prepares two pinned CTranslate2 int8 word models using
+`packaging/requirements-translation-build.txt` and
+`scripts/prepare-translation-assets.py`. Their verified converted files are
+bundled; the raw weights and conversion tools stay outside the portable runtime.
+PyTorch and Transformers are excluded from the bundle. Firefox models and their
+local Bergamot/Node runtime download only during preparation of a selected pair.
+See [translation notices](../THIRD_PARTY_TRANSLATION.md).
+
 Each run has its own directory; existing release folders are never deleted or
 overwritten. Outputs include:
 

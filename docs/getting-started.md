@@ -49,6 +49,8 @@ Preferences are saved automatically. **Pause listening** disables the shortcut s
 
 Closing Settings keeps Lens running. Reopen Settings from the tray icon, or choose **Quit** to exit. Opening Lens again shows the existing instance. **Help and about** opens the guides and installed version in the next build; v0.1.2 users can use this documentation directly.
 
+Under **Performance**, **Keep translation models loaded between captures** controls translation memory. It defaults off: models are loaded for one capture and released when its review closes. Enable it for faster repeated captures; the loaded models occupy memory between captures and are released when you disable it, change the language pair, or quit. Each model stays loaded throughout a review, including word suggestions and wider searches.
+
 ## Update
 
 Quit Lens from the tray, extract the new release into a complete new folder, and open its LanguageLens.exe. Do not mix files from different versions. Settings, downloaded models, voices, and packs are stored outside the portable folder.

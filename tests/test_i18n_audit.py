@@ -106,7 +106,7 @@ def test_model_management_confirmations_have_no_english_fragments(qapp, monkeypa
     window._manage_model("repair")
     assert len(messages) == 2
     assert all("Backups are kept" not in text and "Removing shared packages" not in text for text in messages)
-    assert tr("Backups are kept beside the Argos packages directory. Continue?") in messages[0]
+    assert tr("Backups are kept in the locations below. Disk space is not reclaimed. Continue?") in messages[0]
     window.shutdown()
 
 

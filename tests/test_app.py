@@ -19,6 +19,7 @@ class FakeReview(QObject):
 
     def __init__(self, pixmap, selection, settings):
         super().__init__()
+        self.settings = settings
         self.was_shown = False
         self.close_count = 0
 
@@ -216,6 +217,16 @@ def test_review_speed_preference_updates_only_speed(monkeypatch, qapp):
     assert updated == [.65] and len(saved) == 1
     before.speech_speed = .65
     assert saved[0] == before
+
+
+def test_disabling_retention_updates_open_review_for_later_lookups(qapp):
+    controller=controller_stub()
+    snapshot=Settings(keep_translation_models_loaded=True)
+    controller._capture_settings=snapshot
+    controller._review=FakeReview(QPixmap(10,10),QRect(0,0,10,10),snapshot)
+    controller.setup.current_settings=lambda: Settings(keep_translation_models_loaded=False)
+    controller._save_preferences()
+    assert not snapshot.keep_translation_models_loaded
 
 
 def test_hotkey_preference_saves_immediately_without_applying_other_options(monkeypatch, qapp):

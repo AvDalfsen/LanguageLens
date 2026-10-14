@@ -18,6 +18,8 @@ def main() -> int:
             from language_lens.services.task_worker import main as run
         elif kind == ["speech"]:
             from language_lens.services.speech_worker import main as run
+        elif kind == ["translation"]:
+            from language_lens.services.translation_worker import main as run
         else:
             return 2
         del sys.argv[1:3]

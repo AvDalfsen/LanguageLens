@@ -4,6 +4,7 @@ import ctypes
 from copy import deepcopy
 import os
 import sys
+from pathlib import Path
 
 from PySide6.QtCore import QObject, QTimer, Signal
 from PySide6.QtGui import QAction, QCursor
@@ -38,11 +39,14 @@ def persist(settings, parent=None, *, notify=True) -> bool:
 
 STYLESHEET = """
 QWidget {
-    background: #0b1424;
+    background: transparent;
     color: #e8eef8;
     font-family: "Segoe UI";
     font-size: 14px;
 }
+QMainWindow, QDialog, QMenu, QWidget#reviewWindow { background: #0b1424; }
+QLabel#compactTitle { font-size: 22px; font-weight: 700; color: #f8fafc; }
+QLabel#sectionTitle { font-size: 16px; font-weight: 600; padding: 0; }
 QLabel#title { font-size: 30px; font-weight: 700; color: #f8fafc; }
 QLabel#intro { font-size: 15px; color: #a9b8ce; }
 QLabel#note { color: #8292aa; font-size: 12px; }
@@ -51,10 +55,9 @@ QFrame#card, QFrame#footer {
     border: 1px solid #21314a;
     border-radius: 12px;
 }
-QFrame#footer { border-radius: 0; border-left: 0; border-right: 0; border-bottom: 0; }
+QFrame#footer { border-radius: 10px; }
 QFrame#card QLabel, QFrame#card QCheckBox {
-    padding: 6px 10px;
-    border-radius: 7px;
+    padding: 0;
 }
 QComboBox, QKeySequenceEdit QLineEdit {
     background: #0b1424;
@@ -62,12 +65,14 @@ QComboBox, QKeySequenceEdit QLineEdit {
     border-radius: 7px;
     padding: 8px 12px;
 }
-QComboBox { min-width: 250px; }
+QComboBox { min-width: 180px; padding-right: 32px; }
 QComboBox#uiLanguage { min-width: 140px; padding: 5px 10px; font-size: 12px; }
 QKeySequenceEdit QLineEdit { min-width: 140px; }
 QComboBox:disabled, QKeySequenceEdit QLineEdit:disabled { color: #6f7b8d; }
 QComboBox::drop-down { border: 0; width: 28px; }
+QComboBox::down-arrow { image: url(__ASSET_ROOT__/chevron-down.svg); width: 12px; height: 8px; }
 QComboBox QAbstractItemView { background: #111e32; selection-background-color: #167b79; }
+QToolTip { background: #111e32; color: #e8eef8; border: 1px solid #435570; padding: 8px; }
 QMenu { background: #0b1424; border: 1px solid #31435f; padding: 4px; }
 QMenu::item { background: transparent; color: #e8eef8; padding: 8px 28px; margin: 2px 4px; border-radius: 4px; }
 QMenu::item:selected:enabled { background: #174b50; color: #ffffff; }
@@ -82,7 +87,17 @@ QProgressBar {
     max-height: 8px;
 }
 QProgressBar::chunk { background: #29c7b9; border-radius: 3px; }
-QCheckBox { spacing: 9px; }
+QCheckBox { spacing: 9px; padding: 3px; border: 1px solid transparent; }
+QCheckBox::indicator { width: 14px; height: 14px; border: 1px solid #60728c; border-radius: 3px; background: #0b1424; }
+QCheckBox::indicator:checked { background: #08766e; border-color: #29c7b9; image: url(__ASSET_ROOT__/check.svg); }
+QScrollArea { border: 0; background: transparent; }
+QScrollBar:vertical { background: transparent; width: 12px; margin: 2px; }
+QScrollBar:horizontal { background: transparent; height: 12px; margin: 2px; }
+QScrollBar::handle { background: #435570; border-radius: 4px; min-height: 24px; min-width: 24px; }
+QScrollBar::handle:hover { background: #60728c; }
+QScrollBar::add-line, QScrollBar::sub-line { width: 0; height: 0; }
+QScrollBar::add-page, QScrollBar::sub-page { background: transparent; }
+QPlainTextEdit { background: #0b1424; border: 1px solid #31435f; border-radius: 7px; padding: 8px; }
 QToolButton {
     color: #e8eef8; background: transparent; border: 1px solid transparent;
     border-radius: 4px; padding: 5px;
@@ -93,7 +108,7 @@ QPushButton {
     background: #21314a;
     border: 1px solid #344965;
     border-radius: 7px;
-    padding: 9px 15px;
+    padding: 7px 12px;
 }
 QPushButton:hover { background: #2a3d59; }
 QPushButton#captureButton {
@@ -118,17 +133,17 @@ QPushButton#secondaryButton { background: #111e32; color: #b8c6da; border-color:
 QPushButton#secondaryButton:hover { background: #21314a; color: #e8eef8; }
 QPushButton:disabled { color: #6f7b8d; background: #152136; }
 QPushButton#primaryButton {
-    background: #0f9f94;
+    background: #08766e;
     border-color: #29c7b9;
     color: #ffffff;
     font-weight: 650;
-    padding: 11px 22px;
+    padding: 8px 18px;
 }
-QPushButton#primaryButton:hover { background: #13b3a7; }
+QPushButton#primaryButton:hover { background: #09665f; }
 QPushButton#primaryButton:disabled { color: #6f7b8d; background: #152136; border-color: #314865; }
 QPushButton:focus:enabled, QToolButton:focus:enabled, QComboBox:focus:enabled,
 QKeySequenceEdit:focus:enabled, QCheckBox:focus:enabled, QLabel:focus {
-    border: 2px solid #5eead4;
+    border: 1px solid #5eead4;
 }
 QSlider::handle:horizontal:focus { border: 2px solid #ffffff; }
 QLabel#sentenceTranslation:focus, QFrame#wordPopup QLabel:focus { border: 2px solid #5eead4; }
@@ -152,7 +167,7 @@ QLabel#translationBubble {
     border-radius: 6px;
     padding: 7px 10px;
 }
-"""
+""".replace("__ASSET_ROOT__", (Path(__file__).parent / "assets").as_posix())
 
 
 def enable_per_monitor_dpi_awareness() -> None:
@@ -230,6 +245,7 @@ class LensController(QObject):
         self.tray.setContextMenu(menu)
         translate_ui(menu)
         self.setup.ui_language_changed.connect(lambda previous: translate_ui(menu, previous))
+        self.setup.ui_language_changed.connect(self._refresh_review_language)
         menu.aboutToShow.connect(self._refresh_tray_listening)
         self.tray.activated.connect(self._tray_activated)
         self.tray.show()
@@ -245,6 +261,11 @@ class LensController(QObject):
         self.setup.show()
         self.setup.raise_()
         self.setup.activateWindow()
+
+    def _refresh_review_language(self, previous: str) -> None:
+        review = getattr(self, "_review", None)
+        if review is not None and hasattr(review, "refresh_language"):
+            review.refresh_language(previous)
 
     def show_help(self) -> None:
         self.show_settings()
@@ -264,6 +285,16 @@ class LensController(QObject):
     def _save_preferences(self, *, notify=True) -> None:
         self._save_timer.stop()
         current = self.setup.current_settings()
+        from language_lens.services.translation_session import configure
+        configure(current)
+        # An open review owns a settings snapshot. Disabling retention must also
+        # affect its later expanded lookups; otherwise they could restart a
+        # resident worker using that snapshot's old preference.
+        review=getattr(self,"_review",None)
+        if review is not None and not current.keep_translation_models_loaded:
+            review.settings.keep_translation_models_loaded=False
+        if getattr(self,"_capture_settings",None) is not None and not current.keep_translation_models_loaded:
+            self._capture_settings.keep_translation_models_loaded=False
         if current != self.settings:
             if persist(current, self.setup, notify=notify):
                 self.settings = deepcopy(current)
@@ -514,6 +545,8 @@ class LensController(QObject):
         if self._shutting_down:
             return
         self._shutting_down = True
+        from language_lens.services.translation_session import invalidate
+        invalidate()
         self._save_preferences(notify=False)
         self._desired_hotkey = None
         self._capture_timer.stop()
@@ -539,7 +572,8 @@ class LensController(QObject):
         if (self.setup.capture_ready
                 and (settings.source_language, settings.target_language)
                     == (current.source_language, current.target_language)
-                and offline_ready(settings.source_language, settings.target_language)):
+                and settings.word_lookup_enabled == current.word_lookup_enabled
+                and offline_ready(settings.source_language, settings.target_language, settings.word_lookup_enabled)):
             return True
         self.pause_listening()
         self.setup.refresh_model_status()

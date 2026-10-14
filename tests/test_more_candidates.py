@@ -33,7 +33,7 @@ def test_expansion_is_on_demand_cached_and_not_overwritten_by_late_compact_resul
     canvas.more_candidates_requested.connect(requested.append)
     popup = canvas._bubble
     assert not requested and popup.more.text() == "Show 1 other candidate"
-    assert popup.translation.text() == "1. bank · Top suggestion"
+    assert popup.translation.text() == "bank"
     assert popup.alternatives.isHidden()
     assert popup.search_status.text() == "2 model suggestions available · showing best match"
     popup.more.click()
@@ -53,14 +53,14 @@ def test_expansion_is_on_demand_cached_and_not_overwritten_by_late_compact_resul
     expanded = WordTranslation(("oever", "bank", "banken", "bankrekening", "de bank", "bank-"))
     canvas.set_more_candidates("bank", expanded)
     assert popup.more.text() == "Show best match only"
-    assert popup.translation.text() == "1. oever · Top suggestion"
+    assert popup.translation.text() == "oever"
     assert "5. de bank" in popup.alternatives.text()
     assert "6 distinct candidates from 12" in popup.search_status.text()
     canvas.set_translations({"bank": WordTranslation(("old compact result",))})
-    assert popup.translation.text() == "1. oever · Top suggestion"
+    assert popup.translation.text() == "oever"
     popup.more.click()
     assert popup.alternatives.isHidden()
-    assert popup.translation.text() == "1. oever · Top suggestion"
+    assert popup.translation.text() == "oever"
     assert popup.more.text() == "Show 5 other candidates"
     assert popup.search_status.text() == "6 distinct candidates from 12 model guesses"
     popup.more.click()
@@ -95,7 +95,7 @@ def test_expansion_failure_keeps_existing_translation_and_offers_retry(canvas):
     popup.search.click()
     assert requested == ["bank"]
     canvas.set_more_candidates("bank", None, "Test failure")
-    assert popup.translation.text() == "1. bank · Top suggestion"
+    assert popup.translation.text() == "bank"
     assert popup.search.text() == "Retry wider search"
     assert popup.search.isEnabled() and "Test failure" in popup.search_status.text()
     popup.search.click()
@@ -108,7 +108,7 @@ def test_hide_during_search_remains_hidden_when_result_arrives(canvas):
     popup.more.click()
     assert popup.alternatives.isHidden()
     canvas.set_more_candidates("bank", WordTranslation(("oever", "bank", "banken")))
-    assert popup.alternatives.isHidden() and popup.translation.text() == "1. oever · Top suggestion"
+    assert popup.alternatives.isHidden() and popup.translation.text() == "oever"
 
 
 def test_single_compact_candidate_can_search_for_more(canvas):

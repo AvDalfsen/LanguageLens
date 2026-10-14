@@ -26,8 +26,8 @@ def execute(command, payload, scratch, emit):
         else:
             packs.remove(pack)
         return
-    from language_lens.services.translation import ArgosTranslator
-    translator = ArgosTranslator()
+    from language_lens.services.translation_backends import RoutedTranslator
+    translator = RoutedTranslator()
     if command == "status":
         from language_lens.services.offline import offline_ready
         ready, route, packages = False, [], []
@@ -40,13 +40,22 @@ def execute(command, payload, scratch, emit):
             if not damaged:
                 raise
             emit({"result": {"source": source, "target": target, "ready": False, "route": [],
-                              "prepared": False, "packs": packs.inventory(), "damaged_models": damaged}})
+                              "prepared": False, "word_lookup_enabled": settings.word_lookup_enabled,
+                              "packs": packs.inventory(), "damaged_models": damaged}})
             return
         if ready:
             packages = translator.route(source, target)
-            route = [packages[0].from_code, *(item.to_code for item in packages)] if packages else [source]
+            route = [packages[0].from_code, *(item.to_code for item in packages)] if packages else ([source] if source==target else [source,target])
+        from language_lens.services.local_files import pair_file_summary
+        from language_lens.services.errors import KnownTaskError
+        try:
+            summary = pair_file_summary(settings, translator, packages)
+        except (OSError, ValueError, KeyError, AttributeError, ImportError, KnownTaskError):
+            # A size preview must never make a valid pair unavailable.
+            summary = {"files": [], "download_bytes": 0, "download_unknown": True}
         emit({"result": {"source": source, "target": target, "ready": ready,
-                          "route": route, "prepared": offline_ready(source, target, route=packages), "packs": packs.inventory()}})
+                          "route": route, "prepared": offline_ready(source, target, settings.word_lookup_enabled, route=packages),
+                          "word_lookup_enabled": settings.word_lookup_enabled, "packs": packs.inventory(), **summary}})
         return
     if command in ("install", "repair", "remove", "prepare", "quarantine"):
         package, _backend = translator._modules()
@@ -62,9 +71,13 @@ def execute(command, payload, scratch, emit):
                 from language_lens.services.model_management import quarantine_damaged
                 quarantine_damaged(package, payload["damaged_models"], report)
             elif command == "prepare":
-                prepare(source, target, report, progress)
+                prepare(source, target, report, progress, settings.word_lookup_enabled)
             elif command == "remove":
-                remove_route(source, target, report)
+                if translator.argos_required(source,target):remove_route(source, target, report)
+                from language_lens.services.translation_assets import remove
+                remove(source,target)
+                from language_lens.services.offline import marker_path
+                marker_path(source,target).unlink(missing_ok=True)
             elif command == "repair":
                 translator.install_pair(source, target, report, progress, staged=True, force=True)
             else:
@@ -88,11 +101,14 @@ def execute(command, payload, scratch, emit):
         lines = recognize_regions(regions, QSize(*payload["selection_size"]), engine, report, source)
         emit({"result": [asdict(line) for line in lines]})
     elif command == "more":
-        emit({"result": asdict(translator.word_candidates(payload["word"], source, target, expanded=True))})
+        try:emit({"result": asdict(translator.word_candidates(payload["word"], source, target, expanded=True))})
+        finally:translator.close()
     elif command == "translate":
         from language_lens.services.translation import selection_results
-        for sentence, translations in selection_results(translator, payload["text"], payload["words"], source, target, report):
-            emit({"result": {"sentence": sentence, "words": {word: asdict(value) for word, value in translations.items()}}})
+        try:
+            for sentence, translations in selection_results(translator, payload["text"], payload["words"], source, target, report):
+                emit({"result": {"sentence": sentence, "words": {word: asdict(value) for word, value in translations.items()}}})
+        finally:translator.close()
     else:
         raise ValueError("Unknown task command.")
 

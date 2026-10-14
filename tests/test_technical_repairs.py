@@ -251,7 +251,10 @@ def test_domain_ocr_factory_uses_verified_local_models(monkeypatch):
     monkeypatch.setattr(tasks, "local_ocr_parameters", lambda _: parameters)
     calls = []
     tasks.create_ocr_engine(Settings(source_language="en"), engine_factory=lambda language, **kwargs: calls.append((language, kwargs)))
-    assert calls == [("en", {"params": parameters})]
+    assert calls == [("en", {"params": parameters, "dictionary_lookup": True})]
+    tasks.create_ocr_engine(Settings(source_language="ja", japanese_word_lookup=False),
+                            engine_factory=lambda language, **kwargs: calls.append((language, kwargs)))
+    assert calls[-1] == ("ja", {"params": parameters, "dictionary_lookup": False})
 
 
 def test_native_capture_selection_and_review_do_not_allocate_composite(monkeypatch, qapp):

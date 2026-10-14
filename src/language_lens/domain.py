@@ -171,7 +171,8 @@ def _ocr_word_rect(line: OcrLine, start: int, end: int) -> Rect | None:
     return Rect(min(xs), min(ys), max(max(xs) - min(xs), 1), max(max(ys) - min(ys), 1))
 
 
-def build_word_hits(lines: Iterable[OcrLine], source_language: str | None = None) -> list[WordHit]:
+def build_word_hits(lines: Iterable[OcrLine], source_language: str | None = None,
+                    *, dictionary_lookup: bool = True) -> list[WordHit]:
     """Use language-aware source spans and OCR geometry, with a shaped fallback."""
     hits: list[WordHit] = []
     source_offset = 0
@@ -181,7 +182,8 @@ def build_word_hits(lines: Iterable[OcrLine], source_language: str | None = None
         source_offset += len(line.text) + 1  # same single-space join as speech/translation
         if not text:
             continue
-        spans = line.token_spans if line.token_spans is not None else tuple(word_spans(text, source_language))
+        spans = line.token_spans if line.token_spans is not None else tuple(
+            word_spans(text, source_language, dictionary_lookup=dictionary_lookup))
         vertical = line.bounds.height > line.bounds.width * 1.5
         rectangles = {span: _ocr_word_rect(line, *span) for span in spans}
         missing = tuple(span for span in spans if rectangles[span] is None)
