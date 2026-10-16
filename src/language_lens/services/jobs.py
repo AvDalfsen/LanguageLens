@@ -71,6 +71,8 @@ class TaskPool:
         else:
             job = ServiceJob(task.signals)
         def event(message):
+            if 'translation_error' in message:
+                task.signals.partial_error.emit(message['translation_error'])
             if "progress" in message:
                 task.signals.progress.emit(message["progress"])
             if "result" not in message:

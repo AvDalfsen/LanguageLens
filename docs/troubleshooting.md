@@ -10,9 +10,9 @@
 | F8 does nothing | Choose Start listening, then switch to another app. Settings/review temporarily suspend the shortcut. If Windows reports a conflict, Pause listening and choose a different combination. |
 | The capture is black | Switch the application to borderless-windowed mode. Exclusive fullscreen and protected video can prevent capture. |
 | The game kept running | Pause it manually before capture. The screenshot is frozen; the underlying app is not paused. |
-| Recognition missed a word | Select a tighter, clearer region, then Retry OCR. Very small, decorative, curved, or vertical text can remain difficult. |
+| Recognition missed a word | Use Edit recognized text or Select another area for a clearer region. Retry OCR appears only after a technical recognition failure. Very small, decorative, curved, or vertical text can remain difficult. |
 | The translation looks wrong | Open Recognized text to check OCR first. Use the whole sentence for context, other candidates, or Search for more candidates. Isolated-word suggestions can be ambiguous. |
-| Translation fails or stalls | Use Retry translation. If failures continue, Check required files; Reinstall translation model is a later recovery option. Sentence failure does not necessarily prevent word lookup. |
+| Translation fails or stalls | Use Retry translation beside the inline error. It restarts the translation worker and retains recognized or edited text. If failures continue, Check required files; Reinstall translation model is a later recovery option. Sentence failure does not necessarily prevent word lookup. |
 | No route exists for my pair | Inspect Technical details. Some pairs need two models through English; not every possible direction has available models. Try another target language. |
 | Audio is unavailable | Enable reading aloud and download a voice for Text language. Japanese also needs its pronunciation pack. Try Hear sample and check the selected audio output. |
 | The app is still running after closing Settings | This is the tray behavior. Reopen Settings there, or choose Quit to exit. |

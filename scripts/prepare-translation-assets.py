@@ -1,4 +1,4 @@
-"""Build pinned word-model resources for the separate translation-model release.
+"""Build pinned model resources for the separate translation-model releases.
 
 Conversion runs only here, never in a capture process. Firefox weights and the
 isolated runtime and word models download on demand by explicit file preparation.
@@ -38,8 +38,9 @@ def download(url,path,item):
 def main():
     parser=argparse.ArgumentParser();parser.add_argument('--reuse-benchmark',action='store_true')
     parser.add_argument('--output',type=Path,default=ROOT/'build/translation-word-models')
+    parser.add_argument('--models',nargs='+',default=['small','m2m'],choices=['small','m2m','t5-en-nl-24l'])
     args=parser.parse_args();out=args.output;out.mkdir(parents=True,exist_ok=True)
-    for kind in ('small','m2m'):
+    for kind in args.models:
         model=CATALOG['models'][kind];destination=out/kind
         if all(matches(destination/item['name'],item) for item in model['files']):
             print(kind+': verified existing resources',flush=True);continue
@@ -50,8 +51,11 @@ def main():
                 old=ROOT/'artifacts/translation-accuracy-2026-10-12/execution-v1'
                 source=bench/'models/alirezamsh--small100' if kind=='small' else old/'models/m2m100_418M-ct2-int8'
                 tokenizer=bench/'downloads/alirezamsh--small100' if kind=='small' else old/'downloads/m2m100_418M'
+                if kind=='t5-en-nl-24l':
+                    pilot=ROOT/'artifacts/en-nl-specialist-research-2026-10-15'
+                    source=pilot/'models/t5';tokenizer=pilot/'downloads/t5'
                 for item in model['files']:
-                    path=(tokenizer if item['name']=='sentencepiece.bpe.model' else source)/item['name']
+                    path=(tokenizer if item['name'] in ('sentencepiece.bpe.model','tokenizer.json') else source)/item['name']
                     if not matches(path,item):raise RuntimeError('Benchmark artifact is not the selected checkpoint.')
                     shutil.copyfile(path,stage/item['name'])
             else:
@@ -61,7 +65,8 @@ def main():
                     download(url,source/item['name'],item)
                 from ctranslate2.converters import TransformersConverter
                 TransformersConverter(str(source),low_cpu_mem_usage=True).convert(str(stage),quantization='int8',force=True)
-                shutil.copyfile(source/'sentencepiece.bpe.model',stage/'sentencepiece.bpe.model')
+                tokenizer_name='tokenizer.json' if model['kind']=='t5' else 'sentencepiece.bpe.model'
+                shutil.copyfile(source/tokenizer_name,stage/tokenizer_name)
             if not all(matches(stage/item['name'],item) for item in model['files']):
                 raise RuntimeError('Conversion does not match the benchmark. Use the pinned translation build requirements.')
             destination.mkdir(exist_ok=True)

@@ -8,7 +8,7 @@ from language_lens.services import local_files, offline, voices, task_worker, tr
 
 @pytest.fixture
 def preview(monkeypatch, tmp_path):
-    model = {"files": [{"name": "remote", "bytes": 100, "compressed_bytes": 40},
+    model = {"kind": "firefox", "files": [{"name": "remote", "bytes": 100, "compressed_bytes": 40},
                        {"name": "word-model", "bytes": 200, "compressed_bytes": 75}]}
     catalog = {"models": {"model": model},
                "node_runtime": {"files": [{"name": "node.exe", "bytes": 500}]},

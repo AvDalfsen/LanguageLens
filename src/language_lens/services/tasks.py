@@ -23,6 +23,7 @@ def create_ocr_engine(settings, engine_factory=None):
 class TaskSignals(QObject):
     result = Signal(object)
     error = Signal(str)
+    partial_error = Signal(str)
     progress = Signal(str)
 
 

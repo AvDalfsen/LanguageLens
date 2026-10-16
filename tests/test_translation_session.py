@@ -99,3 +99,28 @@ def test_cancelled_calculation_does_not_publish_or_reload_worker(qapp,fake):
     assert not published and service.process.processId()==pid
     assert records(fake)[-1]['text']=='new selection'
     service.shutdown()
+
+
+def test_technical_retry_restarts_retained_worker_and_keeps_other_queued_jobs(qapp,fake):
+    owner=QObject();request=payload(keep=True,words=())
+    service=sessions.session_for(request['settings'],owner)
+    first=service.submit('translate',request);wait(qapp,lambda:not first.active)
+    pid=service.process.processId()
+    other=service.submit('translate',{**request,'text':'other capture'})
+    sessions.retry_capture(request['settings'],owner)
+    retry=service.submit('translate',request)
+    wait(qapp,lambda:not retry.active and not other.active)
+    assert service.process.processId()!=pid
+    assert [r['text'] for r in records(fake)]==['selection','other capture','selection']
+
+
+def test_partial_errors_retain_safe_failure_message_and_continue_word_jobs(qapp,fake,monkeypatch):
+    worker=WORKER.replace("if r['command']=='sentence':v={'sentence':r['text'],'words':{}}",
+        "if r['command']=='sentence':\n  print(json.dumps({'id':r['id'],'error':'private details','failure':{'code':'missing_assets'},'done':True}),flush=True)\n  continue")
+    monkeypatch.setattr(sessions,'worker_command',lambda _: (sys.executable,['-c',worker]))
+    service=sessions.TranslationSession();job=service.submit('translate',payload())
+    events=[];job.event.connect(events.append);wait(qapp,lambda:not job.active)
+    assert any('missing or changed' in e.get('translation_error','') for e in events)
+    assert any(e.get('result',{}).get('words',{}).get('last') for e in events)
+    assert 'private details' not in json.dumps(events)
+    service.shutdown()

@@ -172,7 +172,9 @@ def test_real_worker_recovers_corrupt_metadata_without_removing_healthy_packages
     result, events = worker(tmp_path, "status")
     assert result.returncode == 0, events
     status = next(event["result"] for event in events if "result" in event)
-    assert status["ready"] and not status.get("damaged_models")
+    # The healthy Argos package remains installed; the independently downloaded
+    # T5 full-text model is still missing from this empty test profile.
+    assert not status["ready"] and not status.get("damaged_models")
 
 
 def package_fixture(root):

@@ -709,7 +709,16 @@ class ReviewWindow(QWidget):
         self.diagnostics_button = ui_widget(QPushButton, tr("Open diagnostics folder"))
         self.diagnostics_button.clicked.connect(open_folder)
         self.diagnostics_button.hide()
-        body_layout.addWidget(self.diagnostics_button)
+        self._error_panel = QWidget()
+        error_layout = QVBoxLayout(self._error_panel)
+        error_layout.setContentsMargins(0, 0, 0, 0)
+        self.error_message = QLabel()
+        self.error_message.setTextFormat(Qt.TextFormat.PlainText)
+        self.error_message.setWordWrap(True)
+        error_layout.addWidget(self.error_message)
+        self._error_panel.hide()
+        self._ocr_error = None
+        body_layout.addWidget(self._error_panel)
         self.recognized_section = ExpandableSection(tr("Recognized text"))
         self.recognized_section.toggle.setEnabled(False)
         set_help(self.recognized_section.toggle, "Show the original text recognized by local OCR to check whether an odd translation "
@@ -763,7 +772,7 @@ class ReviewWindow(QWidget):
         self.copy_translation.setEnabled(False)
         self.copy_translation.clicked.connect(self._copy_translation)
         self.retry_translation = ui_widget(QPushButton, tr("Retry translation"))
-        self.retry_translation.clicked.connect(self._start_translation)
+        self.retry_translation.clicked.connect(self._retry_translation)
         self.retry_translation.setEnabled(False)
         self.collapse_translation = ui_widget(QPushButton, tr("Hide translation"))
         self.collapse_translation.clicked.connect(self._toggle_translation)
@@ -777,12 +786,15 @@ class ReviewWindow(QWidget):
         self.more_button.setPopupMode(QToolButton.ToolButtonPopupMode.InstantPopup)
         self._recovery_menu = QMenu(self.more_button)
         self._recovery_actions = []
-        for button in (self.reselect, self.collapse_translation, self.retry_ocr, self.retry_translation):
+        for button in (self.reselect, self.collapse_translation):
             action = QAction(button.text(), self._recovery_menu)
             action.triggered.connect(button.click)
             self._recovery_menu.addAction(action)
             self._recovery_actions.append((action, button))
             button.setParent(self)
+            button.hide()
+        for button in (self.retry_ocr, self.retry_translation, self.diagnostics_button):
+            error_layout.addWidget(button)
             button.hide()
         self._recovery_menu.aboutToShow.connect(self._sync_recovery_actions)
         self.more_button.setMenu(self._recovery_menu)
@@ -847,7 +859,8 @@ class ReviewWindow(QWidget):
 
         # Tab follows the visual content/actions order, including hidden sections
         # when opened. The screenshot is deliberately not a fake accessible word list.
-        focus_order = (self.recognized_section.toggle, self.recognized_text, self.words, self.edit_source, self.translation,
+        focus_order = (self.retry_ocr, self.retry_translation, self.diagnostics_button,
+                       self.recognized_section.toggle, self.recognized_text, self.words, self.edit_source, self.translation,
                        *self._action_buttons, self._close_button, self.speed_slider)
         for before, after in zip(focus_order, focus_order[1:]):
             QWidget.setTabOrder(before, after)
@@ -870,6 +883,7 @@ class ReviewWindow(QWidget):
     def _retry_ocr(self) -> None:
         if self._closed:
             return
+        self._clear_error()
         for job in self._jobs:
             if job is not None:
                 job.shutdown()
@@ -947,7 +961,10 @@ class ReviewWindow(QWidget):
 
     def _ocr_failed(self, message: str) -> None:
         if not self._closed:
+            self._ocr_error = message
+            self.status.clear()
             self.retry_ocr.setEnabled(True)
+            self.retry_ocr.show()
             self._failed(message)
 
     def _copy_source(self) -> None:
@@ -1088,6 +1105,7 @@ class ReviewWindow(QWidget):
         if self._closed:
             return
         self.retry_ocr.setEnabled(True)
+        self._clear_error()
         self._lines = [
             line.map_geometry(
                 lambda x, y: (x + self._selection.x(), y + self._selection.y())
@@ -1124,13 +1142,19 @@ class ReviewWindow(QWidget):
     def _start_translation(self) -> None:
         if self._closed or not self._lines:
             return
-        self._translation_error = None
+        self._clear_error()
         for job in (self._translation_job, self._more_job):
             if job is not None:
                 job.shutdown()
         self.retry_translation.setEnabled(False)
         self._translations.clear()
         self._failed_words.clear()
+        self._translated_text = ""
+        self.translation.clear()
+        self.translation.hide()
+        self.copy_translation.setEnabled(False)
+        self.collapse_translation.setEnabled(False)
+        self._update_canvases("set_translations", {hit.lookup_text: None for hit in self._hits})
         ui_text(self.status, self._word_instructions() + tr("\nTranslating the selection locally…"))
         task = TranslationTask(
             self._lines, (hit.lookup_text for hit in self._hits), self.settings,
@@ -1138,10 +1162,23 @@ class ReviewWindow(QWidget):
         )
         task.signals.result.connect(self._translation_finished)
         task.signals.error.connect(self._translation_failed)
+        task.signals.partial_error.connect(self._translation_problem)
         task.signals.progress.connect(lambda message: ui_text(self.status, tr_message(message)))
         job = self._translation_job = self._start_task(task)
         if job is not None:
             job.finished.connect(lambda: self.retry_translation.setEnabled(True))
+
+    def _retry_translation(self) -> None:
+        from dataclasses import asdict
+        from language_lens.services.translation_session import retry_capture
+        retry_capture(asdict(self.settings), self)
+        self._start_translation()
+
+    def _translation_problem(self, message: str) -> None:
+        if not self._closed:
+            self._translation_error = message
+            self.retry_translation.show()
+            self._failed(message)
 
     def _translation_failed(self, message: str) -> None:
         if not self._closed:
@@ -1150,12 +1187,12 @@ class ReviewWindow(QWidget):
                        for hit in self.canvas._hits}
             self._update_canvases("set_translations", pending)
             self.retry_translation.setEnabled(True)
-            self._failed(message)
+            ui_text(self.status, self._word_instructions())
+            self._translation_problem(message)
 
     def _translation_finished(self, result: object) -> None:
         if self._closed:
             return
-        self._translation_error = None
         sentence, translations = result
         if sentence is not None:
             self._translated_text = sentence
@@ -1185,7 +1222,9 @@ class ReviewWindow(QWidget):
         if not self._translated_text:
             message += " " + tr("Whole-selection translation unavailable. Word lookups are independent.")
         ui_text(self.status, message)
-        self.diagnostics_button.setVisible(bool(failed or not self._translated_text))
+        if not self._translation_error and (failed or sentence == ""):
+            from language_lens.services.errors import failure_from_code
+            self._translation_problem(failure_from_code('execution','translate').message)
         self._translation_layout_timer.start(0)
 
     def refresh_language(self, previous: str) -> None:
@@ -1200,8 +1239,8 @@ class ReviewWindow(QWidget):
         for canvas in self._canvases:
             canvas._voice_name = voice_name(self._voice) if self._voice else ""
             canvas._pronunciation_message = tr_message(canvas._pronunciation_message)
-        if self._translation_error:
-            self._failed(tr_message(self._translation_error))
+        if self._translation_error or self._ocr_error:
+            self._failed(tr_message(self._translation_error or self._ocr_error))
         elif self._translated_text or self._translations:
             self._translation_finished((None, {}))
         elif self._lines:
@@ -1211,7 +1250,7 @@ class ReviewWindow(QWidget):
 
     def _word_instructions(self) -> str:
         if self._corrected_source:
-            message = tr("Edited text: retry recognition to restore word highlights.")
+            message = tr("Edited text. Word highlights are unavailable for manual corrections.")
             ui_text(self.status, message, property="toolTip")
             return message
         ui_text(self.status, tr("Found {count} words. Hover for details; click to pin. Use the left and right arrow keys to browse words.", count=len(self._hits)), property="toolTip")
@@ -1239,9 +1278,18 @@ class ReviewWindow(QWidget):
     def _failed(self, message: str) -> None:
         if self._closed:
             return
-        ui_text(self.status, tr("Could not finish: {error}", error=message))
+        ui_text(self.error_message, tr("Could not finish: {error}", error=tr_message(message)))
+        self._error_panel.show()
         self.diagnostics_button.show()
         self._position_children()
+
+    def _clear_error(self) -> None:
+        self._ocr_error = self._translation_error = None
+        self._error_panel.hide()
+        self.error_message.clear()
+        self.retry_ocr.hide()
+        self.retry_translation.hide()
+        self.diagnostics_button.hide()
 
     def _refresh_speech(self) -> None:
         message = ""

@@ -2,6 +2,12 @@ name: Publish pinned translation models
 
 on:
   workflow_dispatch:
+    inputs:
+      group:
+        description: Model resource group
+        type: choice
+        options: [words, en-nl]
+        default: words
 
 permissions:
   contents: write
@@ -20,9 +26,10 @@ jobs:
         run: |
           python -m pip install -r packaging/requirements-translation-build.txt
           if ($LASTEXITCODE -ne 0) { throw "Could not install model build tools." }
-          python scripts/prepare-translation-assets.py
+          $models = if ('${{ inputs.group }}' -eq 'en-nl') { @('t5-en-nl-24l') } else { @('small','m2m') }
+          python scripts/prepare-translation-assets.py --models @models
           if ($LASTEXITCODE -ne 0) { throw "Model conversion failed." }
-          python scripts/package-translation-assets.py --output artifacts/translation-model-downloads
+          python scripts/package-translation-assets.py --group '${{ inputs.group }}' --output artifacts/translation-model-downloads
           if ($LASTEXITCODE -ne 0) { throw "Model download checksums differ from the pinned catalog." }
       - name: Publish separate model resources
         shell: pwsh
@@ -30,13 +37,13 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           $catalog = Get-Content src/language_lens/data/translation-providers.json -Raw | ConvertFrom-Json
-          $tag = $catalog.word_model_release.tag
+          $tag = if ('${{ inputs.group }}' -eq 'en-nl') { $catalog.en_nl_model_release.tag } else { $catalog.word_model_release.tag }
           gh release view $tag 2>$null
           if ($LASTEXITCODE -eq 0) { throw "Model release already exists; its pinned assets must not be replaced." }
           $assets = @(Get-ChildItem artifacts/translation-model-downloads -File | ForEach-Object FullName)
           gh release create $tag @assets --target $env:GITHUB_SHA --draft --prerelease --latest=false `
             --title "Translation model resources ($tag)" `
-            --notes "Pinned CTranslate2 int8 word models for Language Lens. The app downloads only the model required by the selected language pair. These are optional model resources, not an application release. MIT licenses, upstream revisions and checksums are recorded in the attached manifest and translation notices."
+            --notes "Pinned CTranslate2 int8 translation models for Language Lens. The app downloads only the model required by the selected language pair. These are optional model resources, not an application release. Licenses, upstream revisions and checksums are recorded in the attached manifest and translation notices."
           if ($LASTEXITCODE -ne 0) { throw "Could not publish the pinned model resources." }
           gh release edit $tag --draft=false --latest=false
           if ($LASTEXITCODE -ne 0) { throw "Could not make the complete model release available." }

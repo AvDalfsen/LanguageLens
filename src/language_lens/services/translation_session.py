@@ -66,6 +66,7 @@ class TranslationSession(QObject):
         self.jobs=[];self.process=None;self.pair=None;self.closed=False
         self.buffer=b'';self.ready=False;self.current=None;self.serial=0
         self.close_when_idle=False
+        self.restart_pending=False
         self.ownership=None
         self.timer=QTimer(self);self.timer.setSingleShot(True);self.timer.timeout.connect(self.timeout)
         self.pump_timer=QTimer(self);self.pump_timer.setSingleShot(True);self.pump_timer.timeout.connect(self._pump)
@@ -89,6 +90,8 @@ class TranslationSession(QObject):
 
     def _pump(self):
         if self.closed or self.current is not None:return
+        if self.restart_pending:
+            self._stop_process();self.restart_pending=False
         self.jobs=[job for job in self.jobs if job.active]
         while self.jobs:
             job=min(self.jobs,key=lambda j:j.priority())
@@ -144,6 +147,8 @@ class TranslationSession(QObject):
                     code=message.get('failure',{}).get('code','execution')
                     from language_lens.services.errors import MESSAGES
                     failure=failure_from_code(code if code in MESSAGES else 'execution','more' if command=='more' else 'translate').message
+                    if command in ('sentence','word'):
+                        job.event.emit({'translation_error':failure})
                     if command=='sentence':
                         job.event.emit({'progress':'Whole-selection translation unavailable. Word lookups are independent.'})
                         job.event.emit({'result':{'sentence':'','words':{}}})
@@ -204,6 +209,14 @@ def session_for(settings,owner):
 def close_capture(owner):
     session=getattr(owner,'_lens_translation_session',None)
     if session is not None:session.shutdown()
+
+
+def retry_capture(settings, owner):
+    """Restart this capture's worker after a technical error, clearing native state."""
+    session = session_for(settings, owner)
+    # Other captures can share a retained worker. Wait for its in-flight unit
+    # to finish, then restart before this retry, without cancelling their jobs.
+    session.restart_pending = True
 
 
 def configure(settings):

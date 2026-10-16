@@ -1,5 +1,5 @@
 {
-  "version": "2026-10-13-v1",
+  "version": "2026-10-16-v1",
   "default": "argos",
   "full_text": {
     "ar-en": {
@@ -97,6 +97,10 @@
     "tr-nl": {
       "model": "tr-en-tiny-3.0",
       "pivot": "nl"
+    },
+    "en-nl": {
+      "model": "t5-en-nl-24l",
+      "pivot": null
     }
   },
   "words": {
@@ -956,6 +960,82 @@
         }
       ],
       "publisher": "https://huggingface.co/alirezamsh/small100"
+    },
+    "t5-en-nl-24l": {
+      "kind": "t5",
+      "source": "en",
+      "target": "nl",
+      "prefix": "translate English to Dutch: ",
+      "repo": "yhavinga/t5-small-24L-ccmatrix-multi",
+      "revision": "54ba749ada76d8443c0d6e0a6039d9dadfdf04a3",
+      "license": "Apache-2.0",
+      "license_url": "https://www.apache.org/licenses/LICENSE-2.0",
+      "conversion": "CTranslate2 4.8.2 int8; Transformers 4.57.1; tokenizers 0.22.2",
+      "source_files": [
+        {
+          "name": "config.json",
+          "bytes": 1154,
+          "sha256": "8e17efbf25a335c434986b9ee309feba4bce1e92d0f22c936a7c7370573ac9c5"
+        },
+        {
+          "name": "pytorch_model.bin",
+          "bytes": 1000148261,
+          "sha256": "7fa179b29ac7ae828f5ba4c402f4f96c45dc0937ee5f0039e921a2bd2c471ea0"
+        },
+        {
+          "name": "tokenizer.json",
+          "bytes": 2075817,
+          "sha256": "19c3f031b4910d2c734dac089147d827ea61d7a1bc7ec3261306cd69efff75f1"
+        },
+        {
+          "name": "tokenizer_config.json",
+          "bytes": 1926,
+          "sha256": "edcf43876f73bd51aad99f11562f5879bcbb3ccb2d41aa0b4455888ea6563d3d"
+        },
+        {
+          "name": "special_tokens_map.json",
+          "bytes": 1786,
+          "sha256": "4720c0fddbe4c5991334f85ad7073d9bd0a294a8ba4641a2f8dab614ca825949"
+        }
+      ],
+      "files": [
+        {
+          "name": "config.json",
+          "bytes": 236,
+          "sha256": "f1859dad6c46f6b301b97634821e6f6f8928b6323293072e759ca68946dbf601",
+          "url": "https://github.com/AvDalfsen/LanguageLens/releases/download/translation-en-nl-2026-10-16-v1/t5-en-nl-24l-config.json.zst",
+          "compression": "zstd",
+          "compressed_bytes": 134,
+          "compressed_sha256": "d869de6fe36b1adefdf243d5732735a2cbeaa16bfac756f9cc19b93d5f48c549"
+        },
+        {
+          "name": "model.bin",
+          "bytes": 251920370,
+          "sha256": "71a6234badf31a53ffc8b973d11ff731d3ac4f421483765d019f942c748ce088",
+          "url": "https://github.com/AvDalfsen/LanguageLens/releases/download/translation-en-nl-2026-10-16-v1/t5-en-nl-24l-model.bin.zst",
+          "compression": "zstd",
+          "compressed_bytes": 230855568,
+          "compressed_sha256": "505fc34177b545310f6061bfacc862bc3392a9d92b837944ef71314312ca1990"
+        },
+        {
+          "name": "shared_vocabulary.json",
+          "bytes": 519012,
+          "sha256": "5b762afedeec9701d322ab601b19ca6de2c3080b287ec833ec0f4e557189c5a4",
+          "url": "https://github.com/AvDalfsen/LanguageLens/releases/download/translation-en-nl-2026-10-16-v1/t5-en-nl-24l-shared_vocabulary.json.zst",
+          "compression": "zstd",
+          "compressed_bytes": 138827,
+          "compressed_sha256": "b16978302a60f109ce3a2e23bdc61ceaabaeeb071e9dd9cc26c10115eb6a4b66"
+        },
+        {
+          "name": "tokenizer.json",
+          "bytes": 2075817,
+          "sha256": "19c3f031b4910d2c734dac089147d827ea61d7a1bc7ec3261306cd69efff75f1",
+          "url": "https://github.com/AvDalfsen/LanguageLens/releases/download/translation-en-nl-2026-10-16-v1/t5-en-nl-24l-tokenizer.json.zst",
+          "compression": "zstd",
+          "compressed_bytes": 433036,
+          "compressed_sha256": "75211a50b666fccddfe7bdd52215db9f2d08dc840650c1043d6168e0b4f09f5c"
+        }
+      ]
     }
   },
   "bergamot_runtime": {
@@ -1003,5 +1083,9 @@
   "word_model_release": {
     "repository": "AvDalfsen/LanguageLens",
     "tag": "translation-models-2026-10-13-v1"
+  },
+  "en_nl_model_release": {
+    "repository": "AvDalfsen/LanguageLens",
+    "tag": "translation-en-nl-2026-10-16-v1"
   }
 }

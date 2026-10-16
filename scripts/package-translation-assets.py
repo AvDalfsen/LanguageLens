@@ -1,4 +1,4 @@
-"""Package verified word weights as pinned downloads, outside the app bundle."""
+"""Package verified weights as pinned downloads, outside the app bundle."""
 import argparse
 import hashlib
 import json
@@ -20,10 +20,10 @@ def receipt(path):
     return {"bytes": path.stat().st_size, "sha256": digest.hexdigest()}
 
 
-def package_models(catalog, source, output, release, *, update=False):
+def package_models(catalog, source, output, release, *, update=False, models=('small','m2m')):
     output.mkdir(parents=True, exist_ok=True)
     base = f"https://github.com/{release['repository']}/releases/download/{release['tag']}"
-    for kind in ("small", "m2m"):
+    for kind in models:
         for item in catalog["models"][kind]["files"]:
             path = source / kind / item["name"]
             if receipt(path) != {key: item[key] for key in ("bytes", "sha256")}:
@@ -45,9 +45,8 @@ def package_models(catalog, source, output, release, *, update=False):
             finally:
                 temporary.unlink(missing_ok=True)
         print(f"{kind}: packaged verified downloads", flush=True)
-    catalog["word_model_release"] = release
     (output / "manifest.json").write_text(json.dumps({
-        "release": release, "models": {kind: catalog["models"][kind] for kind in ("small", "m2m")}
+        "release": release, "models": {kind: catalog["models"][kind] for kind in models}
     }, indent=2) + "\n", encoding="utf-8")
 
 
@@ -57,18 +56,22 @@ def main():
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--update-catalog", action="store_true", help="Deliberately pin a new model release.")
     parser.add_argument("--tag", help="New immutable model release tag; requires --update-catalog.")
+    parser.add_argument('--group',choices=['words','en-nl'],default='words')
     args = parser.parse_args()
     catalog = json.loads(CATALOG_PATH.read_text("utf-8"))
-    release = dict(catalog.get("word_model_release", {"repository": "AvDalfsen/LanguageLens"}))
+    key='word_model_release' if args.group=='words' else 'en_nl_model_release'
+    models=('small','m2m') if args.group=='words' else ('t5-en-nl-24l',)
+    release = dict(catalog.get(key, {"repository": "AvDalfsen/LanguageLens"}))
     if args.tag:
         if not args.update_catalog:
             parser.error("--tag requires --update-catalog")
         release["tag"] = args.tag
     if not release.get("tag"):
         parser.error("A model release must be pinned with --tag and --update-catalog")
-    package_models(catalog, args.source, args.output, release, update=args.update_catalog)
+    package_models(catalog, args.source, args.output, release, update=args.update_catalog,models=models)
     shutil.copy2(ROOT / "THIRD_PARTY_TRANSLATION.md", args.output / "THIRD_PARTY_TRANSLATION.md")
     if args.update_catalog:
+        catalog[key]=release
         CATALOG_PATH.write_text(json.dumps(catalog, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
 

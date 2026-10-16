@@ -54,6 +54,45 @@ class WordModel:
         return WordTranslation(tuple(values if expanded else values[:4]))
 
 
+class T5Model:
+    """The benchmarked bilingual checkpoint, with its native fast tokenizer."""
+    def __init__(self, model_id):
+        import ctranslate2
+        from tokenizers import Tokenizer
+        directory = assets.verified_model(model_id)
+        model = assets.catalog()['models'][model_id]
+        self.source = model['source']
+        self.prefix = model['prefix']
+        self.tokenizer = Tokenizer.from_file(str(directory / 'tokenizer.json'))
+        self.vocab = self.tokenizer.get_vocab()
+        self.backend = ctranslate2.Translator(str(directory), device='cpu', compute_type='int8_float32',
+                                             intra_threads=2, inter_threads=1)
+
+    def translate(self, text):
+        from language_lens.services.sentence_models import split
+        lines = []
+        for line in text.split('\n'):
+            pieces = []
+            for unit in split(line, self.source) if line.strip() else ():
+                # Tokenizer may return a literal unknown glyph rather than its
+                # vocabulary spelling. Match the publisher's ID-based tokenizer.
+                tokens = [t if t in self.vocab else '<unk>'
+                          for t in self.tokenizer.encode(self.prefix + unit).tokens]
+                if len(tokens) > 1024:
+                    raise TranslationUnavailable('Translation input limit reached.')
+                result = self.backend.translate_batch([tokens], beam_size=4, length_penalty=1,
+                    max_input_length=0, max_decoding_length=1024)[0].hypotheses[0]
+                if len(result) >= 1024:
+                    raise TranslationUnavailable('Translation output limit reached.')
+                pieces.extend(result)
+            lines.append(self.tokenizer.decode([self.vocab.get(t, self.vocab['<unk>']) for t in pieces],
+                                               skip_special_tokens=True))
+        return '\n'.join(lines)
+
+    def close(self):
+        self.backend.unload_model()
+
+
 class FirefoxModel:
     def __init__(self,model_id):
         directory=assets.verified_model(model_id);model=assets.catalog()['models'][model_id]
@@ -119,7 +158,10 @@ class RoutedTranslator:
 
     def route(self,source,target):return self.argos.route(source,target) if self.argos_required(source,target) else []
     def is_pair_installed(self,source,target):
-        return assets.ready(source,target) and (not self.argos_required(source,target) or self.argos.is_pair_installed(source,target))
+        # Inspect required Argos packages even when the full-text model is still
+        # missing, so damaged word packages keep their recovery action.
+        argos_ready = not self.argos_required(source,target) or self.argos.is_pair_installed(source,target)
+        return assets.ready(source,target) and argos_ready
 
     def install_pair(self,source,target,report=None,progress=None,*,staged=False,force=False):
         if self.argos_required(source,target):self.argos.install_pair(source,target,report,progress,staged=staged,force=force)
@@ -131,7 +173,9 @@ class RoutedTranslator:
         choice=assets.selection(source,target)['full']
         if choice is None:return self.argos.translate(text,source,target)
         model=self._full.get(choice['model'])
-        if model is None:model=self._full.setdefault(choice['model'],FirefoxModel(choice['model']))
+        if model is None:
+            factory = T5Model if assets.catalog()['models'][choice['model']]['kind'] == 't5' else FirefoxModel
+            model = self._full[choice['model']] = factory(choice['model'])
         result=model.translate(text)
         if choice.get('pivot'):result=self.argos.translate(result,'en',target)
         if not result.strip():raise TranslationUnavailable('No usable full translation.')
@@ -163,4 +207,6 @@ class RoutedTranslator:
         except ImportError:pass
         return {'pid':os.getpid(),'argos':[{'object_id':id(value),'loaded':value.model_is_loaded} for value in dict.fromkeys(values)],
             'words':{kind:{'object_id':id(model.backend),'loaded':model.backend.model_is_loaded} for kind,model in self._words.items()},
-            'firefox':{kind:model.call('inspect') for kind,model in self._full.items()}}
+            'firefox':{kind:model.call('inspect') for kind,model in self._full.items() if isinstance(model,FirefoxModel)},
+            't5':{kind:{'object_id':id(model.backend),'loaded':model.backend.model_is_loaded}
+                  for kind,model in self._full.items() if isinstance(model,T5Model)}}

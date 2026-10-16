@@ -44,6 +44,10 @@ def model_ids(source,target):
                               *( [choice['word']] if choice['word'] else [])]))
 
 
+def needs_firefox(source, target):
+    return any(catalog()['models'][model_id].get('kind') == 'firefox' for model_id in model_ids(source, target))
+
+
 def _owned_path(path,base):
     """Reject links/junctions and verify the absolute application-owned target."""
     if not path.resolve().is_relative_to(base.resolve()):raise KnownTaskError('integrity')
@@ -75,7 +79,7 @@ def required_files(source,target):
     result=[]
     for model_id in model_ids(source,target):
         result.extend((model_path(model_id)/item['name'],item) for item in catalog()['models'][model_id]['files'])
-    if selection(source,target)['full']:
+    if needs_firefox(source,target):
         for kind in ('bergamot_runtime','node_runtime'):
             result.extend((root()/kind/item['name'],item) for item in catalog()[kind]['files'])
     return result
@@ -143,7 +147,7 @@ def prepare(source,target,report,progress,*,force=False):
                     temporary.replace(path)
                 finally:
                     temporary.unlink(missing_ok=True);packed.unlink(missing_ok=True)
-        if selection(source,target)['full']:
+        if needs_firefox(source,target):
             for kind in ('bergamot_runtime','node_runtime'):
                 info=catalog()[kind];directory=_owned_path(root()/kind,settings_path().parent);directory.mkdir(exist_ok=True)
                 expected={item['name']:item for item in info['files']}

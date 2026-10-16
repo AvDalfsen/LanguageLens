@@ -22,14 +22,14 @@ development extra. Building needs an internet connection or populated pip cache.
 It records the Python patch version; this is a version-pinned build recipe, not a
 claim of byte-for-byte reproducibility across machines.
 
-App builds omit both CTranslate2 int8 word models and do not run conversion or
+App builds omit all CTranslate2 int8 model weights and do not run conversion or
 install translation conversion tools. **Download required files** downloads the
-selected pair's pinned word model, Firefox weights and local Bergamot/Node runtime.
+selected pair's pinned T5/word model, or Firefox weights and local Bergamot/Node runtime.
 PyTorch and Transformers are excluded from the bundle. Old source-build model
 resources are explicitly excluded even when a build environment is reused.
 See [translation notices](../THIRD_PARTY_TRANSLATION.md).
 
-### Separate word-model releases
+### Separate translation-model releases
 
 The catalog pins an immutable GitHub model-resource release, separate from app
 versions. Its assets are Zstandard-compressed files with both compressed and
@@ -44,6 +44,13 @@ checks the benchmark hashes, and packages the downloads with
 at level 6. Packaging must match the catalog's existing download hashes. The
 workflow refuses to replace an existing release and publishes model resources as
 a prerelease so they do not become the latest application release.
+
+Select the workflow's `en-nl` group to reproduce the bilingual T5 resources;
+`words` retains the existing SMaLL100/M2M100 release. Locally, use
+`prepare-translation-assets.py --models t5-en-nl-24l`, then
+`package-translation-assets.py --group en-nl --output <directory>`.
+The T5 group uses `en_nl_model_release` independently of `word_model_release`;
+publishing it must not replace or re-upload the existing word resources.
 
 When deliberately changing model resources, first prepare and verify the new
 converted files, then package them with `--output <directory> --update-catalog

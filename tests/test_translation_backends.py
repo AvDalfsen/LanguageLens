@@ -1,10 +1,13 @@
 from types import SimpleNamespace
+import pytest
 from language_lens.domain import WordTranslation
 from language_lens.services import translation_assets as assets, translation_backends as backends
 
 def test_only_benchmarked_pair_function_exceptions_are_routed():
-    assert len(assets.catalog()['full_text'])==24 and len(assets.catalog()['words'])==6
-    assert assets.selection('pt','en')==assets.selection('en','nl')=={'full':None,'word':None}
+    assert len(assets.catalog()['full_text'])==25 and len(assets.catalog()['words'])==6
+    assert assets.selection('pt','en')=={'full':None,'word':None}
+    assert assets.selection('en','nl')=={'full':{'model':'t5-en-nl-24l','pivot':None},'word':None}
+    assert assets.selection('nl','en')=={'full':None,'word':None}
     assert assets.selection('pb','en')=={'full':None,'word':None}
     assert assets.selection('ko','nl')['full'] is None
     assert assets.selection('ko','nl')['word']=='small'
@@ -49,3 +52,58 @@ def test_full_text_decodes_all_sentences_and_preserves_paragraphs(monkeypatch):
     model=backends.FirefoxModel.__new__(backends.FirefoxModel);model.source='hi'
     model.call=lambda command,**kw:kw['text'].upper()
     assert model.translate('first|second\n\nthird|last')=='FIRST SECOND\n\nTHIRD LAST'
+
+
+def test_dutch_full_text_uses_t5_but_word_lookup_and_reverse_keep_argos(monkeypatch):
+    constructed=[]
+    class T5:
+        def __init__(self,model):constructed.append(model)
+        def translate(self,text):return 'Dutch '+text
+        def close(self):constructed.append('closed')
+    monkeypatch.setattr(backends,'T5Model',T5)
+    translator=backends.RoutedTranslator()
+    translator.argos=SimpleNamespace(translate=lambda text,s,t:'Argos '+text,
+        word_candidates=lambda text,s,t,**kw:WordTranslation(('Argos word',)))
+    assert translator.translate('first','en','nl')=='Dutch first'
+    assert translator.translate('second','en','nl')=='Dutch second'
+    assert translator.word_candidates('Where','en','nl').candidates==('Argos word',)
+    assert translator.translate('reverse','nl','en')=='Argos reverse'
+    assert translator.argos_required('en','nl')  # Still needed for independent words.
+    assert constructed==['t5-en-nl-24l']
+    translator.close()
+    assert constructed[-1]=='closed'
+
+
+def test_t5_matches_benchmark_prefix_unknown_tokens_and_line_decoding(monkeypatch):
+    from language_lens.services import sentence_models
+    monkeypatch.setattr(sentence_models,'split',lambda text,language:text.split('|'))
+    seen=[];decoded=[]
+    class Tokenizer:
+        def encode(self,text):seen.append(text);return SimpleNamespace(tokens=['known','unmapped-glyph','</s>'])
+        def decode(self,ids,**kw):
+            decoded.append((ids,kw));return ' '.join(map(str,ids))
+    class Backend:
+        def translate_batch(self,batch,**kw):
+            assert batch==[['known','<unk>','</s>']]
+            assert kw==dict(beam_size=4,length_penalty=1,max_input_length=0,max_decoding_length=1024)
+            return [SimpleNamespace(hypotheses=[['known']])]
+    model=backends.T5Model.__new__(backends.T5Model)
+    model.source='en';model.prefix='translate English to Dutch: '
+    model.tokenizer=Tokenizer();model.vocab={'known':7,'<unk>':2,'</s>':1};model.backend=Backend()
+    assert model.translate('first|second\n\nthird')=='7 7\n\n7'
+    assert seen==[model.prefix+s for s in ('first','second','third')]
+    assert decoded==[([7,7],{'skip_special_tokens':True}),([],{'skip_special_tokens':True}),([7],{'skip_special_tokens':True})]
+
+
+@pytest.mark.parametrize('limit',['input','output'])
+def test_t5_rejects_bounded_output_instead_of_publishing_truncated_translation(monkeypatch,limit):
+    from language_lens.services import sentence_models
+    monkeypatch.setattr(sentence_models,'split',lambda text,language:[text])
+    model=backends.T5Model.__new__(backends.T5Model)
+    model.source='en';model.prefix='prefix ';model.vocab={'<unk>':2,'token':3}
+    model.tokenizer=SimpleNamespace(encode=lambda _:SimpleNamespace(tokens=['token']*(1025 if limit=='input' else 1)))
+    def infer(*args,**kwargs):
+        assert limit=='output', 'Oversized input must not reach inference.'
+        return [SimpleNamespace(hypotheses=[['token']*1024])]
+    model.backend=SimpleNamespace(translate_batch=infer)
+    with pytest.raises(backends.TranslationUnavailable):model.translate('long selection')

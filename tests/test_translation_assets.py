@@ -95,3 +95,22 @@ def test_existing_prepared_word_model_needs_no_network_after_update(downloads, m
     monkeypatch.setattr(assets, "urlopen", no_network)
     assert assets.ready("ko", "en")
     assets.prepare("ko", "en", lambda _: None, lambda _: None)
+
+
+def test_t5_preparation_needs_no_firefox_or_node_runtime(downloads,monkeypatch):
+    catalog, _, requests = downloads
+    catalog['models']['t5']={**catalog['models']['small'],'kind':'t5'}
+    catalog['full_text']['en-nl']={'model':'t5','pivot':None}
+    assert not assets.ready('en','nl')
+    paths=assets.prepare('en','nl',lambda _:None,lambda _:None)
+    assert len(paths)==4 and len(requests)==4 and assets.ready('en','nl')
+    assert not assets.needs_firefox('en','nl')
+    assert not (assets.root()/'node_runtime').exists()
+    from types import SimpleNamespace
+    from language_lens.config import Settings
+    from language_lens.services import local_files,offline,sentence_models
+    monkeypatch.setattr(offline,'ocr_models',lambda _:[])
+    monkeypatch.setattr(sentence_models,'model_root',lambda:assets.root()/'sentences')
+    summary=local_files.pair_file_summary(Settings(source_language='en',target_language='nl'),
+        SimpleNamespace(argos_required=lambda *_:False),[])
+    assert {row['name'] for row in summary['files']}=={'t5','en · MiniSBD'}

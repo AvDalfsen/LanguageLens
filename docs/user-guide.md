@@ -18,14 +18,14 @@ Use **Show other candidates** to reveal the initial alternatives. **Search for m
 | Copy source text | Copy the recognized selection |
 | Copy translation | Copy the translation without a heading |
 | Edit recognized text | Correct OCR text and translate/read the corrected passage |
-| Retry OCR | Scan the same selected region again; old text and audio are cleared |
+| Retry OCR | Appears with a recognition error; scan the same frozen region again |
 | Select another area | Choose another region in the same frozen screenshot |
-| Retry translation | Repeat translation without recapturing |
+| Retry translation | Appears with a translation error; restart translation using the recognized or edited text |
 | Hide translation / Show translation | Collapse or restore the sentence while keeping controls available |
 | Read selection | Speak the original selection when a voice is ready |
 | Close and return | Close the screenshot and return to the previous app |
 
-Use **More options** for retry, another-area selection, and hiding/restoring the translation. Recognized text, translations, and pronunciation notation support keyboard selection/copying; right-click for **Copy selection** or **Copy all**. Expanding **Recognized text** also exposes a keyboard-accessible list of words and **Edit recognized text**. Applying corrections clears the original word highlights because their positions no longer reliably match the edited text. **Retry OCR** restores recognized word positions from the screenshot. Long text and candidate lists scroll. Drag the review panel's background to reposition it; placement lasts for that screenshot.
+Use **More options** for another-area selection and hiding/restoring the translation. A technical recognition or translation failure shows an inline error with its own retry button and diagnostics access. Retry buttons are hidden during normal use. If recognition finds no text, select another area. Recognized text, translations, and pronunciation notation support keyboard selection/copying; right-click for **Copy selection** or **Copy all**. Expanding **Recognized text** also exposes a keyboard-accessible list of words and **Edit recognized text**. Applying corrections clears the original word highlights because their positions no longer reliably match the edited text. Long text and candidate lists scroll. Drag the review panel's background to reposition it; placement lasts for that screenshot.
 
 ## Keyboard reference
 
