@@ -67,30 +67,26 @@ first-time sentence downloads, readiness migration, real offline OCR/translation
 English/Japanese synthesis, startup and optional-pack removal. The full record
 and remaining platform-test limits are in [release building](release-building.md).
 
-## Repeat the comparison
+## Verify sentence handling
 
 With a development environment and existing Portuguese/English/Dutch packages:
 
 ```powershell
 .\.venv\Scripts\python.exe scripts/verify-sentences.py `
   --output artifacts/sentence-validation `
-  --fixtures artifacts/offline-validation --download
-.\.venv\Scripts\python.exe scripts/compare-sentence-baselines.py `
-  --output artifacts/sentence-validation --download
+  --fixtures artifacts/offline-validation
 ```
 
-The first command explicitly prepares all 24 small models, then compares
-boundaries and translation offline in isolated app storage. Omit `--download`
-to require existing fixtures. It writes `minisbd.json`, `legacy.json` and
-`comparison.json`. Unexpected boundary changes or different translations fail
-the check. The second command prepares the three default Stanza tokenizers and
-writes `stanza-comparison.json`. These larger legacy fixtures are development
-assets only. Neither command changes users' installed models.
+This compares boundaries and translation offline in isolated app storage. It
+requires existing fixtures; add `--download` explicitly to prepare the 24 small
+sentence models. It writes `minisbd.json`, `legacy.json` and `comparison.json`.
+Unexpected boundary changes or different translations fail the check. Users'
+installed models are unaffected.
 
-Legacy Stanza comparisons require PyTorch 2.6 or newer and force weights-only
-checkpoint loading before importing Stanza. Do not disable this guard to make a
-comparison pass. Argos 1.11.0 pins Stanza 1.10.1, so a direct Stanza upgrade would
-break its dependency contract. The portable runtime excludes both packages.
+The optional historical Stanza comparison script and its research reports are
+in the local ignored benchmark archive. Legacy Stanza comparisons require
+PyTorch 2.6 or newer and force weights-only checkpoint loading before importing
+Stanza. The portable runtime excludes both packages.
 
 Run `scripts/verify-release.py` with the sentence fixtures and case file to check
 the same inputs in the actual executable; see the release-building guide. The

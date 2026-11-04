@@ -22,6 +22,7 @@ class Failure:
 
 
 MESSAGES = {
+    "model_pack_required": "This translation model needs the supplied local model pack. Install the pack, then use 'Check required files' in Settings. Its download has not been published yet.",
     "sentence_language": "A translation route needs an unsupported sentence language. Choose another route or update Language Lens.",
     "sentence_split": "The sentence splitter could not preserve this selection. Try a shorter passage and check required files in Settings.",
     "missing_pack": "A language pack is missing or changed. Open Settings and download the required language pack under 'Manage local files'.",
@@ -46,6 +47,7 @@ STAGES = {"status": "Checking local files", "prepare": "Preparing local files",
 
 # UI wording is concise; diagnostics retain the detailed English message above.
 UI_MESSAGES = {
+    "model_pack_required": "Install the local translation model pack, then check required files in Settings.",
     "sentence_language": "This route needs an unsupported sentence language. Choose another language pair.",
     "sentence_split": "Sentence splitting failed. Select a shorter passage and check required files.",
     "missing_pack": "A language pack is missing or changed. Download it in Settings.",

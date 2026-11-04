@@ -4,7 +4,10 @@ from language_lens.domain import WordTranslation
 from language_lens.services import translation_assets as assets, translation_backends as backends
 
 def test_only_benchmarked_pair_function_exceptions_are_routed():
-    assert len(assets.catalog()['full_text'])==25 and len(assets.catalog()['words'])==6
+    selected={pair for pair,value in assets.catalog()['words'].items() if value=='full'}
+    assert len(selected)==36
+    assert {'cs-uk','da-nb','ru-uk','uk-ru','fr-ja','fr-zh','en-ja','zh-ja'}<=selected
+    assert not {'de-nl','cs-ru','en-fi','es-fr','ar-en','en-ko'} & selected
     assert assets.selection('pt','en')=={'full':None,'word':None}
     assert assets.selection('en','nl')=={'full':{'model':'t5-en-nl-24l','pivot':None},'word':None}
     assert assets.selection('nl','en')=={'full':None,'word':None}
@@ -15,6 +18,9 @@ def test_only_benchmarked_pair_function_exceptions_are_routed():
     assert assets.selection('en','en')=={'full':None,'word':None}
 
 def test_full_text_and_words_use_separate_providers_and_reuse_models(monkeypatch):
+    original=assets.catalog()
+    monkeypatch.setattr(assets,'catalog',lambda:{**original,'full_text':{k:v for k,v in original['full_text'].items() if k!='en-ja'},
+                                              'words':{**original['words'],'en-ja':'m2m'}})
     calls=[];constructed=[]
     class Firefox:
         def __init__(self,model):constructed.append(model)
@@ -24,6 +30,7 @@ def test_full_text_and_words_use_separate_providers_and_reuse_models(monkeypatch
         def __init__(self,kind):constructed.append(kind)
         def candidates(self,text,source,target,expanded):
             calls.append(('word',text,source,target,expanded));return WordTranslation(('meaning',))
+        def close(self):pass
     monkeypatch.setattr(backends,'FirefoxModel',Firefox);monkeypatch.setattr(backends,'WordModel',Word)
     translator=backends.RoutedTranslator()
     translator.argos=SimpleNamespace(translate=lambda text,s,t:calls.append(('argos',text,s,t)) or 'final',
@@ -42,8 +49,12 @@ def test_selected_models_have_complete_fixed_download_integrity_metadata():
         for file in model['files']:
             assert file['bytes']>0 and len(file['sha256'])==64
             assert not file.get('bundled')
-            assert file['url'].startswith('https://') and len(file['compressed_sha256'])==64
-            assert file['compressed_bytes']>0 and file['compression']=='zstd'
+            assert len(file['compressed_sha256'])==64
+            assert file['compressed_bytes']>0
+            if file.get('url'):assert file['url'].startswith('https://') and file['compression'] in ('zstd','none')
+            else:
+                assert model['kind'] in ('marian','m2m_full','hy')
+                assert file['compression']=='none' and file['compressed_sha256']==file['sha256']
     assert all(m['license']=='MPL-2.0' for m in assets.catalog()['models'].values() if m['kind']=='firefox')
 
 def test_full_text_decodes_all_sentences_and_preserves_paragraphs(monkeypatch):

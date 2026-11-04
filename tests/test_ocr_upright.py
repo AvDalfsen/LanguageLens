@@ -22,7 +22,7 @@ def test_every_language_uses_its_recorded_adoption_controls():
     from language_lens.services.ocr_profiles import profile_for
     from language_lens.services.ocr_settings import OcrSettings, settings_for
     evidence = json.loads((Path(__file__).resolve().parents[1] /
-                           "docs/ocr-upright-policy-evidence.json").read_text(encoding="utf-8"))
+                           "tests/data/ocr-adopted-profiles.json").read_text(encoding="utf-8"))
     assert {row["language"] for row in evidence["languages"]} == {code for name, code in LANGUAGES}
     for row in evidence["languages"]:
         language, recorded = row["language"], row["profile"]

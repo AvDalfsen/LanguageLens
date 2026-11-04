@@ -45,7 +45,8 @@ class OcrSettings:
 DEFAULT_SETTINGS = OcrSettings()
 
 # Upright screen benchmark adoption. Chinese, Dutch, German and Italian
-# retain the existing profiles after final regressions; see docs/ocr-upright-selection.md.
+# retain the existing profiles after final regressions; recorded controls are in
+# tests/data/ocr-adopted-profiles.json.
 SETTINGS_BY_LANGUAGE: dict[str, OcrSettings] = {
     "ar": OcrSettings(det_limit_side_len=256, unclip_ratio=1.8, vertical_padding=False,
         width_height_ratio=16, use_cls=False, rec_min_width=640, text_score=0.3,

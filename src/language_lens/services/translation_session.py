@@ -101,7 +101,12 @@ class TranslationSession(QObject):
             if unit is None:
                 job.complete();self.jobs.remove(job);continue
             self.serial+=1;self.current=(self.serial,job,*unit)
-            self.timer.start(60000 if not self.ready else 30000)
+            # Native GGUF activation and bounded long-text generation can exceed
+            # Firefox's old 30-second window. Keep a finite per-route timeout.
+            from language_lens.services.translation_assets import selection, catalog
+            choice=selection(*self.pair)['full']
+            native_hy=bool(choice and catalog()['models'][choice['model']]['kind']=='hy')
+            self.timer.start(300000 if native_hy else 60000 if not self.ready else 30000)
             if self.process is None:self._start()
             elif self.ready:self._send()
             return

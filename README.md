@@ -42,7 +42,7 @@ The app offers 25 text-language choices, including English, Dutch, French, Germa
 
 Translation models are directional. Some pairs use two local models through English; availability and quality vary by pair. Japanese/Chinese word dictionaries and Japanese pronunciation use additional packs. Settings checks what your chosen pair needs.
 
-Translation uses Argos by default, with benchmarked alternatives for selected directions and separate choices for whole text and word suggestions. English → Dutch whole text uses bilingual T5 24L; its word suggestions and European Portuguese → English use Argos. See the [model selection results](docs/translation-model-selection.md).
+Translation uses Argos for pairs without selected alternatives. The 36 newly adopted translation routes use the same model for whole text and isolated words. Their model files are supplied by a local model pack; public downloads for these additions have not been published yet. Some earlier routes retain separate word providers.
 
 By default, translation models are released when you close a capture's review. For faster repeated captures, enable **Keep translation models loaded between captures** under **Settings → Performance**. This retains model memory until you change languages, disable the setting, or quit; idle models do not continuously translate.
 

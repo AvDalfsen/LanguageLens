@@ -1,5 +1,5 @@
 {
-  "version": "2026-10-16-v1",
+  "version": "2026-11-04-native-v1",
   "default": "argos",
   "full_text": {
     "ar-en": {
@@ -59,16 +59,40 @@
       "pivot": null
     },
     "sv-en": {
-      "model": "sv-en-tiny-3.0",
-      "pivot": null
+      "model": "marian-wave-opus-gmq-en",
+      "pivot": null,
+      "options": {
+        "prefix": "",
+        "normalize": true,
+        "input_bound": 1024,
+        "output_bound": 1023,
+        "require_eos": false,
+        "repair_latin_boundaries": false
+      }
     },
     "tr-en": {
-      "model": "tr-en-tiny-3.0",
-      "pivot": null
+      "model": "marian-wave-opus-tr-en",
+      "pivot": null,
+      "options": {
+        "prefix": "",
+        "normalize": true,
+        "input_bound": 1024,
+        "output_bound": 1023,
+        "require_eos": false,
+        "repair_latin_boundaries": true
+      }
     },
     "uk-en": {
-      "model": "uk-en-tiny-3.0",
-      "pivot": null
+      "model": "marian-wave-opus-zle-en",
+      "pivot": null,
+      "options": {
+        "prefix": "",
+        "normalize": true,
+        "input_bound": 1024,
+        "output_bound": 1023,
+        "require_eos": false,
+        "repair_latin_boundaries": false
+      }
     },
     "tr-da": {
       "model": "tr-en-tiny-3.0",
@@ -101,15 +125,449 @@
     "en-nl": {
       "model": "t5-en-nl-24l",
       "pivot": null
+    },
+    "cs-uk": {
+      "model": "marian-direct-zlw-zle-v1",
+      "pivot": null,
+      "options": {
+        "prefix": ">>ukr<<",
+        "normalize": true,
+        "input_bound": 512,
+        "output_bound": 511,
+        "require_eos": true,
+        "repair_latin_boundaries": false
+      }
+    },
+    "da-en": {
+      "model": "marian-wave-opus-gmq-en",
+      "pivot": null,
+      "options": {
+        "prefix": "",
+        "normalize": false,
+        "input_bound": 1024,
+        "output_bound": 1023,
+        "require_eos": false,
+        "repair_latin_boundaries": false
+      }
+    },
+    "da-nb": {
+      "model": "marian-family-gmq",
+      "pivot": null,
+      "options": {
+        "prefix": ">>nob<<",
+        "normalize": true,
+        "input_bound": 1024,
+        "output_bound": 1023,
+        "require_eos": false,
+        "repair_latin_boundaries": false
+      }
+    },
+    "da-sv": {
+      "model": "marian-family-gmq",
+      "pivot": null,
+      "options": {
+        "prefix": ">>swe<<",
+        "normalize": true,
+        "input_bound": 1024,
+        "output_bound": 1023,
+        "require_eos": false,
+        "repair_latin_boundaries": false
+      }
+    },
+    "en-ja": {
+      "model": "hy-mt2-1.8b-q4",
+      "pivot": null,
+      "options": {
+        "target_name": "Japanese",
+        "decoding": {
+          "temperature": 0.7,
+          "top_p": 0.6,
+          "top_k": 20,
+          "repeat_penalty": 1.05
+        }
+      }
+    },
+    "fi-en": {
+      "model": "marian-gap-fi-en",
+      "pivot": null,
+      "options": {
+        "prefix": "",
+        "normalize": true,
+        "input_bound": 1024,
+        "output_bound": 1023,
+        "require_eos": false,
+        "repair_latin_boundaries": false
+      }
+    },
+    "fi-uk": {
+      "model": "marian-direct-fi-zle-v1",
+      "pivot": null,
+      "options": {
+        "prefix": ">>ukr<<",
+        "normalize": true,
+        "input_bound": 512,
+        "output_bound": 511,
+        "require_eos": true,
+        "repair_latin_boundaries": false
+      }
+    },
+    "fr-es": {
+      "model": "marian-family-itc",
+      "pivot": null,
+      "options": {
+        "prefix": ">>spa<<",
+        "normalize": true,
+        "input_bound": 1024,
+        "output_bound": 1023,
+        "require_eos": false,
+        "repair_latin_boundaries": false
+      }
+    },
+    "fr-it": {
+      "model": "marian-family-itc",
+      "pivot": null,
+      "options": {
+        "prefix": ">>ita<<",
+        "normalize": true,
+        "input_bound": 1024,
+        "output_bound": 1023,
+        "require_eos": false,
+        "repair_latin_boundaries": false
+      }
+    },
+    "fr-ja": {
+      "model": "hy-mt2-1.8b-q4",
+      "pivot": null,
+      "options": {
+        "target_name": "Japanese",
+        "decoding": {
+          "temperature": 0.7,
+          "top_p": 0.6,
+          "top_k": 20,
+          "repeat_penalty": 1.05
+        }
+      }
+    },
+    "fr-tr": {
+      "model": "marian-direct-itc-tr-shortlist-v1",
+      "pivot": null,
+      "options": {
+        "prefix": "",
+        "normalize": true,
+        "input_bound": 1024,
+        "output_bound": 1023,
+        "require_eos": false,
+        "repair_latin_boundaries": false
+      }
+    },
+    "fr-zh": {
+      "model": "hy-mt2-1.8b-q4",
+      "pivot": null,
+      "options": {
+        "target_name": "Chinese",
+        "decoding": {
+          "temperature": 0.7,
+          "top_p": 0.6,
+          "top_k": 20,
+          "repeat_penalty": 1.05
+        }
+      }
+    },
+    "it-en": {
+      "model": "marian-wave-opus-it-en",
+      "pivot": null,
+      "options": {
+        "prefix": "",
+        "normalize": true,
+        "input_bound": 1024,
+        "output_bound": 1023,
+        "require_eos": false,
+        "repair_latin_boundaries": false
+      }
+    },
+    "it-es": {
+      "model": "marian-family-itc",
+      "pivot": null,
+      "options": {
+        "prefix": ">>spa<<",
+        "normalize": true,
+        "input_bound": 1024,
+        "output_bound": 1023,
+        "require_eos": false,
+        "repair_latin_boundaries": false
+      }
+    },
+    "nb-da": {
+      "model": "marian-family-gmq",
+      "pivot": null,
+      "options": {
+        "prefix": ">>dan<<",
+        "normalize": true,
+        "input_bound": 1024,
+        "output_bound": 1023,
+        "require_eos": false,
+        "repair_latin_boundaries": false
+      }
+    },
+    "nb-en": {
+      "model": "marian-wave-opus-gmq-en",
+      "pivot": null,
+      "options": {
+        "prefix": "",
+        "normalize": true,
+        "input_bound": 1024,
+        "output_bound": 1023,
+        "require_eos": false,
+        "repair_latin_boundaries": false
+      }
+    },
+    "nb-sv": {
+      "model": "marian-family-gmq",
+      "pivot": null,
+      "options": {
+        "prefix": ">>swe<<",
+        "normalize": true,
+        "input_bound": 1024,
+        "output_bound": 1023,
+        "require_eos": false,
+        "repair_latin_boundaries": false
+      }
+    },
+    "nb-uk": {
+      "model": "marian-direct-gmq-zle-v1",
+      "pivot": null,
+      "options": {
+        "prefix": ">>ukr<<",
+        "normalize": true,
+        "input_bound": 512,
+        "output_bound": 511,
+        "require_eos": true,
+        "repair_latin_boundaries": false
+      }
+    },
+    "nl-de": {
+      "model": "marian-modern-gmw-five",
+      "pivot": null,
+      "options": {
+        "prefix": ">>deu<<",
+        "normalize": true,
+        "input_bound": 1024,
+        "output_bound": 1023,
+        "require_eos": false,
+        "repair_latin_boundaries": false
+      }
+    },
+    "nl-es": {
+      "model": "marian-modern-gmw-five",
+      "pivot": null,
+      "options": {
+        "prefix": ">>spa<<",
+        "normalize": true,
+        "input_bound": 1024,
+        "output_bound": 1023,
+        "require_eos": false,
+        "repair_latin_boundaries": false
+      }
+    },
+    "nl-pb": {
+      "model": "marian-modern-gmw-five",
+      "pivot": null,
+      "options": {
+        "prefix": ">>por<<",
+        "normalize": true,
+        "input_bound": 1024,
+        "output_bound": 1023,
+        "require_eos": false,
+        "repair_latin_boundaries": false
+      }
+    },
+    "nl-pt": {
+      "model": "marian-modern-gmw-five",
+      "pivot": null,
+      "options": {
+        "prefix": ">>por<<",
+        "normalize": true,
+        "input_bound": 1024,
+        "output_bound": 1023,
+        "require_eos": false,
+        "repair_latin_boundaries": false
+      }
+    },
+    "pb-es": {
+      "model": "marian-family-itc",
+      "pivot": null,
+      "options": {
+        "prefix": ">>spa<<",
+        "normalize": true,
+        "input_bound": 1024,
+        "output_bound": 1023,
+        "require_eos": false,
+        "repair_latin_boundaries": false
+      }
+    },
+    "pl-uk": {
+      "model": "marian-direct-zlw-zle-v1",
+      "pivot": null,
+      "options": {
+        "prefix": ">>ukr<<",
+        "normalize": true,
+        "input_bound": 512,
+        "output_bound": 511,
+        "require_eos": true,
+        "repair_latin_boundaries": false
+      }
+    },
+    "ro-es": {
+      "model": "marian-family-itc",
+      "pivot": null,
+      "options": {
+        "prefix": ">>spa<<",
+        "normalize": true,
+        "input_bound": 1024,
+        "output_bound": 1023,
+        "require_eos": false,
+        "repair_latin_boundaries": false
+      }
+    },
+    "ru-uk": {
+      "model": "marian-family-zle",
+      "pivot": null,
+      "options": {
+        "prefix": ">>ukr<<",
+        "normalize": true,
+        "input_bound": 1024,
+        "output_bound": 1023,
+        "require_eos": false,
+        "repair_latin_boundaries": false
+      }
+    },
+    "sv-da": {
+      "model": "marian-family-gmq",
+      "pivot": null,
+      "options": {
+        "prefix": ">>dan<<",
+        "normalize": true,
+        "input_bound": 1024,
+        "output_bound": 1023,
+        "require_eos": false,
+        "repair_latin_boundaries": false
+      }
+    },
+    "sv-fi": {
+      "model": "marian-direct-sv-fi-b2-v1",
+      "pivot": null,
+      "options": {
+        "prefix": "",
+        "normalize": true,
+        "input_bound": 512,
+        "output_bound": 511,
+        "require_eos": true,
+        "repair_latin_boundaries": false
+      }
+    },
+    "sv-nb": {
+      "model": "marian-family-gmq",
+      "pivot": null,
+      "options": {
+        "prefix": ">>nob<<",
+        "normalize": true,
+        "input_bound": 1024,
+        "output_bound": 1023,
+        "require_eos": false,
+        "repair_latin_boundaries": false
+      }
+    },
+    "sv-nl": {
+      "model": "marian-direct-sv-nl-b2-v1",
+      "pivot": null,
+      "options": {
+        "prefix": "",
+        "normalize": true,
+        "input_bound": 512,
+        "output_bound": 511,
+        "require_eos": true,
+        "repair_latin_boundaries": false
+      }
+    },
+    "sv-uk": {
+      "model": "marian-direct-gmq-zle-v1",
+      "pivot": null,
+      "options": {
+        "prefix": ">>ukr<<",
+        "normalize": true,
+        "input_bound": 512,
+        "output_bound": 511,
+        "require_eos": true,
+        "repair_latin_boundaries": false
+      }
+    },
+    "uk-ru": {
+      "model": "marian-family-zle",
+      "pivot": null,
+      "options": {
+        "prefix": ">>rus<<",
+        "normalize": true,
+        "input_bound": 1024,
+        "output_bound": 1023,
+        "require_eos": false,
+        "repair_latin_boundaries": false
+      }
+    },
+    "zh-ja": {
+      "model": "m2m-full-m2m12b-native-int8-v1",
+      "pivot": null,
+      "options": {
+        "prefix": "",
+        "normalize": false,
+        "input_bound": 1024,
+        "output_bound": 1023,
+        "require_eos": true,
+        "repair_latin_boundaries": false
+      }
     }
   },
   "words": {
-    "en-ja": "m2m",
+    "en-ja": "full",
     "en-ko": "small",
     "ko-en": "small",
     "ko-nl": "small",
     "ja-ko": "m2m",
-    "es-en": "m2m"
+    "es-en": "m2m",
+    "cs-uk": "full",
+    "da-en": "full",
+    "da-nb": "full",
+    "da-sv": "full",
+    "fi-en": "full",
+    "fi-uk": "full",
+    "fr-es": "full",
+    "fr-it": "full",
+    "fr-ja": "full",
+    "fr-tr": "full",
+    "fr-zh": "full",
+    "it-en": "full",
+    "it-es": "full",
+    "nb-da": "full",
+    "nb-en": "full",
+    "nb-sv": "full",
+    "nb-uk": "full",
+    "nl-de": "full",
+    "nl-es": "full",
+    "nl-pb": "full",
+    "nl-pt": "full",
+    "pb-es": "full",
+    "pl-uk": "full",
+    "ro-es": "full",
+    "ru-uk": "full",
+    "sv-da": "full",
+    "sv-en": "full",
+    "sv-fi": "full",
+    "sv-nb": "full",
+    "sv-nl": "full",
+    "sv-uk": "full",
+    "tr-en": "full",
+    "uk-en": "full",
+    "uk-ru": "full",
+    "zh-ja": "full"
   },
   "models": {
     "ar-en-base-memory-3.0": {
@@ -1036,6 +1494,1398 @@
           "compressed_sha256": "75211a50b666fccddfe7bdd52215db9f2d08dc840650c1043d6168e0b4f09f5c"
         }
       ]
+    },
+    "marian-direct-zlw-zle-v1": {
+      "kind": "marian",
+      "repo": "Helsinki-NLP/opus-mt-tc-big-zlw-zle",
+      "revision": "a20a48b6825edab37f3dd1e02562c4f0c7d7f5ee",
+      "license": "cc-by-4.0",
+      "vocabulary": "shared_vocabulary.json",
+      "source_tokenizer": "source.spm",
+      "target_tokenizer": "target.spm",
+      "normalizer_language": "zlw",
+      "files": [
+        {
+          "name": "model.bin",
+          "bytes": 242645853,
+          "sha256": "5ec791b80fc0b0813e071513b6a0df34fd7f8db820a6d3ae4b19110d8218b97c",
+          "url": null,
+          "compressed_bytes": 242645853,
+          "compressed_sha256": "5ec791b80fc0b0813e071513b6a0df34fd7f8db820a6d3ae4b19110d8218b97c",
+          "compression": "none"
+        },
+        {
+          "name": "config.json",
+          "bytes": 233,
+          "sha256": "72901fbd8abd89fb5cf4a388f26fc681f5c4c58a1e1a88b30b879f107270e7ee",
+          "url": null,
+          "compressed_bytes": 233,
+          "compressed_sha256": "72901fbd8abd89fb5cf4a388f26fc681f5c4c58a1e1a88b30b879f107270e7ee",
+          "compression": "none"
+        },
+        {
+          "name": "shared_vocabulary.json",
+          "bytes": 2196589,
+          "sha256": "7f768163eb22de22587e00f5c6b14c1ad40c83d02e566b015821dc653b57b26e",
+          "url": null,
+          "compressed_bytes": 2196589,
+          "compressed_sha256": "7f768163eb22de22587e00f5c6b14c1ad40c83d02e566b015821dc653b57b26e",
+          "compression": "none"
+        },
+        {
+          "name": "source.spm",
+          "bytes": 823630,
+          "sha256": "355a0b36cf3875b624259bb8bb4de72ec71f7476ec2b822a1c4ca1d25db96438",
+          "url": null,
+          "compressed_bytes": 823630,
+          "compressed_sha256": "355a0b36cf3875b624259bb8bb4de72ec71f7476ec2b822a1c4ca1d25db96438",
+          "compression": "none"
+        },
+        {
+          "name": "target.spm",
+          "bytes": 1000034,
+          "sha256": "553cd1bd0e78c767ead25854e48c4cd1a10b244c70a7cbdce5ccac9c9f945e81",
+          "url": null,
+          "compressed_bytes": 1000034,
+          "compressed_sha256": "553cd1bd0e78c767ead25854e48c4cd1a10b244c70a7cbdce5ccac9c9f945e81",
+          "compression": "none"
+        }
+      ]
+    },
+    "marian-wave-opus-gmq-en": {
+      "kind": "marian",
+      "repo": "Helsinki-NLP/opus-mt-tc-big-gmq-en",
+      "revision": "b243b46fc9e1eaf068ae0d8ae896ac1acd7d2380",
+      "license": "cc-by-4.0",
+      "vocabulary": "shared_vocabulary.json",
+      "source_tokenizer": "source.spm",
+      "target_tokenizer": "target.spm",
+      "normalizer_language": "gmq",
+      "files": [
+        {
+          "name": "model.bin",
+          "bytes": 235614043,
+          "sha256": "6001f13823a18d4bddee8ca834559c73062bcee7398deaa75c472f5fff22b612",
+          "url": null,
+          "compressed_bytes": 235614043,
+          "compressed_sha256": "6001f13823a18d4bddee8ca834559c73062bcee7398deaa75c472f5fff22b612",
+          "compression": "none"
+        },
+        {
+          "name": "config.json",
+          "bytes": 233,
+          "sha256": "72901fbd8abd89fb5cf4a388f26fc681f5c4c58a1e1a88b30b879f107270e7ee",
+          "url": null,
+          "compressed_bytes": 233,
+          "compressed_sha256": "72901fbd8abd89fb5cf4a388f26fc681f5c4c58a1e1a88b30b879f107270e7ee",
+          "compression": "none"
+        },
+        {
+          "name": "shared_vocabulary.json",
+          "bytes": 1023120,
+          "sha256": "316b8321b43728bacd55bec718953c61508bb9759f4503f36a07f8e97fb51685",
+          "url": null,
+          "compressed_bytes": 1023120,
+          "compressed_sha256": "316b8321b43728bacd55bec718953c61508bb9759f4503f36a07f8e97fb51685",
+          "compression": "none"
+        },
+        {
+          "name": "source.spm",
+          "bytes": 799747,
+          "sha256": "20dd2029ff0a4b6dd7b89442035d57fb03e9a9efbbd36543d5aae5e2aa866bad",
+          "url": null,
+          "compressed_bytes": 799747,
+          "compressed_sha256": "20dd2029ff0a4b6dd7b89442035d57fb03e9a9efbbd36543d5aae5e2aa866bad",
+          "compression": "none"
+        },
+        {
+          "name": "target.spm",
+          "bytes": 795929,
+          "sha256": "c51247265dd2c7773c3be3669b63c5152ce145baeb54a17975145309eb422cf2",
+          "url": null,
+          "compressed_bytes": 795929,
+          "compressed_sha256": "c51247265dd2c7773c3be3669b63c5152ce145baeb54a17975145309eb422cf2",
+          "compression": "none"
+        }
+      ]
+    },
+    "marian-family-gmq": {
+      "kind": "marian",
+      "repo": "Helsinki-NLP/opus-mt-tc-big-gmq-gmq",
+      "revision": "671e49898a66accc15ed371283de52b3514b589d",
+      "license": "cc-by-4.0",
+      "vocabulary": "shared_vocabulary.json",
+      "source_tokenizer": "source.spm",
+      "target_tokenizer": "target.spm",
+      "normalizer_language": "gmq",
+      "files": [
+        {
+          "name": "model.bin",
+          "bytes": 215143823,
+          "sha256": "6f26091d53079f55326d9e36435c0ac4c1a2b65296b74e514e9b8090b96626ab",
+          "url": null,
+          "compressed_bytes": 215143823,
+          "compressed_sha256": "6f26091d53079f55326d9e36435c0ac4c1a2b65296b74e514e9b8090b96626ab",
+          "compression": "none"
+        },
+        {
+          "name": "config.json",
+          "bytes": 233,
+          "sha256": "72901fbd8abd89fb5cf4a388f26fc681f5c4c58a1e1a88b30b879f107270e7ee",
+          "url": null,
+          "compressed_bytes": 233,
+          "compressed_sha256": "72901fbd8abd89fb5cf4a388f26fc681f5c4c58a1e1a88b30b879f107270e7ee",
+          "compression": "none"
+        },
+        {
+          "name": "shared_vocabulary.json",
+          "bytes": 659642,
+          "sha256": "686d1e1101a1bc1b5ab9a14158bae453551123a7dcad4de1a4ccfbd8a750e6eb",
+          "url": null,
+          "compressed_bytes": 659642,
+          "compressed_sha256": "686d1e1101a1bc1b5ab9a14158bae453551123a7dcad4de1a4ccfbd8a750e6eb",
+          "compression": "none"
+        },
+        {
+          "name": "source.spm",
+          "bytes": 802542,
+          "sha256": "0c9800926dcbcc092f5d297ca2b8c3af64afc58877287cce0dd7beb94ad2feb9",
+          "url": null,
+          "compressed_bytes": 802542,
+          "compressed_sha256": "0c9800926dcbcc092f5d297ca2b8c3af64afc58877287cce0dd7beb94ad2feb9",
+          "compression": "none"
+        },
+        {
+          "name": "target.spm",
+          "bytes": 802737,
+          "sha256": "3f06e9450b1536ecf625fb6e8daa1f7ce9bde964240138b1a5d6df233c9ab3fe",
+          "url": null,
+          "compressed_bytes": 802737,
+          "compressed_sha256": "3f06e9450b1536ecf625fb6e8daa1f7ce9bde964240138b1a5d6df233c9ab3fe",
+          "compression": "none"
+        }
+      ]
+    },
+    "hy-mt2-1.8b-q4": {
+      "kind": "hy",
+      "repo": "tencent/Hy-MT2-1.8B-GGUF",
+      "revision": "a0c709d9fac510f2c807aa3af52872340dc37a4a",
+      "license": "Apache-2.0",
+      "runtime_release": "b11617",
+      "weights": "Hy-MT2-1.8B-Q4_K_M.gguf",
+      "runtime_executable": "runtime/llama-server.exe",
+      "files": [
+        {
+          "name": "Hy-MT2-1.8B-Q4_K_M.gguf",
+          "bytes": 1133080448,
+          "sha256": "dc5f44fcf1fa496ee7ad725982c0c8c553a4de00259b53af84c4b89fb0c06699",
+          "url": null,
+          "compressed_bytes": 1133080448,
+          "compressed_sha256": "dc5f44fcf1fa496ee7ad725982c0c8c553a4de00259b53af84c4b89fb0c06699",
+          "compression": "none"
+        },
+        {
+          "name": "runtime/ggml-base.dll",
+          "bytes": 803840,
+          "sha256": "6d72ae0f1ab521bb646313fa316e90096407af9fcd5def4f1eb2731b6a35baf4",
+          "url": null,
+          "compressed_bytes": 803840,
+          "compressed_sha256": "6d72ae0f1ab521bb646313fa316e90096407af9fcd5def4f1eb2731b6a35baf4",
+          "compression": "none"
+        },
+        {
+          "name": "runtime/ggml-cpu-alderlake.dll",
+          "bytes": 1430016,
+          "sha256": "1974b8c6bfd28c36d110bfd671e5a67fe7240583d32708a5b5d35bf891b7222a",
+          "url": null,
+          "compressed_bytes": 1430016,
+          "compressed_sha256": "1974b8c6bfd28c36d110bfd671e5a67fe7240583d32708a5b5d35bf891b7222a",
+          "compression": "none"
+        },
+        {
+          "name": "runtime/ggml-cpu-cannonlake.dll",
+          "bytes": 1614848,
+          "sha256": "5bac1cb675304fc8390d072350c1c1262475c0f7946d7993ed5a24f793a2ee7b",
+          "url": null,
+          "compressed_bytes": 1614848,
+          "compressed_sha256": "5bac1cb675304fc8390d072350c1c1262475c0f7946d7993ed5a24f793a2ee7b",
+          "compression": "none"
+        },
+        {
+          "name": "runtime/ggml-cpu-cascadelake.dll",
+          "bytes": 1598464,
+          "sha256": "ff15dc9fbd315a7269eb8a9fb1849fbcdf03f9f69d1b34a36871cc90c085d7dd",
+          "url": null,
+          "compressed_bytes": 1598464,
+          "compressed_sha256": "ff15dc9fbd315a7269eb8a9fb1849fbcdf03f9f69d1b34a36871cc90c085d7dd",
+          "compression": "none"
+        },
+        {
+          "name": "runtime/ggml-cpu-cooperlake.dll",
+          "bytes": 1608192,
+          "sha256": "43ac7f529ae8a9af803c58a5e7ccd4c23fa64e0a791a4a8b2beb65cdbcaf6f52",
+          "url": null,
+          "compressed_bytes": 1608192,
+          "compressed_sha256": "43ac7f529ae8a9af803c58a5e7ccd4c23fa64e0a791a4a8b2beb65cdbcaf6f52",
+          "compression": "none"
+        },
+        {
+          "name": "runtime/ggml-cpu-haswell.dll",
+          "bytes": 1434624,
+          "sha256": "13a1e2cd00cd81eb911388cebf34c6fc395c0b540b7b55ccc7f3bc81c65bf934",
+          "url": null,
+          "compressed_bytes": 1434624,
+          "compressed_sha256": "13a1e2cd00cd81eb911388cebf34c6fc395c0b540b7b55ccc7f3bc81c65bf934",
+          "compression": "none"
+        },
+        {
+          "name": "runtime/ggml-cpu-icelake.dll",
+          "bytes": 1605120,
+          "sha256": "8730111a5a970b871e0a82a5e854d7a44d832e065ce5f997e8924ee9572e5abf",
+          "url": null,
+          "compressed_bytes": 1605120,
+          "compressed_sha256": "8730111a5a970b871e0a82a5e854d7a44d832e065ce5f997e8924ee9572e5abf",
+          "compression": "none"
+        },
+        {
+          "name": "runtime/ggml-cpu-ivybridge.dll",
+          "bytes": 1310208,
+          "sha256": "c07dac1c7f0d04b54b321a41b5a7fe82191557eca7b208d3082ab967293e02ad",
+          "url": null,
+          "compressed_bytes": 1310208,
+          "compressed_sha256": "c07dac1c7f0d04b54b321a41b5a7fe82191557eca7b208d3082ab967293e02ad",
+          "compression": "none"
+        },
+        {
+          "name": "runtime/ggml-cpu-piledriver.dll",
+          "bytes": 1304576,
+          "sha256": "00aa6d21f1105dfcb46f86e9756ccae22a3d7777050107b89e2da92b3c18a981",
+          "url": null,
+          "compressed_bytes": 1304576,
+          "compressed_sha256": "00aa6d21f1105dfcb46f86e9756ccae22a3d7777050107b89e2da92b3c18a981",
+          "compression": "none"
+        },
+        {
+          "name": "runtime/ggml-cpu-sandybridge.dll",
+          "bytes": 1290240,
+          "sha256": "6df5214466c2e448aef6bac3604d01daf2c2fd3de7ab8b089241128d09a030db",
+          "url": null,
+          "compressed_bytes": 1290240,
+          "compressed_sha256": "6df5214466c2e448aef6bac3604d01daf2c2fd3de7ab8b089241128d09a030db",
+          "compression": "none"
+        },
+        {
+          "name": "runtime/ggml-cpu-sapphirerapids.dll",
+          "bytes": 1893888,
+          "sha256": "d9d1634fed58556649ac965cdf2424feac5e1c8b757d91a0088ceb71b2603908",
+          "url": null,
+          "compressed_bytes": 1893888,
+          "compressed_sha256": "d9d1634fed58556649ac965cdf2424feac5e1c8b757d91a0088ceb71b2603908",
+          "compression": "none"
+        },
+        {
+          "name": "runtime/ggml-cpu-skylakex.dll",
+          "bytes": 1607680,
+          "sha256": "4a22fd246d5f919eda421029b4271b4f955843424d96f0c88aaf84bed2415c0f",
+          "url": null,
+          "compressed_bytes": 1607680,
+          "compressed_sha256": "4a22fd246d5f919eda421029b4271b4f955843424d96f0c88aaf84bed2415c0f",
+          "compression": "none"
+        },
+        {
+          "name": "runtime/ggml-cpu-sse42.dll",
+          "bytes": 915968,
+          "sha256": "91d9c8e6c45d7c6270799bdd12bf465b1b5a3b84ecab0d63c724b3dae21c529e",
+          "url": null,
+          "compressed_bytes": 915968,
+          "compressed_sha256": "91d9c8e6c45d7c6270799bdd12bf465b1b5a3b84ecab0d63c724b3dae21c529e",
+          "compression": "none"
+        },
+        {
+          "name": "runtime/ggml-cpu-x64.dll",
+          "bytes": 908800,
+          "sha256": "6192adc362a6288b0c02124229e81af91d46d0ce567b209fc3699dd66efc7c29",
+          "url": null,
+          "compressed_bytes": 908800,
+          "compressed_sha256": "6192adc362a6288b0c02124229e81af91d46d0ce567b209fc3699dd66efc7c29",
+          "compression": "none"
+        },
+        {
+          "name": "runtime/ggml-cpu-zen4.dll",
+          "bytes": 1614848,
+          "sha256": "6ed56177b335c3cdeef1c57d236f47465b53e3bf79e5d450713eaaacc97ba015",
+          "url": null,
+          "compressed_bytes": 1614848,
+          "compressed_sha256": "6ed56177b335c3cdeef1c57d236f47465b53e3bf79e5d450713eaaacc97ba015",
+          "compression": "none"
+        },
+        {
+          "name": "runtime/ggml-rpc-server.exe",
+          "bytes": 117248,
+          "sha256": "40a27b91ab8ea869de3fd1e61d05d678bb3e01b1ac6983d5adf0f293fc3e1b4c",
+          "url": null,
+          "compressed_bytes": 117248,
+          "compressed_sha256": "40a27b91ab8ea869de3fd1e61d05d678bb3e01b1ac6983d5adf0f293fc3e1b4c",
+          "compression": "none"
+        },
+        {
+          "name": "runtime/ggml-rpc.dll",
+          "bytes": 215040,
+          "sha256": "12db49438ffa63498e98e74d4559abf5a3f6bfd6b0e9d004c2c66f2f5c0c0997",
+          "url": null,
+          "compressed_bytes": 215040,
+          "compressed_sha256": "12db49438ffa63498e98e74d4559abf5a3f6bfd6b0e9d004c2c66f2f5c0c0997",
+          "compression": "none"
+        },
+        {
+          "name": "runtime/ggml.dll",
+          "bytes": 78848,
+          "sha256": "2a727ca8547d0aa8400472350ea8457f5b85f1376fa10f53d1144f345e9f7fe0",
+          "url": null,
+          "compressed_bytes": 78848,
+          "compressed_sha256": "2a727ca8547d0aa8400472350ea8457f5b85f1376fa10f53d1144f345e9f7fe0",
+          "compression": "none"
+        },
+        {
+          "name": "runtime/libomp.dll",
+          "bytes": 768000,
+          "sha256": "a12116ba72d1d6820407cf30be23da04ce79d6bb8a71a5ee71759c5a1faa6f1c",
+          "url": null,
+          "compressed_bytes": 768000,
+          "compressed_sha256": "a12116ba72d1d6820407cf30be23da04ce79d6bb8a71a5ee71759c5a1faa6f1c",
+          "compression": "none"
+        },
+        {
+          "name": "runtime/LICENSE-LLVM-OpenMP",
+          "bytes": 19741,
+          "sha256": "fdad1758a9e1f9d5a81e18879b3406772115edc92c24bfa36b70c654f325e8e4",
+          "url": null,
+          "compressed_bytes": 19741,
+          "compressed_sha256": "fdad1758a9e1f9d5a81e18879b3406772115edc92c24bfa36b70c654f325e8e4",
+          "compression": "none"
+        },
+        {
+          "name": "runtime/llama-batched-bench-impl.dll",
+          "bytes": 61952,
+          "sha256": "5e6613459ea75a6a7571f11d5ef6f46471d962c66e2ef94372975b79bd48111e",
+          "url": null,
+          "compressed_bytes": 61952,
+          "compressed_sha256": "5e6613459ea75a6a7571f11d5ef6f46471d962c66e2ef94372975b79bd48111e",
+          "compression": "none"
+        },
+        {
+          "name": "runtime/llama-batched-bench.exe",
+          "bytes": 9216,
+          "sha256": "7296ce63db618f559107bf7160adcbc5731634099c8262c1d3e8dbafd98a8ee4",
+          "url": null,
+          "compressed_bytes": 9216,
+          "compressed_sha256": "7296ce63db618f559107bf7160adcbc5731634099c8262c1d3e8dbafd98a8ee4",
+          "compression": "none"
+        },
+        {
+          "name": "runtime/llama-bench-impl.dll",
+          "bytes": 404480,
+          "sha256": "4ed256f0df5bb31cba1693af97d8d27e96514a2ccd494f43f23c2f47fea16702",
+          "url": null,
+          "compressed_bytes": 404480,
+          "compressed_sha256": "4ed256f0df5bb31cba1693af97d8d27e96514a2ccd494f43f23c2f47fea16702",
+          "compression": "none"
+        },
+        {
+          "name": "runtime/llama-bench.exe",
+          "bytes": 9216,
+          "sha256": "6e2f915d5bf85914db071b053e745e66f58b2b936b312e00c184434467249a01",
+          "url": null,
+          "compressed_bytes": 9216,
+          "compressed_sha256": "6e2f915d5bf85914db071b053e745e66f58b2b936b312e00c184434467249a01",
+          "compression": "none"
+        },
+        {
+          "name": "runtime/llama-cli-impl.dll",
+          "bytes": 3317248,
+          "sha256": "69377473b2f2b8e80e49fd2fc4d455d45c4a0bbac0c39a439380042762e7a080",
+          "url": null,
+          "compressed_bytes": 3317248,
+          "compressed_sha256": "69377473b2f2b8e80e49fd2fc4d455d45c4a0bbac0c39a439380042762e7a080",
+          "compression": "none"
+        },
+        {
+          "name": "runtime/llama-cli.exe",
+          "bytes": 9216,
+          "sha256": "d4e43f9d6fae8f86e37930acd798d96dd2c7e486e42a7f577213810e4e548874",
+          "url": null,
+          "compressed_bytes": 9216,
+          "compressed_sha256": "d4e43f9d6fae8f86e37930acd798d96dd2c7e486e42a7f577213810e4e548874",
+          "compression": "none"
+        },
+        {
+          "name": "runtime/llama-common.dll",
+          "bytes": 8015872,
+          "sha256": "0ff19fa1ef19a5ad7719e3784a4e3ccce704a0b160f4c010be5b91830dd21e06",
+          "url": null,
+          "compressed_bytes": 8015872,
+          "compressed_sha256": "0ff19fa1ef19a5ad7719e3784a4e3ccce704a0b160f4c010be5b91830dd21e06",
+          "compression": "none"
+        },
+        {
+          "name": "runtime/llama-completion-impl.dll",
+          "bytes": 140800,
+          "sha256": "731be789c756bf2d0c5cc43ff193c0adba427a4b90584d8667d403355bf2274e",
+          "url": null,
+          "compressed_bytes": 140800,
+          "compressed_sha256": "731be789c756bf2d0c5cc43ff193c0adba427a4b90584d8667d403355bf2274e",
+          "compression": "none"
+        },
+        {
+          "name": "runtime/llama-completion.exe",
+          "bytes": 9216,
+          "sha256": "ea2ea6772b6f060b6bb6350ef02b967258ed25003d44af98977cc4951f94a965",
+          "url": null,
+          "compressed_bytes": 9216,
+          "compressed_sha256": "ea2ea6772b6f060b6bb6350ef02b967258ed25003d44af98977cc4951f94a965",
+          "compression": "none"
+        },
+        {
+          "name": "runtime/llama-fit-params-impl.dll",
+          "bytes": 43008,
+          "sha256": "97328c267b30ffcf894539a13965c2820376f26f2c6604df8e364d24b814388c",
+          "url": null,
+          "compressed_bytes": 43008,
+          "compressed_sha256": "97328c267b30ffcf894539a13965c2820376f26f2c6604df8e364d24b814388c",
+          "compression": "none"
+        },
+        {
+          "name": "runtime/llama-fit-params.exe",
+          "bytes": 9216,
+          "sha256": "30e353223b9245e77d14fc184a1cced331db572a0948cc1e94427a64a9f274c4",
+          "url": null,
+          "compressed_bytes": 9216,
+          "compressed_sha256": "30e353223b9245e77d14fc184a1cced331db572a0948cc1e94427a64a9f274c4",
+          "compression": "none"
+        },
+        {
+          "name": "runtime/llama-gemma3-cli.exe",
+          "bytes": 27136,
+          "sha256": "b2a7690bc6c3e523d04485a668f36fd17b05be96473d6d3a93024bdcfdedd91e",
+          "url": null,
+          "compressed_bytes": 27136,
+          "compressed_sha256": "b2a7690bc6c3e523d04485a668f36fd17b05be96473d6d3a93024bdcfdedd91e",
+          "compression": "none"
+        },
+        {
+          "name": "runtime/llama-gguf-split.exe",
+          "bytes": 60416,
+          "sha256": "3a3ff7b4e40379228c014770014243706f9486f40f8b8d882a6dd93ceeaa7494",
+          "url": null,
+          "compressed_bytes": 60416,
+          "compressed_sha256": "3a3ff7b4e40379228c014770014243706f9486f40f8b8d882a6dd93ceeaa7494",
+          "compression": "none"
+        },
+        {
+          "name": "runtime/llama-imatrix.exe",
+          "bytes": 252416,
+          "sha256": "6c48981d754103a29783ce98af62fb1a8d8dc89ba8b2adde6b86afafb980a401",
+          "url": null,
+          "compressed_bytes": 252416,
+          "compressed_sha256": "6c48981d754103a29783ce98af62fb1a8d8dc89ba8b2adde6b86afafb980a401",
+          "compression": "none"
+        },
+        {
+          "name": "runtime/llama-llava-cli.exe",
+          "bytes": 27136,
+          "sha256": "b2a7690bc6c3e523d04485a668f36fd17b05be96473d6d3a93024bdcfdedd91e",
+          "url": null,
+          "compressed_bytes": 27136,
+          "compressed_sha256": "b2a7690bc6c3e523d04485a668f36fd17b05be96473d6d3a93024bdcfdedd91e",
+          "compression": "none"
+        },
+        {
+          "name": "runtime/llama-minicpmv-cli.exe",
+          "bytes": 27136,
+          "sha256": "b2a7690bc6c3e523d04485a668f36fd17b05be96473d6d3a93024bdcfdedd91e",
+          "url": null,
+          "compressed_bytes": 27136,
+          "compressed_sha256": "b2a7690bc6c3e523d04485a668f36fd17b05be96473d6d3a93024bdcfdedd91e",
+          "compression": "none"
+        },
+        {
+          "name": "runtime/llama-mtmd-cli.exe",
+          "bytes": 92672,
+          "sha256": "d4984648cd6e1fcbf9d3ed661d2ca7509914ca64165488cbafb78862c2c999a8",
+          "url": null,
+          "compressed_bytes": 92672,
+          "compressed_sha256": "d4984648cd6e1fcbf9d3ed661d2ca7509914ca64165488cbafb78862c2c999a8",
+          "compression": "none"
+        },
+        {
+          "name": "runtime/llama-mtmd-debug.exe",
+          "bytes": 55808,
+          "sha256": "edf62a885f5d94ea95e84eeef52c58bde53c6d09663063db1d40b2315b586552",
+          "url": null,
+          "compressed_bytes": 55808,
+          "compressed_sha256": "edf62a885f5d94ea95e84eeef52c58bde53c6d09663063db1d40b2315b586552",
+          "compression": "none"
+        },
+        {
+          "name": "runtime/llama-perplexity-impl.dll",
+          "bytes": 197632,
+          "sha256": "425516b8dd4dae76f8244183649f050ecfee5e55e390ba513d15baa4752ebaa2",
+          "url": null,
+          "compressed_bytes": 197632,
+          "compressed_sha256": "425516b8dd4dae76f8244183649f050ecfee5e55e390ba513d15baa4752ebaa2",
+          "compression": "none"
+        },
+        {
+          "name": "runtime/llama-perplexity.exe",
+          "bytes": 9216,
+          "sha256": "95b1a3c6b18d3bb7834f4db633e24ccc7b43ef89aadec1d9b33b6a7a8b6c96f4",
+          "url": null,
+          "compressed_bytes": 9216,
+          "compressed_sha256": "95b1a3c6b18d3bb7834f4db633e24ccc7b43ef89aadec1d9b33b6a7a8b6c96f4",
+          "compression": "none"
+        },
+        {
+          "name": "runtime/llama-quantize-impl.dll",
+          "bytes": 137216,
+          "sha256": "446c3c645c8440af59e8b75cab418845c1fcffefdb2a6eb602e6eeef69256d30",
+          "url": null,
+          "compressed_bytes": 137216,
+          "compressed_sha256": "446c3c645c8440af59e8b75cab418845c1fcffefdb2a6eb602e6eeef69256d30",
+          "compression": "none"
+        },
+        {
+          "name": "runtime/llama-quantize.exe",
+          "bytes": 9216,
+          "sha256": "ad4bef5afb82be1201759fd742c3978084055970cba6784b880a7cb641381a18",
+          "url": null,
+          "compressed_bytes": 9216,
+          "compressed_sha256": "ad4bef5afb82be1201759fd742c3978084055970cba6784b880a7cb641381a18",
+          "compression": "none"
+        },
+        {
+          "name": "runtime/llama-qwen2vl-cli.exe",
+          "bytes": 27136,
+          "sha256": "b2a7690bc6c3e523d04485a668f36fd17b05be96473d6d3a93024bdcfdedd91e",
+          "url": null,
+          "compressed_bytes": 27136,
+          "compressed_sha256": "b2a7690bc6c3e523d04485a668f36fd17b05be96473d6d3a93024bdcfdedd91e",
+          "compression": "none"
+        },
+        {
+          "name": "runtime/llama-results.exe",
+          "bytes": 46592,
+          "sha256": "fb395d4688023ae89e861193fb619dc01563855edaa405beba2ce8f74ace490a",
+          "url": null,
+          "compressed_bytes": 46592,
+          "compressed_sha256": "fb395d4688023ae89e861193fb619dc01563855edaa405beba2ce8f74ace490a",
+          "compression": "none"
+        },
+        {
+          "name": "runtime/llama-server-impl.dll",
+          "bytes": 9244672,
+          "sha256": "6611debb6ec8dcbea16377420854288b6646dad3d132ac704c6396a688384d91",
+          "url": null,
+          "compressed_bytes": 9244672,
+          "compressed_sha256": "6611debb6ec8dcbea16377420854288b6646dad3d132ac704c6396a688384d91",
+          "compression": "none"
+        },
+        {
+          "name": "runtime/llama-server.exe",
+          "bytes": 9216,
+          "sha256": "715f0ea98819f03fc596e9d352e989fc0ae093056282e0d73b2d657e7afa7d02",
+          "url": null,
+          "compressed_bytes": 9216,
+          "compressed_sha256": "715f0ea98819f03fc596e9d352e989fc0ae093056282e0d73b2d657e7afa7d02",
+          "compression": "none"
+        },
+        {
+          "name": "runtime/llama-tokenize.exe",
+          "bytes": 58880,
+          "sha256": "593520201e660619a8bca41524c77bdebfb758b8faec85a9d0eca49013fd3a56",
+          "url": null,
+          "compressed_bytes": 58880,
+          "compressed_sha256": "593520201e660619a8bca41524c77bdebfb758b8faec85a9d0eca49013fd3a56",
+          "compression": "none"
+        },
+        {
+          "name": "runtime/llama-tts.exe",
+          "bytes": 41984,
+          "sha256": "f5ce4d1de5e6b05423cb91b3df18a56be719693fc897e6abbdb7496c1dd4fce7",
+          "url": null,
+          "compressed_bytes": 41984,
+          "compressed_sha256": "f5ce4d1de5e6b05423cb91b3df18a56be719693fc897e6abbdb7496c1dd4fce7",
+          "compression": "none"
+        },
+        {
+          "name": "runtime/llama.dll",
+          "bytes": 3521536,
+          "sha256": "7fc91a82b5805eee92841ad102bc5a8768223be02cc94af753689a6a3e0795ef",
+          "url": null,
+          "compressed_bytes": 3521536,
+          "compressed_sha256": "7fc91a82b5805eee92841ad102bc5a8768223be02cc94af753689a6a3e0795ef",
+          "compression": "none"
+        },
+        {
+          "name": "runtime/llama.exe",
+          "bytes": 104448,
+          "sha256": "49ceb9db2aea13b0f24ca29ff3be434c333c9f8a682b9113b6a9f7a30eb754bf",
+          "url": null,
+          "compressed_bytes": 104448,
+          "compressed_sha256": "49ceb9db2aea13b0f24ca29ff3be434c333c9f8a682b9113b6a9f7a30eb754bf",
+          "compression": "none"
+        },
+        {
+          "name": "runtime/mtmd.dll",
+          "bytes": 1835008,
+          "sha256": "1e091027ca6141a979c325aebfd62548275066ff59b65563eae80a8a8d6be470",
+          "url": null,
+          "compressed_bytes": 1835008,
+          "compressed_sha256": "1e091027ca6141a979c325aebfd62548275066ff59b65563eae80a8a8d6be470",
+          "compression": "none"
+        }
+      ]
+    },
+    "marian-gap-fi-en": {
+      "kind": "marian",
+      "repo": "Helsinki-NLP/opus-mt-tc-big-fi-en",
+      "revision": "956e13710061738d21f677e4ed16a56546511c0f",
+      "license": "cc-by-4.0",
+      "vocabulary": "shared_vocabulary.json",
+      "source_tokenizer": "source.spm",
+      "target_tokenizer": "target.spm",
+      "normalizer_language": "fi",
+      "files": [
+        {
+          "name": "model.bin",
+          "bytes": 238770993,
+          "sha256": "827710c49c03060568dd46d7638a6b1375f01cd25fbee13b75b7894b08263a35",
+          "url": null,
+          "compressed_bytes": 238770993,
+          "compressed_sha256": "827710c49c03060568dd46d7638a6b1375f01cd25fbee13b75b7894b08263a35",
+          "compression": "none"
+        },
+        {
+          "name": "config.json",
+          "bytes": 233,
+          "sha256": "72901fbd8abd89fb5cf4a388f26fc681f5c4c58a1e1a88b30b879f107270e7ee",
+          "url": null,
+          "compressed_bytes": 233,
+          "compressed_sha256": "72901fbd8abd89fb5cf4a388f26fc681f5c4c58a1e1a88b30b879f107270e7ee",
+          "compression": "none"
+        },
+        {
+          "name": "shared_vocabulary.json",
+          "bytes": 1122254,
+          "sha256": "94c1b4d62f0d178144cdd6daaa372f33bf4cc861afe90e7b22291c71f9b71458",
+          "url": null,
+          "compressed_bytes": 1122254,
+          "compressed_sha256": "94c1b4d62f0d178144cdd6daaa372f33bf4cc861afe90e7b22291c71f9b71458",
+          "compression": "none"
+        },
+        {
+          "name": "source.spm",
+          "bytes": 831865,
+          "sha256": "82fcb74f79c5f5b5bf0fe73f7dfb6a646efa50ffb4b2a0cd564a1193c78a032e",
+          "url": null,
+          "compressed_bytes": 831865,
+          "compressed_sha256": "82fcb74f79c5f5b5bf0fe73f7dfb6a646efa50ffb4b2a0cd564a1193c78a032e",
+          "compression": "none"
+        },
+        {
+          "name": "target.spm",
+          "bytes": 789795,
+          "sha256": "ec7b44af3bba8e0439b9cf203adf29e37921ae6711491d138e219b9f1b69d84c",
+          "url": null,
+          "compressed_bytes": 789795,
+          "compressed_sha256": "ec7b44af3bba8e0439b9cf203adf29e37921ae6711491d138e219b9f1b69d84c",
+          "compression": "none"
+        }
+      ]
+    },
+    "marian-direct-fi-zle-v1": {
+      "kind": "marian",
+      "repo": "Helsinki-NLP/opus-mt-tc-big-fi-zle",
+      "revision": "c391c323183ffce10affddda62215708e776488d",
+      "license": "cc-by-4.0",
+      "vocabulary": "shared_vocabulary.json",
+      "source_tokenizer": "source.spm",
+      "target_tokenizer": "target.spm",
+      "normalizer_language": "fi",
+      "files": [
+        {
+          "name": "model.bin",
+          "bytes": 241968113,
+          "sha256": "0080655c58459110355652e838e4fe695f293a40b13bfb68aa5ce57785ac43bc",
+          "url": null,
+          "compressed_bytes": 241968113,
+          "compressed_sha256": "0080655c58459110355652e838e4fe695f293a40b13bfb68aa5ce57785ac43bc",
+          "compression": "none"
+        },
+        {
+          "name": "config.json",
+          "bytes": 233,
+          "sha256": "72901fbd8abd89fb5cf4a388f26fc681f5c4c58a1e1a88b30b879f107270e7ee",
+          "url": null,
+          "compressed_bytes": 233,
+          "compressed_sha256": "72901fbd8abd89fb5cf4a388f26fc681f5c4c58a1e1a88b30b879f107270e7ee",
+          "compression": "none"
+        },
+        {
+          "name": "shared_vocabulary.json",
+          "bytes": 2103935,
+          "sha256": "d2381a7aea8da8e83861e55d0980b8654bcb5bd0870323b28190d364a2df854f",
+          "url": null,
+          "compressed_bytes": 2103935,
+          "compressed_sha256": "d2381a7aea8da8e83861e55d0980b8654bcb5bd0870323b28190d364a2df854f",
+          "compression": "none"
+        },
+        {
+          "name": "source.spm",
+          "bytes": 825192,
+          "sha256": "cc4435dbfab49e483192b62a87ff6854ab849847d6fb358326c96229b0033979",
+          "url": null,
+          "compressed_bytes": 825192,
+          "compressed_sha256": "cc4435dbfab49e483192b62a87ff6854ab849847d6fb358326c96229b0033979",
+          "compression": "none"
+        },
+        {
+          "name": "target.spm",
+          "bytes": 985365,
+          "sha256": "05f2d644a6e13847b98b46c53bb3488b3edf887a08d694379e1bb54338c78a37",
+          "url": null,
+          "compressed_bytes": 985365,
+          "compressed_sha256": "05f2d644a6e13847b98b46c53bb3488b3edf887a08d694379e1bb54338c78a37",
+          "compression": "none"
+        }
+      ]
+    },
+    "marian-family-itc": {
+      "kind": "marian",
+      "repo": "Helsinki-NLP/opus-mt-tc-big-itc-itc",
+      "revision": "a185ba7b3cac07bbd692dd517577b8c2dc7abb2c",
+      "license": "cc-by-4.0",
+      "vocabulary": "shared_vocabulary.json",
+      "source_tokenizer": "source.spm",
+      "target_tokenizer": "target.spm",
+      "normalizer_language": "itc",
+      "files": [
+        {
+          "name": "model.bin",
+          "bytes": 215547583,
+          "sha256": "ed839ab23ae9ec323f66e09a8fa22932a4122e35fcea200f9acdee9fc93eb012",
+          "url": null,
+          "compressed_bytes": 215547583,
+          "compressed_sha256": "ed839ab23ae9ec323f66e09a8fa22932a4122e35fcea200f9acdee9fc93eb012",
+          "compression": "none"
+        },
+        {
+          "name": "config.json",
+          "bytes": 233,
+          "sha256": "72901fbd8abd89fb5cf4a388f26fc681f5c4c58a1e1a88b30b879f107270e7ee",
+          "url": null,
+          "compressed_bytes": 233,
+          "compressed_sha256": "72901fbd8abd89fb5cf4a388f26fc681f5c4c58a1e1a88b30b879f107270e7ee",
+          "compression": "none"
+        },
+        {
+          "name": "shared_vocabulary.json",
+          "bytes": 671548,
+          "sha256": "6a7a78ee06a8b2dc938c438548860bd51bd84dcf1e48d12e7d979375d8f30034",
+          "url": null,
+          "compressed_bytes": 671548,
+          "compressed_sha256": "6a7a78ee06a8b2dc938c438548860bd51bd84dcf1e48d12e7d979375d8f30034",
+          "compression": "none"
+        },
+        {
+          "name": "source.spm",
+          "bytes": 810819,
+          "sha256": "afade4a78a9e1c0853e1614f9f2f607d522fdceda4eceb510883b7954a287220",
+          "url": null,
+          "compressed_bytes": 810819,
+          "compressed_sha256": "afade4a78a9e1c0853e1614f9f2f607d522fdceda4eceb510883b7954a287220",
+          "compression": "none"
+        },
+        {
+          "name": "target.spm",
+          "bytes": 811011,
+          "sha256": "8452e3069d0e13d220a2cf2da7cf1bd9cda32a653721a3cab29ed3b8d7d5ed64",
+          "url": null,
+          "compressed_bytes": 811011,
+          "compressed_sha256": "8452e3069d0e13d220a2cf2da7cf1bd9cda32a653721a3cab29ed3b8d7d5ed64",
+          "compression": "none"
+        }
+      ]
+    },
+    "marian-direct-itc-tr-shortlist-v1": {
+      "kind": "marian",
+      "repo": "Helsinki-NLP/opus-mt-tc-big-itc-tr",
+      "revision": "2e1fff8a0bdb9431e995125928fdd394ca16b012",
+      "license": "cc-by-4.0",
+      "vocabulary": "shared_vocabulary.json",
+      "source_tokenizer": "source.spm",
+      "target_tokenizer": "target.spm",
+      "normalizer_language": "itc",
+      "files": [
+        {
+          "name": "model.bin",
+          "bytes": 239507443,
+          "sha256": "559c575a7b638fb296f20482f094d8612e4809f036a62629de46c74eebc4919b",
+          "url": null,
+          "compressed_bytes": 239507443,
+          "compressed_sha256": "559c575a7b638fb296f20482f094d8612e4809f036a62629de46c74eebc4919b",
+          "compression": "none"
+        },
+        {
+          "name": "config.json",
+          "bytes": 233,
+          "sha256": "72901fbd8abd89fb5cf4a388f26fc681f5c4c58a1e1a88b30b879f107270e7ee",
+          "url": null,
+          "compressed_bytes": 233,
+          "compressed_sha256": "72901fbd8abd89fb5cf4a388f26fc681f5c4c58a1e1a88b30b879f107270e7ee",
+          "compression": "none"
+        },
+        {
+          "name": "shared_vocabulary.json",
+          "bytes": 1224957,
+          "sha256": "8b787400026f30b5ab94ebb5646ca0272811ea5317d6bc85cde2d39ffa4b27f3",
+          "url": null,
+          "compressed_bytes": 1224957,
+          "compressed_sha256": "8b787400026f30b5ab94ebb5646ca0272811ea5317d6bc85cde2d39ffa4b27f3",
+          "compression": "none"
+        },
+        {
+          "name": "source.spm",
+          "bytes": 802843,
+          "sha256": "ace12b20f025a06c3ef27ee566f2e4f56b900cb4b40bd766a6094dc055933765",
+          "url": null,
+          "compressed_bytes": 802843,
+          "compressed_sha256": "ace12b20f025a06c3ef27ee566f2e4f56b900cb4b40bd766a6094dc055933765",
+          "compression": "none"
+        },
+        {
+          "name": "target.spm",
+          "bytes": 832675,
+          "sha256": "6eb3375c132c34b473d930533cff67d4f39cdf52405830418956639fbf97fa0e",
+          "url": null,
+          "compressed_bytes": 832675,
+          "compressed_sha256": "6eb3375c132c34b473d930533cff67d4f39cdf52405830418956639fbf97fa0e",
+          "compression": "none"
+        }
+      ]
+    },
+    "marian-wave-opus-it-en": {
+      "kind": "marian",
+      "repo": "Helsinki-NLP/opus-mt-tc-big-it-en",
+      "revision": "5009c4525f89c23e195873e918ba6827777d1a27",
+      "license": "cc-by-4.0",
+      "vocabulary": "shared_vocabulary.json",
+      "source_tokenizer": "source.spm",
+      "target_tokenizer": "target.spm",
+      "normalizer_language": "it",
+      "files": [
+        {
+          "name": "model.bin",
+          "bytes": 235260753,
+          "sha256": "5595dc853728446cabec34bc47b1634fb388cc0396004080f766b70a374067d6",
+          "url": null,
+          "compressed_bytes": 235260753,
+          "compressed_sha256": "5595dc853728446cabec34bc47b1634fb388cc0396004080f766b70a374067d6",
+          "compression": "none"
+        },
+        {
+          "name": "config.json",
+          "bytes": 233,
+          "sha256": "72901fbd8abd89fb5cf4a388f26fc681f5c4c58a1e1a88b30b879f107270e7ee",
+          "url": null,
+          "compressed_bytes": 233,
+          "compressed_sha256": "72901fbd8abd89fb5cf4a388f26fc681f5c4c58a1e1a88b30b879f107270e7ee",
+          "compression": "none"
+        },
+        {
+          "name": "shared_vocabulary.json",
+          "bytes": 1024215,
+          "sha256": "51008eafa076154c3a96b439b956b3ae3942510f3108067026dced8219289f8a",
+          "url": null,
+          "compressed_bytes": 1024215,
+          "compressed_sha256": "51008eafa076154c3a96b439b956b3ae3942510f3108067026dced8219289f8a",
+          "compression": "none"
+        },
+        {
+          "name": "source.spm",
+          "bytes": 820134,
+          "sha256": "4e900c0f10324efc6ac67a5246cec9b0faf693ea1ea9fa1786a9f3755a59a73a",
+          "url": null,
+          "compressed_bytes": 820134,
+          "compressed_sha256": "4e900c0f10324efc6ac67a5246cec9b0faf693ea1ea9fa1786a9f3755a59a73a",
+          "compression": "none"
+        },
+        {
+          "name": "target.spm",
+          "bytes": 802852,
+          "sha256": "8e6799550a391c7a30ae95869c4692a00352e05fdf1ffcf9b50d96f08b0327bf",
+          "url": null,
+          "compressed_bytes": 802852,
+          "compressed_sha256": "8e6799550a391c7a30ae95869c4692a00352e05fdf1ffcf9b50d96f08b0327bf",
+          "compression": "none"
+        }
+      ]
+    },
+    "marian-direct-gmq-zle-v1": {
+      "kind": "marian",
+      "repo": "Helsinki-NLP/opus-mt-tc-big-gmq-zle",
+      "revision": "4761fa709606465f803ffdca08f75ea8b401d4bb",
+      "license": "cc-by-4.0",
+      "vocabulary": "shared_vocabulary.json",
+      "source_tokenizer": "source.spm",
+      "target_tokenizer": "target.spm",
+      "normalizer_language": "gmq",
+      "files": [
+        {
+          "name": "model.bin",
+          "bytes": 242420283,
+          "sha256": "b16ca1296e314701d19027e6b8436aa4346c8d98d13846be5d9da39e1cddf1af",
+          "url": null,
+          "compressed_bytes": 242420283,
+          "compressed_sha256": "b16ca1296e314701d19027e6b8436aa4346c8d98d13846be5d9da39e1cddf1af",
+          "compression": "none"
+        },
+        {
+          "name": "config.json",
+          "bytes": 233,
+          "sha256": "72901fbd8abd89fb5cf4a388f26fc681f5c4c58a1e1a88b30b879f107270e7ee",
+          "url": null,
+          "compressed_bytes": 233,
+          "compressed_sha256": "72901fbd8abd89fb5cf4a388f26fc681f5c4c58a1e1a88b30b879f107270e7ee",
+          "compression": "none"
+        },
+        {
+          "name": "shared_vocabulary.json",
+          "bytes": 2101274,
+          "sha256": "fec9e24f74082a76f5327b7ad7543b4d8684d263ed26075bb897761386d0bf69",
+          "url": null,
+          "compressed_bytes": 2101274,
+          "compressed_sha256": "fec9e24f74082a76f5327b7ad7543b4d8684d263ed26075bb897761386d0bf69",
+          "compression": "none"
+        },
+        {
+          "name": "source.spm",
+          "bytes": 807151,
+          "sha256": "9cd1d66c501e588e5deb2a9dfda8cf5370c870a5755087b676e04b5336ff1bb0",
+          "url": null,
+          "compressed_bytes": 807151,
+          "compressed_sha256": "9cd1d66c501e588e5deb2a9dfda8cf5370c870a5755087b676e04b5336ff1bb0",
+          "compression": "none"
+        },
+        {
+          "name": "target.spm",
+          "bytes": 994651,
+          "sha256": "a62fbc31052711d155dc46c2ce9a27f6987d4c3bdefdb721f9d70bcdf2cc54ce",
+          "url": null,
+          "compressed_bytes": 994651,
+          "compressed_sha256": "a62fbc31052711d155dc46c2ce9a27f6987d4c3bdefdb721f9d70bcdf2cc54ce",
+          "compression": "none"
+        }
+      ]
+    },
+    "marian-modern-gmw-five": {
+      "kind": "marian",
+      "repo": "Helsinki-NLP/opus-mt-tc-bible-big-gmw-deu_eng_fra_por_spa",
+      "revision": "a6933ed14d06d91d797809258bdb2d52f5487a36",
+      "license": "apache-2.0",
+      "vocabulary": "shared_vocabulary.json",
+      "source_tokenizer": "source.spm",
+      "target_tokenizer": "target.spm",
+      "normalizer_language": "gmw",
+      "files": [
+        {
+          "name": "model.bin",
+          "bytes": 231194275,
+          "sha256": "53c03b9270efcdfc942bb80fb3c90100e76edae8f05465afd44fb7d313b1eb20",
+          "url": null,
+          "compressed_bytes": 231194275,
+          "compressed_sha256": "53c03b9270efcdfc942bb80fb3c90100e76edae8f05465afd44fb7d313b1eb20",
+          "compression": "none"
+        },
+        {
+          "name": "config.json",
+          "bytes": 233,
+          "sha256": "72901fbd8abd89fb5cf4a388f26fc681f5c4c58a1e1a88b30b879f107270e7ee",
+          "url": null,
+          "compressed_bytes": 233,
+          "compressed_sha256": "72901fbd8abd89fb5cf4a388f26fc681f5c4c58a1e1a88b30b879f107270e7ee",
+          "compression": "none"
+        },
+        {
+          "name": "shared_vocabulary.json",
+          "bytes": 901514,
+          "sha256": "d9a04e7a2cf3edc91d14f4d0c87a728f56080b2c83e8005bb2b5649726562e62",
+          "url": null,
+          "compressed_bytes": 901514,
+          "compressed_sha256": "d9a04e7a2cf3edc91d14f4d0c87a728f56080b2c83e8005bb2b5649726562e62",
+          "compression": "none"
+        },
+        {
+          "name": "source.spm",
+          "bytes": 794713,
+          "sha256": "eec711a7a9398a6edbc52f8d0249552bf965f85aee845a17a237783ea95f7ba7",
+          "url": null,
+          "compressed_bytes": 794713,
+          "compressed_sha256": "eec711a7a9398a6edbc52f8d0249552bf965f85aee845a17a237783ea95f7ba7",
+          "compression": "none"
+        },
+        {
+          "name": "target.spm",
+          "bytes": 806555,
+          "sha256": "6f0c6c5e91a1196fd729077284ba6d816a278a58f012a834f1beac1f550aeb91",
+          "url": null,
+          "compressed_bytes": 806555,
+          "compressed_sha256": "6f0c6c5e91a1196fd729077284ba6d816a278a58f012a834f1beac1f550aeb91",
+          "compression": "none"
+        }
+      ]
+    },
+    "marian-family-zle": {
+      "kind": "marian",
+      "repo": "Helsinki-NLP/opus-mt-tc-big-zle-zle",
+      "revision": "779c880171613b8962211d06d77c946a5b79bceb",
+      "license": "cc-by-4.0",
+      "vocabulary": "shared_vocabulary.json",
+      "source_tokenizer": "source.spm",
+      "target_tokenizer": "target.spm",
+      "normalizer_language": "zle",
+      "files": [
+        {
+          "name": "model.bin",
+          "bytes": 216556983,
+          "sha256": "5f91f4020f181a6268d6a4a91e901543d4f9f1229d75b46b2bf39224e83f3749",
+          "url": null,
+          "compressed_bytes": 216556983,
+          "compressed_sha256": "5f91f4020f181a6268d6a4a91e901543d4f9f1229d75b46b2bf39224e83f3749",
+          "compression": "none"
+        },
+        {
+          "name": "config.json",
+          "bytes": 233,
+          "sha256": "72901fbd8abd89fb5cf4a388f26fc681f5c4c58a1e1a88b30b879f107270e7ee",
+          "url": null,
+          "compressed_bytes": 233,
+          "compressed_sha256": "72901fbd8abd89fb5cf4a388f26fc681f5c4c58a1e1a88b30b879f107270e7ee",
+          "compression": "none"
+        },
+        {
+          "name": "shared_vocabulary.json",
+          "bytes": 1827106,
+          "sha256": "c69e322f2d19e47aa01789f04da4d7ea33826f420ae2525857655d277fd28f13",
+          "url": null,
+          "compressed_bytes": 1827106,
+          "compressed_sha256": "c69e322f2d19e47aa01789f04da4d7ea33826f420ae2525857655d277fd28f13",
+          "compression": "none"
+        },
+        {
+          "name": "source.spm",
+          "bytes": 1012800,
+          "sha256": "9b49b740c96c0d82a918f7986274b4352cce26420bf166db9dddd9a2e96e40aa",
+          "url": null,
+          "compressed_bytes": 1012800,
+          "compressed_sha256": "9b49b740c96c0d82a918f7986274b4352cce26420bf166db9dddd9a2e96e40aa",
+          "compression": "none"
+        },
+        {
+          "name": "target.spm",
+          "bytes": 1012444,
+          "sha256": "4c5be1deafcea3cd0a23b164ea9645df09e394a91959e35bfd5140db879c5ff9",
+          "url": null,
+          "compressed_bytes": 1012444,
+          "compressed_sha256": "4c5be1deafcea3cd0a23b164ea9645df09e394a91959e35bfd5140db879c5ff9",
+          "compression": "none"
+        }
+      ]
+    },
+    "marian-direct-sv-fi-b2-v1": {
+      "kind": "marian",
+      "repo": "Helsinki-NLP/opus-mt-sv-fi",
+      "revision": "5a7a8838bf6390743aedcb542911dd07c6342244",
+      "license": "apache-2.0",
+      "vocabulary": "shared_vocabulary.json",
+      "source_tokenizer": "source.spm",
+      "target_tokenizer": "target.spm",
+      "normalizer_language": "sv",
+      "files": [
+        {
+          "name": "model.bin",
+          "bytes": 77286395,
+          "sha256": "0c598eaf38df58b3f3e74cd62c0ba97083ece81adb99209da7f8e8d5860a4c2b",
+          "url": null,
+          "compressed_bytes": 77286395,
+          "compressed_sha256": "0c598eaf38df58b3f3e74cd62c0ba97083ece81adb99209da7f8e8d5860a4c2b",
+          "compression": "none"
+        },
+        {
+          "name": "config.json",
+          "bytes": 233,
+          "sha256": "72901fbd8abd89fb5cf4a388f26fc681f5c4c58a1e1a88b30b879f107270e7ee",
+          "url": null,
+          "compressed_bytes": 233,
+          "compressed_sha256": "72901fbd8abd89fb5cf4a388f26fc681f5c4c58a1e1a88b30b879f107270e7ee",
+          "compression": "none"
+        },
+        {
+          "name": "shared_vocabulary.json",
+          "bytes": 1250617,
+          "sha256": "d4344be7bda6711f0b89593b49ead680b82480a665e571447363b2d280f0fd73",
+          "url": null,
+          "compressed_bytes": 1250617,
+          "compressed_sha256": "d4344be7bda6711f0b89593b49ead680b82480a665e571447363b2d280f0fd73",
+          "compression": "none"
+        },
+        {
+          "name": "source.spm",
+          "bytes": 826779,
+          "sha256": "d088ad29a4369e8fd3e05f47b46cb0a773d933bfdce36d33509f6c3eb5f3c638",
+          "url": null,
+          "compressed_bytes": 826779,
+          "compressed_sha256": "d088ad29a4369e8fd3e05f47b46cb0a773d933bfdce36d33509f6c3eb5f3c638",
+          "compression": "none"
+        },
+        {
+          "name": "target.spm",
+          "bytes": 848676,
+          "sha256": "182f6ba6110e8e1d94bccc9208b801efd08dda0071e5f0168b5cd31e2bcbbb91",
+          "url": null,
+          "compressed_bytes": 848676,
+          "compressed_sha256": "182f6ba6110e8e1d94bccc9208b801efd08dda0071e5f0168b5cd31e2bcbbb91",
+          "compression": "none"
+        }
+      ]
+    },
+    "marian-direct-sv-nl-b2-v1": {
+      "kind": "marian",
+      "repo": "Helsinki-NLP/opus-mt-sv-nl",
+      "revision": "c6f9c1a65f4c4714ab392d003b04a18700a5bf4c",
+      "license": "apache-2.0",
+      "vocabulary": "shared_vocabulary.json",
+      "source_tokenizer": "source.spm",
+      "target_tokenizer": "target.spm",
+      "normalizer_language": "sv",
+      "files": [
+        {
+          "name": "model.bin",
+          "bytes": 75293235,
+          "sha256": "29658df78cd90eaf04b42bc0ccadbe35e84deb4d4985dcec08d14280f3166c0d",
+          "url": null,
+          "compressed_bytes": 75293235,
+          "compressed_sha256": "29658df78cd90eaf04b42bc0ccadbe35e84deb4d4985dcec08d14280f3166c0d",
+          "compression": "none"
+        },
+        {
+          "name": "config.json",
+          "bytes": 233,
+          "sha256": "72901fbd8abd89fb5cf4a388f26fc681f5c4c58a1e1a88b30b879f107270e7ee",
+          "url": null,
+          "compressed_bytes": 233,
+          "compressed_sha256": "72901fbd8abd89fb5cf4a388f26fc681f5c4c58a1e1a88b30b879f107270e7ee",
+          "compression": "none"
+        },
+        {
+          "name": "shared_vocabulary.json",
+          "bytes": 1106043,
+          "sha256": "f0876ab58baa92aeee50766ba3a025a96158656969a29f06da2a6a815ef786fd",
+          "url": null,
+          "compressed_bytes": 1106043,
+          "compressed_sha256": "f0876ab58baa92aeee50766ba3a025a96158656969a29f06da2a6a815ef786fd",
+          "compression": "none"
+        },
+        {
+          "name": "source.spm",
+          "bytes": 825768,
+          "sha256": "fe2973953af53c8b29c9a8d718405eaa7aed8f37156db7451be1a3e6032a23d0",
+          "url": null,
+          "compressed_bytes": 825768,
+          "compressed_sha256": "fe2973953af53c8b29c9a8d718405eaa7aed8f37156db7451be1a3e6032a23d0",
+          "compression": "none"
+        },
+        {
+          "name": "target.spm",
+          "bytes": 817924,
+          "sha256": "72b94ec90a2d4cb702685e5ee452154620adea7cf3350442b82aaecaa9767916",
+          "url": null,
+          "compressed_bytes": 817924,
+          "compressed_sha256": "72b94ec90a2d4cb702685e5ee452154620adea7cf3350442b82aaecaa9767916",
+          "compression": "none"
+        }
+      ]
+    },
+    "marian-wave-opus-tr-en": {
+      "kind": "marian",
+      "repo": "Helsinki-NLP/opus-mt-tc-big-tr-en",
+      "revision": "2261c8fc7b1af59caee87f8ff0ecf3fbccfe8391",
+      "license": "cc-by-4.0",
+      "vocabulary": "shared_vocabulary.json",
+      "source_tokenizer": "source.spm",
+      "target_tokenizer": "target.spm",
+      "normalizer_language": "tr",
+      "files": [
+        {
+          "name": "model.bin",
+          "bytes": 237977893,
+          "sha256": "61df8aed31762eaefa0e3a9807a8caa91894d305a2eb5a56156699d1d1ebfbac",
+          "url": null,
+          "compressed_bytes": 237977893,
+          "compressed_sha256": "61df8aed31762eaefa0e3a9807a8caa91894d305a2eb5a56156699d1d1ebfbac",
+          "compression": "none"
+        },
+        {
+          "name": "config.json",
+          "bytes": 233,
+          "sha256": "72901fbd8abd89fb5cf4a388f26fc681f5c4c58a1e1a88b30b879f107270e7ee",
+          "url": null,
+          "compressed_bytes": 233,
+          "compressed_sha256": "72901fbd8abd89fb5cf4a388f26fc681f5c4c58a1e1a88b30b879f107270e7ee",
+          "compression": "none"
+        },
+        {
+          "name": "shared_vocabulary.json",
+          "bytes": 1170026,
+          "sha256": "44dd886d9f538a4b22e58d89758bd336e73b06c753a436f7531436daafcaedee",
+          "url": null,
+          "compressed_bytes": 1170026,
+          "compressed_sha256": "44dd886d9f538a4b22e58d89758bd336e73b06c753a436f7531436daafcaedee",
+          "compression": "none"
+        },
+        {
+          "name": "source.spm",
+          "bytes": 833378,
+          "sha256": "a6946a00a5cbd04044bb1c25b48ea798561a2fd12d872e5d1452bdc3dc076e77",
+          "url": null,
+          "compressed_bytes": 833378,
+          "compressed_sha256": "a6946a00a5cbd04044bb1c25b48ea798561a2fd12d872e5d1452bdc3dc076e77",
+          "compression": "none"
+        },
+        {
+          "name": "target.spm",
+          "bytes": 796940,
+          "sha256": "cfd9506b675c3f26850ae08995f5a7c8baf56db49d9784a80f418fb8a9210d48",
+          "url": null,
+          "compressed_bytes": 796940,
+          "compressed_sha256": "cfd9506b675c3f26850ae08995f5a7c8baf56db49d9784a80f418fb8a9210d48",
+          "compression": "none"
+        }
+      ]
+    },
+    "marian-wave-opus-zle-en": {
+      "kind": "marian",
+      "repo": "Helsinki-NLP/opus-mt-tc-big-zle-en",
+      "revision": "09a40f722d6d8b76aaad6fe51a06c914622a13d1",
+      "license": "cc-by-4.0",
+      "vocabulary": "shared_vocabulary.json",
+      "source_tokenizer": "source.spm",
+      "target_tokenizer": "target.spm",
+      "normalizer_language": "zle",
+      "files": [
+        {
+          "name": "model.bin",
+          "bytes": 242053603,
+          "sha256": "860d99f70a826652be43f1f79bcb6dd81e936f8cd5b27c67767b326daa1e21a7",
+          "url": null,
+          "compressed_bytes": 242053603,
+          "compressed_sha256": "860d99f70a826652be43f1f79bcb6dd81e936f8cd5b27c67767b326daa1e21a7",
+          "compression": "none"
+        },
+        {
+          "name": "config.json",
+          "bytes": 233,
+          "sha256": "72901fbd8abd89fb5cf4a388f26fc681f5c4c58a1e1a88b30b879f107270e7ee",
+          "url": null,
+          "compressed_bytes": 233,
+          "compressed_sha256": "72901fbd8abd89fb5cf4a388f26fc681f5c4c58a1e1a88b30b879f107270e7ee",
+          "compression": "none"
+        },
+        {
+          "name": "shared_vocabulary.json",
+          "bytes": 2137483,
+          "sha256": "ee12302f160cdc16bbdf0c5ebf339d1413ca4e9285d27ee7425cbc1e99a4d86f",
+          "url": null,
+          "compressed_bytes": 2137483,
+          "compressed_sha256": "ee12302f160cdc16bbdf0c5ebf339d1413ca4e9285d27ee7425cbc1e99a4d86f",
+          "compression": "none"
+        },
+        {
+          "name": "source.spm",
+          "bytes": 1016851,
+          "sha256": "a982dbb9362861151e36b0db1595b324cd1ce09acf46ce1f4d6d624e11c5807f",
+          "url": null,
+          "compressed_bytes": 1016851,
+          "compressed_sha256": "a982dbb9362861151e36b0db1595b324cd1ce09acf46ce1f4d6d624e11c5807f",
+          "compression": "none"
+        },
+        {
+          "name": "target.spm",
+          "bytes": 802387,
+          "sha256": "e69faed7f1e60eec38c64cceba35cc4fb05ec6478082f4c8a14b141fd6596e9e",
+          "url": null,
+          "compressed_bytes": 802387,
+          "compressed_sha256": "e69faed7f1e60eec38c64cceba35cc4fb05ec6478082f4c8a14b141fd6596e9e",
+          "compression": "none"
+        }
+      ]
+    },
+    "m2m-full-m2m12b-native-int8-v1": {
+      "kind": "m2m_full",
+      "repo": "facebook/m2m100_1.2B",
+      "revision": "7b36184180524c1a1bbfa37f120a608046250b98",
+      "license": "cc-by-4.0",
+      "vocabulary": "shared_vocabulary.json",
+      "source_tokenizer": "sentencepiece.bpe.model",
+      "target_tokenizer": "sentencepiece.bpe.model",
+      "normalizer_language": "zh",
+      "files": [
+        {
+          "name": "model.bin",
+          "bytes": 1249655188,
+          "sha256": "61a68b96c0e4a10a09a1944f9e6627a8854dccf53a0127817808bb976ce94b4f",
+          "url": null,
+          "compressed_bytes": 1249655188,
+          "compressed_sha256": "61a68b96c0e4a10a09a1944f9e6627a8854dccf53a0127817808bb976ce94b4f",
+          "compression": "none"
+        },
+        {
+          "name": "config.json",
+          "bytes": 233,
+          "sha256": "72901fbd8abd89fb5cf4a388f26fc681f5c4c58a1e1a88b30b879f107270e7ee",
+          "url": null,
+          "compressed_bytes": 233,
+          "compressed_sha256": "72901fbd8abd89fb5cf4a388f26fc681f5c4c58a1e1a88b30b879f107270e7ee",
+          "compression": "none"
+        },
+        {
+          "name": "shared_vocabulary.json",
+          "bytes": 2924622,
+          "sha256": "18916ac68f9ac8fbd5250ca603dcb3861aac8672924d93a8dadc82eb3147f941",
+          "url": null,
+          "compressed_bytes": 2924622,
+          "compressed_sha256": "18916ac68f9ac8fbd5250ca603dcb3861aac8672924d93a8dadc82eb3147f941",
+          "compression": "none"
+        },
+        {
+          "name": "sentencepiece.bpe.model",
+          "bytes": 2423393,
+          "sha256": "d8f7c76ed2a5e0822be39f0a4f95a55eb19c78f4593ce609e2edbc2aea4d380a",
+          "url": null,
+          "compressed_bytes": 2423393,
+          "compressed_sha256": "d8f7c76ed2a5e0822be39f0a4f95a55eb19c78f4593ce609e2edbc2aea4d380a",
+          "compression": "none"
+        },
+        {
+          "name": "vocab.json",
+          "bytes": 3708092,
+          "sha256": "b6e77e474aeea8f441363aca7614317c06381f3eacfe10fb9856d5081d1074cc",
+          "url": null,
+          "compressed_bytes": 3708092,
+          "compressed_sha256": "b6e77e474aeea8f441363aca7614317c06381f3eacfe10fb9856d5081d1074cc",
+          "compression": "none"
+        }
+      ],
+      "encoder": "vocab.json"
     }
   },
   "bergamot_runtime": {

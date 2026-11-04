@@ -175,6 +175,7 @@ class ImageCanvas(QWidget):
         self._tooltip_avoid_rect = QRect()
         self._pinned = False
         self.candidates_enabled = True
+        self.candidate_expansion_enabled = True
         self._expanded_translations: dict[str, WordTranslation] = {}
         self._candidate_lists_visible: set[str] = set()
         self._candidate_loading: set[str] = set()
@@ -258,7 +259,7 @@ class ImageCanvas(QWidget):
         self._refresh_bubble()
 
     def _search_candidates(self) -> None:
-        if self._hovered is None or not self.candidates_enabled:
+        if self._hovered is None or not self.candidates_enabled or not self.candidate_expansion_enabled:
             return
         word = self._hovered.lookup_text
         if word not in self._candidate_loading and word not in self._expanded_translations:
@@ -325,7 +326,7 @@ class ImageCanvas(QWidget):
             len(hit.translation.candidates) if hit.translation else None
         )
         bubble.set_expansion_state(
-            available=self.candidates_enabled and bool(result and result.candidates),
+            available=self.candidates_enabled and self.candidate_expansion_enabled and bool(result and result.candidates),
             loading=word in self._candidate_loading,
             showing=showing,
             searched=expanded_result is not None,
@@ -681,6 +682,8 @@ class ReviewWindow(QWidget):
             # when smaller than the standalone canvas's preferred minimum.
             canvas.setMinimumSize(1, 1)
             canvas.candidates_enabled = settings.source_language != settings.target_language
+            from language_lens.services.translation_assets import supports_expansion
+            canvas.candidate_expansion_enabled = supports_expansion(settings.source_language, settings.target_language)
             canvas.word_selected.connect(lambda hit, canvas=canvas: self._word_selected(hit, canvas))
             canvas.word_audio_requested.connect(self._read_word)
             canvas.pronunciation_retry_requested.connect(self._prepare_pronunciation)

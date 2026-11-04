@@ -1,7 +1,7 @@
 """Recognition policy shared by inference, asset preparation and readiness.
 
-Selection evidence and limits: docs/ocr-upright-selection.md, with earlier
-evidence in docs/ocr-joint-selection.md. Keep this module
+Adopted controls are recorded in tests/data/ocr-adopted-profiles.json.
+Historical research is kept in the local ignored benchmark archive. Keep this module
 free of native imports: the GUI checks readiness without loading OCR models.
 """
 from __future__ import annotations

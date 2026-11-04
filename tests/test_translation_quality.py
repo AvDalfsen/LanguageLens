@@ -12,7 +12,7 @@ def test_real_translation_meanings_with_existing_fixtures(tmp_path):
     root=Path(__file__).resolve().parents[1]
     models=Path(os.environ.get("LANGUAGE_LENS_TEST_TRANSLATIONS",root/"artifacts/offline-validation/data/argos-translate/packages"))
     sentences=Path(os.environ.get("LANGUAGE_LENS_TEST_SENTENCES",root/"artifacts/sentence-validation/LanguageLens/offline/sentences"))
-    if not models.is_dir() or not sentences.is_dir():
+    if not any(models.glob("*/model/model.bin")) or not any(sentences.glob("*.onnx")):
         pytest.skip("Requires local Argos and MiniSBD fixtures; never downloads")
     output=tmp_path/"translation-quality.json"
     child=subprocess.run([sys.executable,str(root/"scripts/verify-translations.py"),"--models",str(models),

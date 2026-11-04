@@ -3,7 +3,9 @@ from functools import lru_cache
 from importlib.resources import files
 import hashlib
 import json
+import os
 from pathlib import Path
+import shutil
 import stat
 import tarfile
 import time
@@ -29,7 +31,10 @@ def selection(source, target):
 
 def identity(source, target):
     choice=selection(source,target)
-    return {'version':catalog()['version'], **choice} if choice['full'] or choice['word'] else {'version':'argos-v1'}
+    if not choice['full'] and not choice['word']:return {'version':'argos-v1'}
+    definitions={key:catalog()['models'][key] for key in model_ids(source,target)}
+    return {'version':catalog()['version'], **choice,
+            'models_sha256':hashlib.sha256(json.dumps(definitions,sort_keys=True).encode()).hexdigest()}
 
 
 def root():return settings_path().parent/'offline/translators'
@@ -41,7 +46,26 @@ def model_path(model_id):
 def model_ids(source,target):
     choice=selection(source,target)
     return list(dict.fromkeys([*( [choice['full']['model']] if choice['full'] else []),
-                              *( [choice['word']] if choice['word'] else [])]))
+                              *( [choice['word']] if choice['word'] and choice['word'] != 'full' else [])]))
+
+
+def supports_expansion(source,target):
+    return source != target and selection(source,target)['word'] != 'full'
+
+
+def bundle_roots():
+    """Optional separately supplied model packs, never researcher-specific paths."""
+    result=[Path(__file__).resolve().parents[1]/'_translation_assets/providers']
+    if os.environ.get('LANGUAGE_LENS_MODEL_PACK'):
+        result.insert(0,Path(os.environ['LANGUAGE_LENS_MODEL_PACK']))
+    return result
+
+
+def local_file(model_id,item):
+    for base in bundle_roots():
+        path=base/model_id/item['name']
+        if path.resolve().is_relative_to(base.resolve()) and valid(path,item):return path
+    return None
 
 
 def needs_firefox(source, target):
@@ -137,12 +161,20 @@ def prepare(source,target,report,progress,*,force=False):
             for item in model['files']:
                 path=_owned_path(directory/item['name'],settings_path().parent);paths.append(path)
                 if not force and valid(path,item):continue
+                path.parent.mkdir(parents=True,exist_ok=True)
                 report('Preparing local files')
                 temporary=path.with_name('.'+path.name+'.'+uuid4().hex+'.part')
                 packed=temporary.with_suffix('.download')
                 try:
-                    _download({'url':item['url'],'bytes':item['compressed_bytes'],'sha256':item['compressed_sha256']},packed,progress)
-                    _decompress(packed,temporary,item)
+                    existing=local_file(model_id,item)
+                    if existing is not None:
+                        shutil.copyfile(existing,temporary)
+                        progress(DownloadProgress(item['bytes'],item['bytes']))
+                    elif item.get('url'):
+                        _download({'url':item['url'],'bytes':item['compressed_bytes'],'sha256':item['compressed_sha256']},packed,progress)
+                        if item.get('compression')=='none':packed.replace(temporary)
+                        else:_decompress(packed,temporary,item)
+                    else:raise KnownTaskError('model_pack_required')
                     if not valid(temporary,item):raise KnownTaskError('integrity')
                     temporary.replace(path)
                 finally:

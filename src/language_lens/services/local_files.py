@@ -13,7 +13,9 @@ def pair_file_summary(settings, translator, route):
                      "installed": all(assets.valid(assets.model_path(model_id) / item["name"], item) for item in model["files"])})
         for item in model["files"]:
             if not assets.valid(assets.model_path(model_id) / item["name"], item):
-                download += item["compressed_bytes"]
+                if assets.local_file(model_id,item) is not None:continue
+                if 'url' not in item or item.get('url'):download += item["compressed_bytes"]
+                else:unknown=True
     if assets.needs_firefox(settings.source_language, settings.target_language):
         for kind in ("node_runtime", "bergamot_runtime"):
             info = assets.catalog()[kind]

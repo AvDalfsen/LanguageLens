@@ -6,6 +6,7 @@ import os
 from pathlib import Path
 import queue
 import subprocess
+import sys
 import threading
 import unicodedata
 
@@ -52,6 +53,9 @@ class WordModel:
             if key and key not in seen:seen.add(key);values.append(value)
         if not values:raise TranslationUnavailable('No usable word alternatives.')
         return WordTranslation(tuple(values if expanded else values[:4]))
+
+    def close(self):
+        self.backend.unload_model()
 
 
 class T5Model:
@@ -174,9 +178,15 @@ class RoutedTranslator:
         if choice is None:return self.argos.translate(text,source,target)
         model=self._full.get(choice['model'])
         if model is None:
-            factory = T5Model if assets.catalog()['models'][choice['model']]['kind'] == 't5' else FirefoxModel
+            from language_lens.services.native_translation import NativeCT2Model, HyModel
+            factories = {'t5':T5Model, 'firefox':FirefoxModel, 'marian':NativeCT2Model,
+                         'm2m_full':NativeCT2Model, 'hy':HyModel}
+            factory = factories.get(assets.catalog()['models'][choice['model']]['kind'])
+            if factory is None: raise KnownTaskError('runtime')
             model = self._full[choice['model']] = factory(choice['model'])
-        result=model.translate(text)
+        if assets.catalog()['models'][choice['model']]['kind'] in ('marian','m2m_full','hy'):
+            result=model.translate(text,source,target,choice['options'])
+        else:result=model.translate(text)
         if choice.get('pivot'):result=self.argos.translate(result,'en',target)
         if not result.strip():raise TranslationUnavailable('No usable full translation.')
         return result.strip()
@@ -185,6 +195,8 @@ class RoutedTranslator:
     def word_candidates(self,text,source,target,*,expanded=False):
         if not text or source==target:return self.argos.word_candidates(text,source,target,**({'expanded':True} if expanded else {}))
         kind=assets.selection(source,target)['word']
+        if kind == 'full':
+            return WordTranslation((self.translate(text,source,target),))
         if kind is None:return self.argos.word_candidates(text,source,target,**({'expanded':True} if expanded else {}))
         model=self._words.get(kind)
         if model is None:model=self._words.setdefault(kind,WordModel(kind))
@@ -192,6 +204,7 @@ class RoutedTranslator:
 
     def close(self):
         for model in self._full.values():model.close()
+        for model in self._words.values():model.close()
         self._full.clear();self._words.clear()
         self.translate.cache_clear();self.word_candidates.cache_clear()
 
@@ -201,12 +214,16 @@ class RoutedTranslator:
             if hasattr(item,'t1'):return backends(item.t1)+backends(item.t2)
             return [item.translator] if getattr(item,'translator',None) is not None else []
         values=[]
-        try:
-            _package,module=self.argos._modules()
-            for value in module.installed_translates:values.extend(backends(value))
-        except ImportError:pass
+        if 'argostranslate.translate' in sys.modules:
+            try:
+                _package,module=self.argos._modules()
+                for value in module.installed_translates:values.extend(backends(value))
+            except ImportError:pass
         return {'pid':os.getpid(),'argos':[{'object_id':id(value),'loaded':value.model_is_loaded} for value in dict.fromkeys(values)],
             'words':{kind:{'object_id':id(model.backend),'loaded':model.backend.model_is_loaded} for kind,model in self._words.items()},
             'firefox':{kind:model.call('inspect') for kind,model in self._full.items() if isinstance(model,FirefoxModel)},
             't5':{kind:{'object_id':id(model.backend),'loaded':model.backend.model_is_loaded}
-                  for kind,model in self._full.items() if isinstance(model,T5Model)}}
+                  for kind,model in self._full.items() if isinstance(model,T5Model)},
+            'native':{kind:{'object_id':id(getattr(model,'backend',model)),
+                              'loaded':model.backend.model_is_loaded if hasattr(model,'backend') else model.process.poll() is None}
+                      for kind,model in self._full.items() if assets.catalog()['models'][kind]['kind'] in ('marian','m2m_full','hy')}}

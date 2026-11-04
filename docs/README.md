@@ -22,11 +22,12 @@
 - [Build a portable release](release-building.md)
 - [Language packs and updates](language-packs.md)
 - [Sentence models and validation](sentence-splitting.md)
-- [Upright OCR model and settings adoption](ocr-upright-selection.md)
 - [IPA conventions and evidence](ipa-audit.md)
 - [Speech/runtime/voice notices](../THIRD_PARTY_SPEECH.md)
 - [Pronunciation research prototype](../prototypes/pronunciation/README.md)
 
 ## Development history
+
+Local OCR and translation benchmark reports, results, and research tools are preserved under the ignored `artifacts/` directory, with formerly checked-in research files in `artifacts/benchmark-archive/repository/`. Production OCR regression controls remain in `tests/data/ocr-adopted-profiles.json`.
 
 [Historical audits and implementation notes](archive/README.md) preserve the detailed investigation and validation records. Use the guides above for current instructions.

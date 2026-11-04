@@ -9,3 +9,25 @@ build/
 dist/
 src/language_lens/_translation_assets/
 
+# Local benchmark archives, reports, and research-only tools.
+/artifacts/benchmark-archive/
+/*benchmarks.cmd
+/docs/cpu-translation-*.md
+/docs/multilingual-translation-*
+/docs/ocr-*.md
+/docs/ocr-*benchmark.json
+/docs/ocr-upright-policy-evidence.json
+/docs/translation-benchmark-queue.md
+/docs/translation-model-selection.md
+/docs/translation-production-integration.md
+/docs/translation-provider-residency-design.md
+/scripts/audit-ocr-*.py
+/scripts/report-ocr-*.py
+/scripts/verify-ocr-*.py
+/scripts/finalize-ocr-settings.py
+/scripts/compare-sentence-baselines.py
+/scripts/create-translation-catalog.py
+/scripts/stage-benchmarked-models.py
+/scripts/verify-native-translation.py
+/scripts/data/ocr-*.json
+

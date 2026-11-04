@@ -287,8 +287,9 @@ def test_installed_fixture_generates_real_audio_with_pinned_catalogue(qapp, tmp_
     candidates = ([Path(configured) / voice.id, Path(configured) / voice.locale] if configured else
                   [artifacts / "voice-validation" / voice.id,
                    artifacts / "pronunciation" / "voices" / voice.locale])
-    fixture = next((path for path in candidates if path.is_dir()), candidates[0])
-    if not fixture.is_dir() or not voices.runtime_ready():
+    fixture = next((path for path in candidates
+                    if all((path / name).is_file() for name, _size, _hash in voice.files)), None)
+    if fixture is None or not voices.runtime_ready():
         pytest.skip("Requires local pronunciation fixtures and pinned Piper runtime")
     directory = tmp_path / voice.id
     directory.mkdir()

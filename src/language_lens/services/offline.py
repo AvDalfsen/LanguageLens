@@ -14,6 +14,23 @@ from urllib.request import urlopen
 from language_lens.config import settings_path
 from language_lens.services.errors import KnownTaskError
 
+_NATIVE_CONNECT = socket.socket.connect
+
+
+def connect_owned_loopback(process, port, address, timeout, source_address=None):
+    """Private transport for one live owned model helper, with no DNS or proxies."""
+    if (address != ('127.0.0.1', port) or source_address is not None or
+            process is None or process.poll() is not None):
+        raise RuntimeError('Only the owned local model endpoint is permitted.')
+    handle = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    try:
+        handle.settimeout(timeout)
+        _NATIVE_CONNECT(handle, address)
+        return handle
+    except BaseException:
+        handle.close()
+        raise
+
 
 def assets_root() -> Path:
     return settings_path().parent / "offline"
@@ -139,7 +156,7 @@ def _configuration_record(path) -> list | None:
 
 
 def translation_state(package, route) -> dict:
-    settings = package.settings
+    settings = package.settings if package is not None else None
     roots = [str(Path(root).resolve()) for root in settings.package_dirs] if route else []
     return {"route": route_identity(route), "roots": roots, "catalog": _package_catalog(roots),
             "environment": _translation_environment(),
@@ -219,7 +236,7 @@ def prepare(source: str, target: str, report, progress, word_lookup: bool = True
                 temporary.unlink(missing_ok=True)
         paths.append(path)
     from language_lens.services import sentence_models
-    package_module, _backend = translator._modules()
+    package_module = translator._modules()[0] if translator.argos_required(source,target) else None
     route = translator.route(source, target)
     prepared_translation = translation_state(package_module, route)
     sentence_languages = list(dict.fromkeys([source,*(item.from_code for item in route)]))
@@ -229,9 +246,10 @@ def prepare(source: str, target: str, report, progress, word_lookup: bool = True
     voice = selected_voice(source, {})
     sample = voice.sample if voice else "Hello."
     report("Verifying OCR and translation with networking disabled…")
-    _package, backend = translator._modules()
-    backend.get_installed_languages.cache_clear()
-    backend.installed_translates.clear()
+    if translator.argos_required(source,target):
+        _package, backend = translator._modules()
+        backend.get_installed_languages.cache_clear()
+        backend.installed_translates.clear()
     try:
         with no_network():
             from language_lens.text import word_spans
