@@ -878,8 +878,7 @@ class ReviewWindow(QWidget):
         for window in (self, *self._tiles):
             for key, step in (("Right", 1), ("Left", -1)):
                 shortcut = QShortcut(QKeySequence(key), window)
-                shortcut.activated.connect(lambda step=step: self._navigate_word(
-                    -step if self.settings.source_language == "ar" else step))
+                shortcut.activated.connect(lambda step=step: self._navigate_word(step))
                 self._shortcuts.append(shortcut)
         self._retry_ocr()
 

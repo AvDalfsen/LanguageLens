@@ -9,11 +9,11 @@ import re
 from string import Formatter
 
 UI_LANGUAGES = (
-    ("العربية", "ar"), ("中文", "zh"), ("Čeština", "cs"),
+    ("中文", "zh"), ("Čeština", "cs"),
     ("Dansk", "da"), ("Nederlands", "nl"), ("English", "en"),
     ("Suomi", "fi"), ("Français", "fr"), ("Deutsch", "de"),
     ("Ελληνικά", "el"), ("हिन्दी", "hi"), ("Magyar", "hu"),
-    ("Italiano", "it"), ("日本語", "ja"), ("한국어", "ko"),
+    ("Italiano", "it"), ("日本語", "ja"),
     ("Norsk bokmål", "nb"), ("Polski", "pl"),
     ("Português (Portugal)", "pt"), ("Português (Brasil)", "pb"),
     ("Română", "ro"), ("Русский", "ru"), ("Español", "es"),
@@ -65,7 +65,7 @@ def set_language(code: str) -> None:
     app = QApplication.instance()
     if app:
         _install_qt_translator(app)
-        app.setLayoutDirection(Qt.LayoutDirection.RightToLeft if _language == "ar" else Qt.LayoutDirection.LeftToRight)
+        app.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
 
 
 class _UiText(str):
@@ -240,7 +240,7 @@ def translate_ui(root, previous: str | None = None) -> None:
 
     for widget in [root, *root.findChildren(QWidget), *root.findChildren(QAction)]:
         if isinstance(widget, QWidget) and widget.isWindow():
-            widget.setLayoutDirection(Qt.LayoutDirection.RightToLeft if _language == "ar" else Qt.LayoutDirection.LeftToRight)
+            widget.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
         for getter, setter in (("text", "setText"), ("windowTitle", "setWindowTitle"),
                                ("toolTip", "setToolTip"), ("accessibleName", "setAccessibleName"),
                                ("accessibleDescription", "setAccessibleDescription")):
@@ -280,7 +280,7 @@ def translate_ui(root, previous: str | None = None) -> None:
                         widget._lens_ui_items[index] = (original[0], new)
             finally:
                 widget.blockSignals(blocked)
-    root.setLayoutDirection(Qt.LayoutDirection.RightToLeft if _language == "ar" else Qt.LayoutDirection.LeftToRight)
+    root.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
 
 
 def question(parent, title: str, message: str, buttons):

@@ -5,15 +5,16 @@ from language_lens.services import translation_assets as assets, translation_bac
 
 def test_only_benchmarked_pair_function_exceptions_are_routed():
     selected={pair for pair,value in assets.catalog()['words'].items() if value=='full'}
-    assert len(selected)==36
+    assert len(selected)==40
     assert {'cs-uk','da-nb','ru-uk','uk-ru','fr-ja','fr-zh','en-ja','zh-ja'}<=selected
-    assert not {'de-nl','cs-ru','en-fi','es-fr','ar-en','en-ko'} & selected
+    assert {'es-fr','es-it','es-pb','es-ro'}<=selected
+    assert not {'de-nl','cs-ru','en-fi','ar-en','en-ko'} & selected
     assert assets.selection('pt','en')=={'full':None,'word':None}
     assert assets.selection('en','nl')=={'full':{'model':'t5-en-nl-24l','pivot':None},'word':None}
     assert assets.selection('nl','en')=={'full':None,'word':None}
     assert assets.selection('pb','en')=={'full':None,'word':None}
-    assert assets.selection('ko','nl')['full'] is None
-    assert assets.selection('ko','nl')['word']=='small'
+    assert assets.selection('ar','en')=={'full':None,'word':None}
+    assert assets.selection('ko','en')=={'full':None,'word':None}
     assert assets.selection('tr','nl')['full']=={'model':'tr-en-tiny-3.0','pivot':'nl'}
     assert assets.selection('en','en')=={'full':None,'word':None}
 

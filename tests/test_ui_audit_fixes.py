@@ -63,7 +63,7 @@ def test_disclosures_and_language_changes_keep_the_window_stable(settings_window
     assert w.size() == initial and w.width() <= 820
     assert not (QEvent.Type.Show in events and QEvent.Type.Hide in events)
     assert w.current_settings().settings_window_size is None
-    for code in ("de", "ar", "ja", "en"):
+    for code in ("de", "hi", "ja", "en"):
         w.ui_language.setCurrentIndex(w.ui_language.findData(code))
         QTest.qWait(100)
         assert w.size() == initial
@@ -179,7 +179,7 @@ def test_localized_language_names_and_rtl_disclosures(settings_window):
     w.ui_language.setCurrentIndex(w.ui_language.findData("de"))
     assert language_name("ja") == "Japanisch"
     assert w.source.itemText(w.source.findData("ja")) == "Japanisch"
-    w.ui_language.setCurrentIndex(w.ui_language.findData("ar"))
+    w.setLayoutDirection(Qt.LayoutDirection.RightToLeft)
     assert w.performance.toggle.arrowType() == Qt.ArrowType.LeftArrow
     w.performance.toggle.click()
     assert w.performance.toggle.arrowType() == Qt.ArrowType.DownArrow
@@ -193,14 +193,14 @@ def test_open_review_language_change_preserves_results_and_requests(review_facto
     w.canvas._hovered = w.canvas._hits[0]
     w.canvas._pinned = True
     w.canvas._refresh_bubble()
-    set_language("ar")
+    set_language("hi")
     w.refresh_language("en")
     assert tasks == before and w._hits == hits
     assert w.translation.text() == text
     assert w.copy_translation.text() == tr("Copy translation")
     assert w.words.itemText(0) == "1. Read"
     assert w.canvas._bubble.translation.text() == "Lees"
-    assert w.layoutDirection() == Qt.LayoutDirection.RightToLeft
+    assert w.layoutDirection() == Qt.LayoutDirection.LeftToRight
     set_language("en")
-    w.refresh_language("ar")
+    w.refresh_language("hi")
     assert w.translation.text() == text and w.copy_translation.text() == "Copy translation"

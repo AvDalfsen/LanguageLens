@@ -50,7 +50,7 @@ def main() -> int:
             else:
                 assert not any(item["ready"] for item in packs.inventory()), "Base check must use empty language-pack storage"
                 checks.append("Core runtime operates without optional language packs")
-            for language in ("pt", "ja", "zh", "ar"):
+            for language in ("pt", "ja", "zh", "hi"):
                 assert ocr_models(language)
         checks.append("English pronunciation and OCR catalogues")
 

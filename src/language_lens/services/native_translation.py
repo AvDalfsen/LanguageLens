@@ -86,6 +86,7 @@ class NativeCT2Model:
                               max_decoding_length=options['output_bound'])
                 if target_prefix: kwargs['target_prefix'] = target_prefix
                 if options.get('require_eos'): kwargs['return_end_token'] = True
+                if options.get('disable_unk'): kwargs['disable_unk'] = True
                 out = self.backend.translate_batch([tokens], **kwargs)[0].hypotheses[0]
                 self.last_units.append({'source':unit, 'input_tokens':tokens, 'output_tokens':out})
                 if (len(out) >= options['output_bound'] or

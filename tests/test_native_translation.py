@@ -59,6 +59,17 @@ def test_marian_normalization_tags_unknowns_and_paragraphs(monkeypatch):
     assert seen[0][1]['return_end_token'] is True
 
 
+def test_spanish_romanian_preserves_its_selected_unknown_token_policy(monkeypatch):
+    model, seen = native(monkeypatch)
+    options = assets.selection('es', 'ro')['full']['options']
+    model.vocab.add('>>ron<<')
+    assert model.translate('word', 'es', 'ro', options) == 'word'
+    assert seen[0][0][0][0] == '>>ron<<'
+    assert seen[0][1]['disable_unk'] is True
+    assert not any(assets.selection('es', target)['full']['options'].get('disable_unk')
+                   for target in ('fr', 'it', 'pb'))
+
+
 @pytest.mark.parametrize('output',[['word'] , ['word']*8])
 def test_incomplete_or_bounded_output_is_not_published(monkeypatch,output):
     model,_=native(monkeypatch,output=output)

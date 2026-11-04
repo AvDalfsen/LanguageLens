@@ -48,9 +48,6 @@ DEFAULT_SETTINGS = OcrSettings()
 # retain the existing profiles after final regressions; recorded controls are in
 # tests/data/ocr-adopted-profiles.json.
 SETTINGS_BY_LANGUAGE: dict[str, OcrSettings] = {
-    "ar": OcrSettings(det_limit_side_len=256, unclip_ratio=1.8, vertical_padding=False,
-        width_height_ratio=16, use_cls=False, rec_min_width=640, text_score=0.3,
-        preprocessing='contrast', scale=2, confidence=0.6),
     "zh": OcrSettings(det_limit_side_len=128, unclip_ratio=1.3, preprocessing='dark-invert'),
     "cs": OcrSettings(det_limit_side_len=64, unclip_ratio=1.8, det_thresh=0.4, box_thresh=0.6,
         vertical_padding=False, width_height_ratio=16, rec_min_width=160, text_score=0.3,
@@ -70,10 +67,6 @@ SETTINGS_BY_LANGUAGE: dict[str, OcrSettings] = {
     "hu": OcrSettings(unclip_ratio=1.4, text_score=0.5),
     "it": OcrSettings(det_limit_side_len=128, unclip_ratio=1.0),
     "ja": OcrSettings(det_limit_side_len=128, unclip_ratio=1.5, dilation=False, use_cls=False),
-    "ko": OcrSettings(det_limit_side_len=64, unclip_ratio=1.3, det_thresh=0.4, box_thresh=0.6,
-        dilation=False, vertical_padding=False, cls_thresh=0.8, use_cls=False, rec_min_width=160,
-        text_score=0.3, preprocessing='contrast', scale=1.5, confidence=0.3, min_height=60,
-        min_side_len=60),
     "nb": OcrSettings(det_limit_side_len=64, unclip_ratio=2.0, det_thresh=0.2,
         width_height_ratio=16, cls_thresh=0.8, use_cls=False, rec_min_width=640, text_score=0.3,
         confidence=0.6, min_height=60, min_side_len=60),

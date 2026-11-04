@@ -28,7 +28,7 @@ def downloads(monkeypatch, tmp_path):
                           "compression": "zstd", "compressed_bytes": len(packed), "compressed_sha256": digest(packed)})
         models[kind] = {"files": files}
     catalog = {"models": models, "full_text": {}, "words": {
-        "en-ja": "m2m", "es-en": "m2m", "ko-nl": "small", "ko-en": "small"}}
+        "en-ja": "m2m", "es-en": "m2m", "hi-nl": "small", "hi-en": "small"}}
     monkeypatch.setattr(assets, "catalog", lambda: catalog)
     monkeypatch.setattr(assets, "settings_path", lambda: tmp_path / "LanguageLens/settings.json")
     requests = []
@@ -82,19 +82,19 @@ def test_failed_download_preserves_existing_file_and_cleans_temporary_data(downl
         item["compressed_bytes"] = len(payloads[item["url"]])
         item["compressed_sha256"] = digest(payloads[item["url"]])
     with pytest.raises(KnownTaskError):
-        assets.prepare("ko", "nl", lambda _: None, lambda _: None)
+        assets.prepare("hi", "nl", lambda _: None, lambda _: None)
     assert path.read_bytes() == previous
-    assert not assets.ready("ko", "nl")
+    assert not assets.ready("hi", "nl")
     assert not list(assets.root().rglob("*.part")) and not list(assets.root().rglob("*.download"))
 
 
 def test_existing_prepared_word_model_needs_no_network_after_update(downloads, monkeypatch):
-    assets.prepare("ko", "nl", lambda _: None, lambda _: None)
+    assets.prepare("hi", "nl", lambda _: None, lambda _: None)
     def no_network(*args, **kwargs):
         raise AssertionError("Already prepared weights must be reused")
     monkeypatch.setattr(assets, "urlopen", no_network)
-    assert assets.ready("ko", "en")
-    assets.prepare("ko", "en", lambda _: None, lambda _: None)
+    assert assets.ready("hi", "en")
+    assets.prepare("hi", "en", lambda _: None, lambda _: None)
 
 
 def test_t5_preparation_needs_no_firefox_or_node_runtime(downloads,monkeypatch):

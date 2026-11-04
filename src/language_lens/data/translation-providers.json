@@ -1,15 +1,7 @@
 {
-  "version": "2026-11-04-native-v1",
+  "version": "2026-11-04-native-v3",
   "default": "argos",
   "full_text": {
-    "ar-en": {
-      "model": "ar-en-base-memory-3.0",
-      "pivot": null
-    },
-    "en-ar": {
-      "model": "en-ar-base-memory-3.0",
-      "pivot": null
-    },
     "en-es": {
       "model": "en-es-base-memory-3.0",
       "pivot": null
@@ -24,10 +16,6 @@
     },
     "en-it": {
       "model": "en-it-base-memory-3.0",
-      "pivot": null
-    },
-    "en-ko": {
-      "model": "en-ko-base-3.0",
       "pivot": null
     },
     "en-pl": {
@@ -52,10 +40,6 @@
     },
     "ja-en": {
       "model": "ja-en-base-3.0",
-      "pivot": null
-    },
-    "ko-en": {
-      "model": "ko-en-base-3.0",
       "pivot": null
     },
     "sv-en": {
@@ -524,14 +508,59 @@
         "require_eos": true,
         "repair_latin_boundaries": false
       }
+    },
+    "es-fr": {
+      "model": "marian-family-itc",
+      "pivot": null,
+      "options": {
+        "prefix": ">>fra<<",
+        "normalize": true,
+        "input_bound": 1024,
+        "output_bound": 1023,
+        "require_eos": false,
+        "repair_latin_boundaries": false
+      }
+    },
+    "es-it": {
+      "model": "marian-family-itc",
+      "pivot": null,
+      "options": {
+        "prefix": ">>ita<<",
+        "normalize": true,
+        "input_bound": 1024,
+        "output_bound": 1023,
+        "require_eos": false,
+        "repair_latin_boundaries": false
+      }
+    },
+    "es-pb": {
+      "model": "marian-family-itc",
+      "pivot": null,
+      "options": {
+        "prefix": ">>por<<",
+        "normalize": true,
+        "input_bound": 1024,
+        "output_bound": 1023,
+        "require_eos": false,
+        "repair_latin_boundaries": false
+      }
+    },
+    "es-ro": {
+      "model": "marian-family-itc",
+      "pivot": null,
+      "options": {
+        "prefix": ">>ron<<",
+        "normalize": true,
+        "input_bound": 1024,
+        "output_bound": 1023,
+        "require_eos": false,
+        "repair_latin_boundaries": false,
+        "disable_unk": true
+      }
     }
   },
   "words": {
     "en-ja": "full",
-    "en-ko": "small",
-    "ko-en": "small",
-    "ko-nl": "small",
-    "ja-ko": "m2m",
     "es-en": "m2m",
     "cs-uk": "full",
     "da-en": "full",
@@ -567,89 +596,13 @@
     "tr-en": "full",
     "uk-en": "full",
     "uk-ru": "full",
-    "zh-ja": "full"
+    "zh-ja": "full",
+    "es-fr": "full",
+    "es-it": "full",
+    "es-pb": "full",
+    "es-ro": "full"
   },
   "models": {
-    "ar-en-base-memory-3.0": {
-      "kind": "firefox",
-      "source": "ar",
-      "target": "en",
-      "architecture": "base-memory",
-      "files": [
-        {
-          "name": "vocab.aren.spm",
-          "bytes": 860035,
-          "sha256": "51b4ee3f828d10015464523d0b4f5a6c086b0b2a9bde716a581001cf6c260366",
-          "url": "https://firefox-settings-attachments.cdn.mozilla.net/main-workspace/translations-models-v2/324af319-7174-4574-a0e5-dc047a78aa33.zst",
-          "compressed_bytes": 349058,
-          "compressed_sha256": "4e7256a9b84ae2773a5b32a234418d1c111a018b9e1bf2580ad83972d5166687",
-          "compression": "zstd",
-          "role": "vocab"
-        },
-        {
-          "name": "model.aren.intgemm.alphas.bin",
-          "bytes": 31561787,
-          "sha256": "7b7af0282dc5f4d8805b9a298c2fa828967e3f09ca10f1942ebeea0b2cfc12fa",
-          "url": "https://firefox-settings-attachments.cdn.mozilla.net/main-workspace/translations-models-v2/c1fc44d3-7b80-415e-9b74-57c4ee027559.zst",
-          "compressed_bytes": 22770191,
-          "compressed_sha256": "beed6b0da7378dfe256a9c0604a0d07dcb2b9ad4ce5295ac1ea6f1c5815eed65",
-          "compression": "zstd",
-          "role": "model"
-        },
-        {
-          "name": "lex.50.50.aren.s2t.bin",
-          "bytes": 4627200,
-          "sha256": "4b45f14dbea40d368093a13563fc1ca48457ee70c1291c82b206f3baff210081",
-          "url": "https://firefox-settings-attachments.cdn.mozilla.net/main-workspace/translations-models-v2/5fef8e32-9215-4eda-b63d-b4105b9820f6.zst",
-          "compressed_bytes": 1623998,
-          "compressed_sha256": "0dc3d51a8e41da0ee6f53784e04b2cd044e20e15f15b09aa9c1d96047de803b4",
-          "compression": "zstd",
-          "role": "lex"
-        }
-      ],
-      "license": "MPL-2.0",
-      "publisher": "https://mozilla.github.io/translations/firefox-models/"
-    },
-    "en-ar-base-memory-3.0": {
-      "kind": "firefox",
-      "source": "en",
-      "target": "ar",
-      "architecture": "base-memory",
-      "files": [
-        {
-          "name": "vocab.enar.spm",
-          "bytes": 863591,
-          "sha256": "8d93c54aa5e2044c416ec680b5ff9af0227bd698521666e8b1a1ea1b041fbae8",
-          "url": "https://firefox-settings-attachments.cdn.mozilla.net/main-workspace/translations-models-v2/371728a2-8c02-4528-bd76-4cd1c4e8f05e.zst",
-          "compressed_bytes": 351089,
-          "compressed_sha256": "9f68a65a64d4c64ea41d94024160e1443ff51b6c7ba0a2f93e7702beaa0b1d25",
-          "compression": "zstd",
-          "role": "vocab"
-        },
-        {
-          "name": "model.enar.intgemm.alphas.bin",
-          "bytes": 31561787,
-          "sha256": "ae659d7045fc2e5d6ba50583586a5d94ee4358d92c019847e37b57a0e627faa8",
-          "url": "https://firefox-settings-attachments.cdn.mozilla.net/main-workspace/translations-models-v2/0d56ac93-c0ac-4854-b48e-09e38d51dace.zst",
-          "compressed_bytes": 22272394,
-          "compressed_sha256": "41dc919c1110508ad7f03ee53bbb28a54abd61d1b15bbc3fe51c5df5c9331016",
-          "compression": "zstd",
-          "role": "model"
-        },
-        {
-          "name": "lex.50.50.enar.s2t.bin",
-          "bytes": 3139692,
-          "sha256": "2b7194817c5dd9225ca90c0d908cc92e1d6d1f45625781a5feb037ac568d6a61",
-          "url": "https://firefox-settings-attachments.cdn.mozilla.net/main-workspace/translations-models-v2/6b7c1061-729a-44e3-858d-409a7061a704.zst",
-          "compressed_bytes": 1204697,
-          "compressed_sha256": "f5fe1d8d145e38b4c6fd9f7a35d0d5779388fa135743561e1d25e982d7191222",
-          "compression": "zstd",
-          "role": "lex"
-        }
-      ],
-      "license": "MPL-2.0",
-      "publisher": "https://mozilla.github.io/translations/firefox-models/"
-    },
     "en-es-base-memory-3.0": {
       "kind": "firefox",
       "source": "en",
@@ -805,46 +758,6 @@
           "compressed_sha256": "a97b81e39392c07084f3e8340f119e31ae10529634dd0ad6bad1f945d94bb4c7",
           "compression": "zstd",
           "role": "lex"
-        }
-      ],
-      "license": "MPL-2.0",
-      "publisher": "https://mozilla.github.io/translations/firefox-models/"
-    },
-    "en-ko-base-3.0": {
-      "kind": "firefox",
-      "source": "en",
-      "target": "ko",
-      "architecture": "base",
-      "files": [
-        {
-          "name": "lex.50.50.enko.s2t.bin",
-          "bytes": 6676356,
-          "sha256": "7734265822ce315c72334ad538e698ab3900ab8e8f04bd43768d0aecad6b6df7",
-          "url": "https://firefox-settings-attachments.cdn.mozilla.net/main-workspace/translations-models-v2/493336e3-8e7b-4223-86c5-e88846a85d46.zst",
-          "compressed_bytes": 2675843,
-          "compressed_sha256": "7216367b7f524c0ae1f39353e5c4622b230d1c2e47924182a5853418c1e69f64",
-          "compression": "zstd",
-          "role": "lex"
-        },
-        {
-          "name": "model.enko.intgemm.alphas.bin",
-          "bytes": 59504955,
-          "sha256": "1c310a79b61b8824b2eb26b045db043d92722f3e66ea06998f7c89f48da9f6bc",
-          "url": "https://firefox-settings-attachments.cdn.mozilla.net/main-workspace/translations-models-v2/e4e7e781-bd8e-4dae-9f8e-d0c8a8a5b07b.zst",
-          "compressed_bytes": 44942689,
-          "compressed_sha256": "ebe3a360c2a007e31df8595bc01a856376c195718ed3c0a27b336eb9b349d313",
-          "compression": "zstd",
-          "role": "model"
-        },
-        {
-          "name": "vocab.enko.spm",
-          "bytes": 1406926,
-          "sha256": "709bf0e425345e0e92ce41ed84348a1296a2107c92bdb6624404450ffecbd1f9",
-          "url": "https://firefox-settings-attachments.cdn.mozilla.net/main-workspace/translations-models-v2/ac6a46cf-1cf0-4ea0-b1ad-9fa40d6f6513.zst",
-          "compressed_bytes": 595440,
-          "compressed_sha256": "dc5b8d46f6dff08950bf36db741f52431a41466cf33f5a105d1c5154586559d2",
-          "compression": "zstd",
-          "role": "vocab"
         }
       ],
       "license": "MPL-2.0",
@@ -1085,46 +998,6 @@
           "compressed_sha256": "e6715f3e8a9d2ff08004b8185305de73906d7c31352f99a7f0424b4bf96a9422",
           "compression": "zstd",
           "role": "lex"
-        }
-      ],
-      "license": "MPL-2.0",
-      "publisher": "https://mozilla.github.io/translations/firefox-models/"
-    },
-    "ko-en-base-3.0": {
-      "kind": "firefox",
-      "source": "ko",
-      "target": "en",
-      "architecture": "base",
-      "files": [
-        {
-          "name": "model.koen.intgemm.alphas.bin",
-          "bytes": 59504955,
-          "sha256": "1c902d6f7a8d7e3efe6ff4f7d4960a369957bca4ce2ce4a6e8572c231d525090",
-          "url": "https://firefox-settings-attachments.cdn.mozilla.net/main-workspace/translations-models-v2/1c6279db-79f9-40cc-a5b8-419e1a3ff9d8.zst",
-          "compressed_bytes": 42015393,
-          "compressed_sha256": "a2c67f552fb6fdb7a673f2745edd875c484d58c006912708b183c145f0f6c970",
-          "compression": "zstd",
-          "role": "model"
-        },
-        {
-          "name": "lex.50.50.koen.s2t.bin",
-          "bytes": 8617080,
-          "sha256": "471cd980c4ba08c240246f9361f64eb5d627848a135b5731d665f9efaa1e26ae",
-          "url": "https://firefox-settings-attachments.cdn.mozilla.net/main-workspace/translations-models-v2/074637f4-565e-4d6a-a0e7-e771851e0a80.zst",
-          "compressed_bytes": 3118173,
-          "compressed_sha256": "1f9b85b576dc8c18aecda1a9fade332d198176e503f14767d8fc03c8868586f0",
-          "compression": "zstd",
-          "role": "lex"
-        },
-        {
-          "name": "vocab.koen.spm",
-          "bytes": 1410063,
-          "sha256": "1c72b740ab793cdc3a8f16913dd6b4e806c77421077dd2d85edeb7be38418598",
-          "url": "https://firefox-settings-attachments.cdn.mozilla.net/main-workspace/translations-models-v2/eb596ffb-63d3-4519-870e-6d5bb5328be9.zst",
-          "compressed_bytes": 595536,
-          "compressed_sha256": "0ada2b1c9fde85c727ee88d702d1444f9ae427fa85a5bc269035b936ba4a6673",
-          "compression": "zstd",
-          "role": "vocab"
         }
       ],
       "license": "MPL-2.0",

@@ -78,7 +78,7 @@ With a development environment and existing Portuguese/English/Dutch packages:
 ```
 
 This compares boundaries and translation offline in isolated app storage. It
-requires existing fixtures; add `--download` explicitly to prepare the 24 small
+requires existing fixtures; add `--download` explicitly to prepare the 22 small
 sentence models. It writes `minisbd.json`, `legacy.json` and `comparison.json`.
 Unexpected boundary changes or different translations fail the check. Users'
 installed models are unaffected.

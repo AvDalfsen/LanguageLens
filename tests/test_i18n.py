@@ -96,7 +96,7 @@ def test_live_switch_keeps_pair_voice_hotkey_readiness_and_job_objects(window, c
     ]
     assert window.ui_language.findData("pb") < window.ui_language.findData("pt")
     assert window.ui_language.currentData() == code
-    assert window.layoutDirection() == (Qt.LayoutDirection.RightToLeft if code == "ar" else Qt.LayoutDirection.LeftToRight)
+    assert window.layoutDirection() == Qt.LayoutDirection.LeftToRight
     assert window.ui_language.parentWidget().layoutDirection() == Qt.LayoutDirection.LeftToRight
     window.ui_language.setCurrentIndex(window.ui_language.findData("en"))
     assert window.source.currentText() == "Japanese"
@@ -106,7 +106,7 @@ def test_live_switch_keeps_pair_voice_hotkey_readiness_and_job_objects(window, c
 def test_switch_preserves_listening_and_running_model_task(window):
     window.set_listening("<ctrl>+<alt>+q")
     window._installing = True
-    window.ui_language.setCurrentIndex(window.ui_language.findData("ar"))
+    window.ui_language.setCurrentIndex(window.ui_language.findData("hi"))
     assert window._installing
     assert window.start_button.text() == tr("Pause listening")
     assert window.current_settings().hotkey == "<ctrl>+<alt>+q"
@@ -126,7 +126,7 @@ def test_tooltips_and_tray_round_trip(window):
     original = window.source.toolTip()
     menu = QMenu()
     action = menu.addAction("Settings")
-    for code in ("nl", "ja", "ar", "en"):
+    for code in ("nl", "ja", "hi", "en"):
         previous = language()
         window.ui_language.setCurrentIndex(window.ui_language.findData(code))
         translate_ui(menu, previous)
@@ -144,7 +144,7 @@ def test_template_arguments_and_unknown_diagnostics_are_preserved():
 
 def test_localized_review_leaves_recognized_text_and_model_translations_untouched(review_factory):
     from language_lens.domain import OcrLine, WordTranslation
-    set_language("ar")
+    set_language("hi")
     review, _ = review_factory()
     source = "Installed Missing"
     review._ocr_finished([OcrLine(source, .99, ((0, 0), (180, 0), (180, 25), (0, 25)))])
@@ -257,7 +257,7 @@ def test_pronunciation_tooltips_translate_explanations_without_changing_phonemes
     review.shutdown_speech()
 
 
-@pytest.mark.parametrize("code", ["nl", "ar", "ja"])
+@pytest.mark.parametrize("code", ["nl", "hi", "ja"])
 @pytest.mark.parametrize("failure_code", ["sentence_language","sentence_split","missing_pack","pack_restart","pack_platform","disk_full","permission","network","timeout","route_unavailable","missing_assets","integrity","runtime","inspection","execution"])
 def test_categorized_failure_widgets_localize_and_survive_switches(qapp,code,failure_code):
     from PySide6.QtWidgets import QLabel

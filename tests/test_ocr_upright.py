@@ -52,12 +52,12 @@ def test_scaled_recognition_maps_lines_and_character_boxes_to_source(monkeypatch
     def construct(**_kwargs):
         def recognize(image, **kwargs):
             inputs.append(image)
-            return SimpleNamespace(boxes=[box], txts=["كتاب"], scores=[.59], word_results=None)
+            return SimpleNamespace(boxes=[box], txts=["Olá"], scores=[.59], word_results=None)
         return recognize
     monkeypatch.setattr(rapidocr, "RapidOCR", construct)
-    engine = RapidOcrEngine("ar")
+    engine = RapidOcrEngine("pb")
     image = np.zeros((20, 60, 3), dtype=np.uint8)
-    assert engine.recognize(image) == []  # the measured Arabic floor is .6
+    assert engine.recognize(image) == []  # the measured Brazilian Portuguese floor is .6
     line = engine.recognize(image, .5)[0]
     assert inputs[0].shape == (40, 120, 3)
     assert line.polygon == ((2, 3), (22, 3), (22, 13), (2, 13))
@@ -73,7 +73,7 @@ def test_native_character_geometry_is_scaled_with_its_line(monkeypatch):
     assert line.bounds.width == 20
 
 
-@pytest.mark.parametrize("language,expected", [("ar", .6), ("en", .6), ("ko", .3), ("fr", .45)])
+@pytest.mark.parametrize("language,expected", [("pt", .6), ("en", .6), ("sv", .3), ("fr", .45)])
 def test_default_floor_is_per_language_and_custom_floor_is_preserved(language, expected):
     assert confidence_for(language, Settings().min_ocr_confidence) == expected
     assert confidence_for(language, .7) == .7

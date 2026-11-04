@@ -208,6 +208,9 @@ class ArgosTranslator:
             try:
                 languages = {language.code: language for language in backend.get_installed_languages()}
                 translation = languages[source].get_translation(languages[target])
+                if source == "es":
+                    from language_lens.services.argos_precision import prepare_translation
+                    prepare_translation(translation)
                 hypotheses = translation.hypotheses(
                     text, num_hypotheses=EXPANDED_HYPOTHESES if expanded else 5,
                 )
@@ -248,6 +251,9 @@ class ArgosTranslator:
         _, translate = self._modules()
         with self._lock:
             try:
+                if source == "es":
+                    from language_lens.services.argos_precision import prepare_translation
+                    prepare_translation(translate.get_translation_from_codes(source, target))
                 result = translate.translate(text, source, target)
             except Exception as exc:  # Argos raises several backend-specific errors
                 raise TranslationUnavailable(

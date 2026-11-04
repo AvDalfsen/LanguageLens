@@ -155,17 +155,23 @@ def test_native_alignment_maps_composed_glyph_to_decomposed_source():
     assert [(box.start, box.end) for box in mapped.span_boxes] == [(0, 2)]
 
 
-def test_rtl_source_does_not_use_upstream_ltr_character_projection(monkeypatch, qapp):
+def test_non_latin_source_does_not_use_upstream_character_projection(monkeypatch, qapp):
     calls = []
     def recognize(_image, **kwargs):
         calls.append(kwargs)
-        return SimpleNamespace(boxes=[polygon(10, 20, 200)], txts=["هذا كتاب"], scores=[.99],
-                               word_results=[(('هذا كتاب', .99, polygon(10, 20, 200)),)])
+        return SimpleNamespace(boxes=[polygon(10, 20, 200)], txts=["यह किताब"], scores=[.99],
+                               word_results=None)
     monkeypatch.setattr(rapidocr, "RapidOCR", lambda **kwargs: recognize)
-    lines = RapidOcrEngine("ar").recognize(np.zeros((32, 96, 3), dtype=np.uint8))
+    lines = RapidOcrEngine("hi").recognize(np.zeros((32, 96, 3), dtype=np.uint8))
     assert not calls[0]["return_word_box"] and not lines[0].span_boxes
-    hits = build_word_hits(lines, "ar")
-    assert hits[0].bounds.x > hits[1].bounds.x
+    hits = build_word_hits(lines, "hi")
+    assert hits[0].bounds.x < hits[1].bounds.x
+
+
+def test_mixed_rtl_text_never_inherits_upstream_ltr_boxes():
+    line = OcrLine("هذا كتاب", .99, polygon(10, 20, 200))
+    mapped = _attach_boxes([line], [(('هذا كتاب', .99, polygon(10, 20, 200)),)])
+    assert not mapped[0].span_boxes
 
 
 @pytest.mark.parametrize("source,text,expected", [

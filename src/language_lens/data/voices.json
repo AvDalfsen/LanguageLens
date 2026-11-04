@@ -1,33 +1,5 @@
 [
   {
-    "id": "ar_JO-kareem-medium",
-    "name": "Kareem · Arabic (Jordan)",
-    "locale": "ar-JO",
-    "language": "ar",
-    "espeak": "ar",
-    "directory": "ar/ar_JO/kareem/medium",
-    "sample": "مرحباً! اختر نصاً وسأقرأه بصوت عالٍ.",
-    "phoneme_type": "espeak",
-    "license_note": "See URL",
-    "files": [
-      [
-        "ar_JO-kareem-medium.onnx",
-        63201294,
-        "9e95cab07b679da603bba17c4dec7ab3111320571964ee95c0379603c086491e"
-      ],
-      [
-        "ar_JO-kareem-medium.onnx.json",
-        5024,
-        "ea6d9b9d9076dbdb6bf5c98c6a141ef154959d2359709b37855727964e7d6c4d"
-      ],
-      [
-        "MODEL_CARD",
-        283,
-        "38e1e4f94c4cb9eda041a639096763a8c5681d0be5a5b3e22f990aed6bb4b86e"
-      ]
-    ]
-  },
-  {
     "id": "cs_CZ-jirka-medium",
     "name": "Jirka · Czech",
     "locale": "cs-CZ",
@@ -304,34 +276,6 @@
         "MODEL_CARD",
         361,
         "26dcad3474c39c7fc394c1e57e60121c90832afa9f43e7942faa7c51e1e81905"
-      ]
-    ]
-  },
-  {
-    "id": "ko_KR-kss-medium",
-    "name": "Kss · Korean",
-    "locale": "ko-KR",
-    "language": "ko",
-    "espeak": "ko",
-    "directory": "ko/ko_KR/kss/medium",
-    "sample": "안녕하세요. 글을 선택하면 소리 내어 읽어 드립니다.",
-    "phoneme_type": "espeak",
-    "license_note": "CC BY-NC-SA 4.0 (non-commercial)",
-    "files": [
-      [
-        "ko_KR-kss-medium.onnx",
-        63221984,
-        "624fd774e26895f24bebae1bd9a3379e3394baeade4b584924f83e414096e2c9"
-      ],
-      [
-        "ko_KR-kss-medium.onnx.json",
-        5232,
-        "153b5619d0580f824a59108d83ca19434de410eb8e4fe80325b58684fdc8a1df"
-      ],
-      [
-        "MODEL_CARD",
-        333,
-        "792db9e4889b69bf56bf49ed584809292110e16bf1fc904ff2b99faf8f778d6d"
       ]
     ]
   },

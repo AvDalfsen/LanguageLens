@@ -12,7 +12,7 @@ The portable preview needs Windows x64; it does not need Python, Git, or adminis
 
 ## Choose the interface language
 
-In the source app and next portable build, use **UI language** at the top right of Settings. All 25 choices are listed in their native names. The change takes effect immediately, works offline, and is saved automatically. It keeps your text language, translation target and voice settings. The longer help guides remain in English.
+In the source app and next portable build, use **UI language** at the top right of Settings. All 23 choices are listed in their native names. The change takes effect immediately, works offline, and is saved automatically. It keeps your text language, translation target and voice settings. The longer help guides remain in English.
 
 ## Prepare your languages
 

@@ -1,16 +1,5 @@
 [
   {
-    "language": "ar",
-    "sentences": [
-      "افتح الباب.",
-      "المفتاح على الطاولة."
-    ],
-    "baseline": [
-      "افتح الباب. المفتاح على الطاولة."
-    ],
-    "baseline_note": "Same boundary merge in Stanza 1.10.1 default tokenizer and MiniSBD 0.9.5."
-  },
-  {
     "language": "zh",
     "separator": "",
     "sentences": [
@@ -105,13 +94,6 @@
     "sentences": [
       "ドアを開けてください。",
       "鍵は机の上にあります。"
-    ]
-  },
-  {
-    "language": "ko",
-    "sentences": [
-      "문을 열어 주세요.",
-      "열쇠는 탁자 위에 있습니다."
     ]
   },
   {

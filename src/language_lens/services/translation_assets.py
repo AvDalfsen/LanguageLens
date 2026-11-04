@@ -31,9 +31,13 @@ def selection(source, target):
 
 def identity(source, target):
     choice=selection(source,target)
-    if not choice['full'] and not choice['word']:return {'version':'argos-v1'}
+    precision = {}
+    if source == 'es' and source != target and (not choice['full'] or not choice['word'] or choice['full'].get('pivot')):
+        from language_lens.services.argos_precision import POLICY_ID
+        precision = {'argos_precision': POLICY_ID}
+    if not choice['full'] and not choice['word']:return {'version':'argos-v1', **precision}
     definitions={key:catalog()['models'][key] for key in model_ids(source,target)}
-    return {'version':catalog()['version'], **choice,
+    return {'version':catalog()['version'], **choice, **precision,
             'models_sha256':hashlib.sha256(json.dumps(definitions,sort_keys=True).encode()).hexdigest()}
 
 

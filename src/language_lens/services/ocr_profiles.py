@@ -61,7 +61,6 @@ TESSERACT_RUSSIAN = OcrProfile("tesseract-best-rus-eng", "TESSERACT5", "RUS_ENG"
 # Explicit language assignments, including the app's nb and pb aliases. CH is
 # the catalogue key for the unified v6 recognizer, not a Chinese-only alphabet.
 PROFILES_BY_LANGUAGE = {
-    "ar": OcrProfile("arabic-v5", "PPOCRV5", "ARABIC", "MOBILE"),
     "zh": MULTILINGUAL_SMALL,
     "cs": MULTILINGUAL_SMALL,
     "da": MULTILINGUAL_SMALL,
@@ -75,7 +74,6 @@ PROFILES_BY_LANGUAGE = {
     "hu": MULTILINGUAL_MEDIUM,
     "it": LATIN_V5,
     "ja": MULTILINGUAL_SMALL,
-    "ko": OcrProfile("korean-v5", "PPOCRV5", "KOREAN", "MOBILE"),
     "nb": MULTILINGUAL_SMALL,
     "pl": MULTILINGUAL_SMALL,
     "pt": LATIN_V5,

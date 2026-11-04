@@ -4,6 +4,49 @@ import pytest
 from language_lens.config import Settings, load_settings, save_settings
 
 
+@pytest.mark.parametrize("removed", ["ar", "ko"])
+@pytest.mark.parametrize("field", ["source_language", "target_language", "ui_language"])
+def test_retired_language_settings_fall_back_without_resetting_other_preferences(tmp_path, removed, field):
+    path = tmp_path / "settings.json"
+    raw = {"source_language": "ja", "target_language": "nl", "ui_language": "de",
+           "speech_speed": .8, "speech_voices": {removed: "retired", "en": "en_US-lessac-medium"}}
+    raw[field] = removed
+    path.write_text(json.dumps(raw), encoding="utf-8")
+    settings = load_settings(path)
+    assert getattr(settings, field) == getattr(Settings(), field)
+    for unchanged in {"source_language", "target_language", "ui_language"} - {field}:
+        assert getattr(settings, unchanged) == raw[unchanged]
+    assert settings.speech_speed == .8
+    assert settings.speech_voices == {"en": "en_US-lessac-medium"}
+    save_settings(settings, path)
+    assert load_settings(path) == settings
+
+
+def test_retired_languages_are_absent_from_application_catalogs():
+    from language_lens.config import LANGUAGES
+    from language_lens.i18n import UI_LANGUAGES, catalogs, _language_names
+    from language_lens.services import sentence_models, translation_assets, voices
+    from language_lens.services.ocr_profiles import PROFILES_BY_LANGUAGE
+    from language_lens.services.ocr_settings import SETTINGS_BY_LANGUAGE
+
+    removed = {"ar", "ko"}
+    supported = {code for _, code in LANGUAGES}
+    assert len(supported) == 23 and not supported & removed
+    assert {code for _, code in UI_LANGUAGES} == supported
+    assert set(catalogs()["languages"]) == supported
+    assert set(_language_names()) == supported
+    assert all(set(locale["languages"]) == supported for locale in _language_names().values())
+    assert set(PROFILES_BY_LANGUAGE) == set(SETTINGS_BY_LANGUAGE) == supported
+    assert set(sentence_models.catalog()["languages"]) == supported
+    assert not set(sentence_models.catalog()["models"]) & removed
+    assert {voice.language for voice in voices.VOICES} == supported
+    catalog = translation_assets.catalog()
+    for field in ("full_text", "words"):
+        assert all(not set(pair.split("-")) & removed for pair in catalog[field])
+    assert all(model.get("source") not in removed and model.get("target") not in removed
+               for model in catalog["models"].values())
+
+
 @pytest.mark.parametrize("scope", ["all", "current"])
 def test_settings_round_trip(tmp_path, scope):
     path = tmp_path / "settings.json"

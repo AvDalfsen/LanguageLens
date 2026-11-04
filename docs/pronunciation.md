@@ -9,7 +9,7 @@
 3. Read **Voice details and licence**, then click **Download voice**. The button shows the download size.
 4. Wait for verification, and use **Hear sample** to preview it.
 
-The upcoming interface calls the checkbox **Enable read aloud**; earlier previews use a longer label. All 25 text-language choices have a catalogue voice. Availability is not a native-speaker quality rating.
+The upcoming interface calls the checkbox **Enable read aloud**; earlier previews use a longer label. All 23 text-language choices have a catalogue voice. Availability is not a native-speaker quality rating.
 
 Voices usually need about 63–114 MB each; Japanese pronunciation also needs a separate pack. Settings displays missing components and progress. Downloads can be cancelled and retried; completed files are retained. **Check voice files** verifies installed data and fetches missing/damaged files.
 

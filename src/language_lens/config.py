@@ -10,7 +10,6 @@ from language_lens.services.hotkey import normalize_hotkey
 
 
 LANGUAGES: tuple[tuple[str, str], ...] = (
-    ("Arabic", "ar"),
     ("Chinese", "zh"),
     ("Czech", "cs"),
     ("Danish", "da"),
@@ -24,7 +23,6 @@ LANGUAGES: tuple[tuple[str, str], ...] = (
     ("Hungarian", "hu"),
     ("Italian", "it"),
     ("Japanese", "ja"),
-    ("Korean", "ko"),
     ("Norwegian", "nb"),
     ("Polish", "pl"),
     ("Portuguese (Portugal)", "pt"),

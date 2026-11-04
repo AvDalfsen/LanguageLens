@@ -6,35 +6,38 @@
 
 Choose the language written on screen under **Text language**, and the language you know under **Translate into**. These choices control text processing. **UI language**, in the top right of Settings, independently changes the interface language in the source app and next portable build.
 
-The interface offers the same 25 choices, including both Portuguese variants. Languages appear under their own names, such as Nederlands, 日本語 and العربية. English is the default; changes apply immediately and are saved automatically. Arabic uses a right-to-left layout, with the selector still in the top right. No model or voice download is needed for UI translation.
+The interface offers the same 23 choices, including both Portuguese variants. Languages appear under their own names, such as Nederlands, 日本語 and हिन्दी. English is the default; changes apply immediately and are saved automatically. No model or voice download is needed for UI translation.
 
 Controls, status messages and tooltips are translated using the complete English messages as the reference. The longer user guides remain in English, as do upstream model/voice names, licence notices and some technical diagnostics. These are initial translations; native-speaker corrections are welcome.
 
 | | | |
 | --- | --- | --- |
-| Arabic | Chinese | Czech |
-| Danish | Dutch | English |
-| Finnish | French | German |
-| Greek | Hindi | Hungarian |
-| Italian | Japanese | Korean |
-| Norwegian | Polish | Portuguese (Portugal) |
-| Portuguese (Brazil) | Romanian | Russian |
-| Spanish | Swedish | Turkish |
-| Ukrainian | | |
+| Chinese | Czech | Danish |
+| Dutch | English | Finnish |
+| French | German | Greek |
+| Hindi | Hungarian | Italian |
+| Japanese | Norwegian | Polish |
+| Portuguese (Portugal) | Portuguese (Brazil) | Romanian |
+| Russian | Spanish | Swedish |
+| Turkish | Ukrainian | |
 
-These are the 25 selectable text-language choices. They do not establish that every source/target pair is available or that all languages have equal recognition, translation, or pronunciation quality.
+Arabic and Korean are not offered because recognition and translation quality did not meet the application’s requirements. Saved selections for either language fall back to the defaults: Portuguese text, English target and English interface.
+
+These are the 23 selectable text-language choices. They do not establish that every source/target pair is available or that all languages have equal recognition, translation, or pronunciation quality.
 
 ## What Settings checks
 
 | Capability | What to expect |
 | --- | --- |
 | OCR | A local model selected for the text language's script. Small, stylized, curved, or vertical text can be difficult. |
-| Translation | Directional Argos models. A direct route is used when available; other pairs can use two models through English. |
+| Translation | Directional local models, including selected alternatives to Argos. Other pairs use Argos directly or through English. |
 | Word lookup | OCR alignment and word segmentation. Japanese/Chinese use additional dictionary packs. |
-| Read aloud | A downloadable catalogue voice for each text-language choice; 26 catalogue voices including both English accents. |
+| Read aloud | A downloadable catalogue voice for each text-language choice; 24 catalogue voices including both English accents. |
 | Phonetic display | Audited estimated IPA conventions for English and Portuguese accents; labelled engine notation for other languages. |
 
 Click **Download required files** for the chosen pair and wait for verification. Settings reports route/capabilities under **Technical details**. A missing route may need another target language or an upstream model that does not currently exist. A dropdown entry is not a promise of every possible translation direction.
+
+Spanish → French, Italian, Brazilian Portuguese and Romanian use the selected shared local model. The Portuguese output is generic Portuguese; Brazilian regional wording is not guaranteed. Remaining Argos routes using the affected Spanish → English 1.9 model apply a computation compatibility fix to prevent the previously observed repetitive nonsense. This fix does not guarantee accurate meaning.
 
 ## Optional language packs
 

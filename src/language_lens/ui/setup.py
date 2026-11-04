@@ -139,7 +139,7 @@ class SetupWindow(QMainWindow):
         self._header_row.addStretch()
         self._header_row.addWidget(language_controls, 0, Qt.AlignmentFlag.AlignRight)
         header = QWidget()
-        # The language selector stays in the top right for Arabic too.
+        # Keep the interface language selector anchored in the top right.
         header.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
         header.setLayout(self._header_row)
         intro = ui_widget(QLabel, tr("Explore the text on your screen, one word or a whole sentence at a time. "

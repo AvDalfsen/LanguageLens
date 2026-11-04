@@ -137,7 +137,7 @@ class FirefoxModel:
 
     def translate(self,text):
         # Decode bounded sentences separately. The WASM decoder can omit parts of
-        # multi-sentence Hindi/Korean inputs when passed an entire paragraph.
+        # multi-sentence inputs when passed an entire paragraph.
         from language_lens.services.sentence_models import split
         return '\n'.join(' '.join(self.call('translate',text=unit).strip() for unit in split(line,self.source))
                          for line in text.split('\n'))

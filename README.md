@@ -38,11 +38,11 @@ For voices, shortcuts, updates, or uninstalling, follow the [getting-started gui
 
 ## Languages and compatibility
 
-The app offers 25 text-language choices, including English, Dutch, French, German, Spanish, Portuguese (Portugal/Brazil), Japanese, Chinese, Korean, Arabic, and Hindi. See the [complete language list and capability notes](docs/languages.md).
+The app offers 23 text-language choices, including English, Dutch, French, German, Spanish, Portuguese (Portugal/Brazil), Japanese, Chinese, and Hindi. See the [complete language list and capability notes](docs/languages.md).
 
 Translation models are directional. Some pairs use two local models through English; availability and quality vary by pair. Japanese/Chinese word dictionaries and Japanese pronunciation use additional packs. Settings checks what your chosen pair needs.
 
-Translation uses Argos for pairs without selected alternatives. The 36 newly adopted translation routes use the same model for whole text and isolated words. Their model files are supplied by a local model pack; public downloads for these additions have not been published yet. Some earlier routes retain separate word providers.
+Translation uses Argos for pairs without selected alternatives. The 40 newly adopted translation routes use the same model for whole text and isolated words. Their model files are supplied by a local model pack; public downloads for these additions have not been published yet. Some earlier routes retain separate word providers.
 
 By default, translation models are released when you close a capture's review. For faster repeated captures, enable **Keep translation models loaded between captures** under **Settings → Performance**. This retains model memory until you change languages, disable the setting, or quit; idle models do not continuously translate.
 
