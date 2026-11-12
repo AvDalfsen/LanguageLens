@@ -36,7 +36,7 @@ def pair_file_summary(settings, translator, route):
     if translator.argos_required(settings.source_language, settings.target_language):
         package, _ = translator._modules()
         locations.append(str(Path(package.settings.package_data_dir).parent / "language-lens-removed-models"))
-    langs = dict.fromkeys([settings.source_language, *(item.from_code for item in route)])
+    langs = assets.sentence_languages(settings.source_language, settings.target_language, route)
     for lang in langs:
         info = sentence_models.catalog()["models"][sentence_models.model_code(lang)]
         path = sentence_models.model_path(lang)

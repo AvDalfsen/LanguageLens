@@ -1,0 +1,8 @@
+# Build-only dependencies. Do not add Transformers to capture/runtime imports.
+ctranslate2==4.8.2
+transformers==4.57.1
+tokenizers==0.22.2
+sentencepiece==0.2.2
+safetensors==0.6.2
+huggingface-hub==0.36.0
+torch==2.14.1

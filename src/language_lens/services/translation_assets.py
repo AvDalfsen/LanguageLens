@@ -49,8 +49,36 @@ def model_path(model_id):
 
 def model_ids(source,target):
     choice=selection(source,target)
-    return list(dict.fromkeys([*( [choice['full']['model']] if choice['full'] else []),
+    return list(dict.fromkeys([*(step['model'] for step in full_steps(source,target)),
                               *( [choice['word']] if choice['word'] and choice['word'] != 'full' else [])]))
+
+
+def full_steps(source, target):
+    """Return only catalog-selected steps; never discover a new pivot route."""
+    choice = selection(source, target)['full']
+    if not choice:
+        return []
+    if 'pipeline' not in choice:
+        return [{'source': source, 'target': 'en' if choice.get('pivot') else target,
+                 'model': choice['model'], 'options': choice.get('options', {})}]
+    steps = choice['pipeline']
+    if not isinstance(steps, list) or len(steps) < 2 or choice.get('pivot'):
+        raise KnownTaskError('runtime')
+    previous = source
+    for step in steps:
+        if (step.get('source') != previous or step.get('target') == previous or
+                step.get('model') not in catalog()['models'] or step.get('pivot')):
+            raise KnownTaskError('runtime')
+        previous = step.get('target')
+    if previous != target:
+        raise KnownTaskError('runtime')
+    return steps
+
+
+def sentence_languages(source, target, route=()):
+    """Include native intermediate inputs as well as any Argos leaf inputs."""
+    return list(dict.fromkeys([source, *(step['source'] for step in full_steps(source, target)),
+                              *(item.from_code for item in route)]))
 
 
 def supports_expansion(source,target):

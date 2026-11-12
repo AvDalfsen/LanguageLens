@@ -61,6 +61,22 @@ def test_argos_only_pair_does_not_download_word_weights(downloads):
     assert not requests
 
 
+def test_pipeline_preparation_downloads_both_components_and_recovers_only_missing_leaf(downloads):
+    catalog, _, requests = downloads
+    catalog['full_text']['hi-nl'] = {'pipeline': [
+        {'source': 'hi', 'target': 'en', 'model': 'small'},
+        {'source': 'en', 'target': 'nl', 'model': 'm2m'}]}
+    catalog['words']['hi-nl'] = 'full'
+    paths = assets.prepare('hi', 'nl', lambda _: None, lambda _: None)
+    assert len(paths) == 8 and len(requests) == 8 and assets.ready('hi', 'nl')
+    missing = assets.model_path('m2m')/'model.bin'
+    missing.unlink()
+    assert not assets.ready('hi', 'nl')
+    assets.prepare('hi', 'nl', lambda _: None, lambda _: None)
+    assert len(requests) == 9 and requests[-1] == catalog['models']['m2m']['files'][0]['url']
+    assert assets.ready('hi', 'nl')
+
+
 @pytest.mark.parametrize("damage", ["transfer", "checksum", "decoded_size", "decoded_checksum", "not_zstd"])
 def test_failed_download_preserves_existing_file_and_cleans_temporary_data(downloads, damage):
     catalog, payloads, _ = downloads

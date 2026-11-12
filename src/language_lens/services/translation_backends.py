@@ -72,16 +72,18 @@ class T5Model:
         self.backend = ctranslate2.Translator(str(directory), device='cpu', compute_type='int8_float32',
                                              intra_threads=2, inter_threads=1)
 
-    def translate(self, text):
+    def translate(self, text, *, source=None, prefix=None):
         from language_lens.services.sentence_models import split
+        source = self.source if source is None else source
+        prefix = self.prefix if prefix is None else prefix
         lines = []
         for line in text.split('\n'):
             pieces = []
-            for unit in split(line, self.source) if line.strip() else ():
+            for unit in split(line, source) if line.strip() else ():
                 # Tokenizer may return a literal unknown glyph rather than its
                 # vocabulary spelling. Match the publisher's ID-based tokenizer.
                 tokens = [t if t in self.vocab else '<unk>'
-                          for t in self.tokenizer.encode(self.prefix + unit).tokens]
+                          for t in self.tokenizer.encode(prefix + unit).tokens]
                 if len(tokens) > 1024:
                     raise TranslationUnavailable('Translation input limit reached.')
                 result = self.backend.translate_batch([tokens], beam_size=4, length_penalty=1,
@@ -160,15 +162,24 @@ class RoutedTranslator:
         choice=assets.selection(source,target)
         return source!=target and (not choice['full'] or not choice['word'] or choice['full'].get('pivot'))
 
-    def route(self,source,target):return self.argos.route(source,target) if self.argos_required(source,target) else []
+    @staticmethod
+    def argos_pair(source, target):
+        choice = assets.selection(source, target)
+        # A selected native first leg plus the same full route for words needs
+        # only the English-to-target package, not the superseded source leg.
+        if choice['full'] and choice['full'].get('pivot') and choice['word'] == 'full':
+            return 'en', target
+        return source, target
+
+    def route(self,source,target):return self.argos.route(*self.argos_pair(source,target)) if self.argos_required(source,target) else []
     def is_pair_installed(self,source,target):
         # Inspect required Argos packages even when the full-text model is still
         # missing, so damaged word packages keep their recovery action.
-        argos_ready = not self.argos_required(source,target) or self.argos.is_pair_installed(source,target)
+        argos_ready = not self.argos_required(source,target) or self.argos.is_pair_installed(*self.argos_pair(source,target))
         return assets.ready(source,target) and argos_ready
 
     def install_pair(self,source,target,report=None,progress=None,*,staged=False,force=False):
-        if self.argos_required(source,target):self.argos.install_pair(source,target,report,progress,staged=staged,force=force)
+        if self.argos_required(source,target):self.argos.install_pair(*self.argos_pair(source,target),report,progress,staged=staged,force=force)
         assets.prepare(source,target,report or (lambda _:None),progress or (lambda _:None),force=force)
 
     @lru_cache(maxsize=4096)
@@ -176,20 +187,30 @@ class RoutedTranslator:
         if not text or source==target:return text
         choice=assets.selection(source,target)['full']
         if choice is None:return self.argos.translate(text,source,target)
-        model=self._full.get(choice['model'])
-        if model is None:
-            from language_lens.services.native_translation import NativeCT2Model, HyModel
-            factories = {'t5':T5Model, 'firefox':FirefoxModel, 'marian':NativeCT2Model,
-                         'm2m_full':NativeCT2Model, 'hy':HyModel}
-            factory = factories.get(assets.catalog()['models'][choice['model']]['kind'])
-            if factory is None: raise KnownTaskError('runtime')
-            model = self._full[choice['model']] = factory(choice['model'])
-        if assets.catalog()['models'][choice['model']]['kind'] in ('marian','m2m_full','hy'):
-            result=model.translate(text,source,target,choice['options'])
-        else:result=model.translate(text)
+        result=text
+        for step in assets.full_steps(source,target):
+            result=self._translate_step(result,step['source'],step['target'],step)
+            if not result.strip():raise TranslationUnavailable('No usable full translation.')
+            result=result.strip()
         if choice.get('pivot'):result=self.argos.translate(result,'en',target)
         if not result.strip():raise TranslationUnavailable('No usable full translation.')
         return result.strip()
+
+    def _translate_step(self,text,source,target,choice):
+        model=self._full.get(choice['model'])
+        if model is None:
+            from language_lens.services.native_translation import NativeCT2Model, HyModel, MadladModel
+            factories = {'t5':T5Model, 'firefox':FirefoxModel, 'marian':NativeCT2Model,
+                         'm2m_full':NativeCT2Model, 'hy':HyModel, 'madlad':MadladModel}
+            factory = factories.get(assets.catalog()['models'][choice['model']]['kind'])
+            if factory is None: raise KnownTaskError('runtime')
+            model = self._full[choice['model']] = factory(choice['model'])
+        kind = assets.catalog()['models'][choice['model']]['kind']
+        if kind in ('marian','m2m_full','hy','madlad'):
+            result=model.translate(text,source,target,choice.get('options', {}))
+        elif kind == 't5':result=model.translate(text, **choice.get('options', {}))
+        else:result=model.translate(text)
+        return result
 
     @lru_cache(maxsize=4096)
     def word_candidates(self,text,source,target,*,expanded=False):
@@ -226,4 +247,4 @@ class RoutedTranslator:
                   for kind,model in self._full.items() if isinstance(model,T5Model)},
             'native':{kind:{'object_id':id(getattr(model,'backend',model)),
                               'loaded':model.backend.model_is_loaded if hasattr(model,'backend') else model.process.poll() is None}
-                      for kind,model in self._full.items() if assets.catalog()['models'][kind]['kind'] in ('marian','m2m_full','hy')}}
+                      for kind,model in self._full.items() if assets.catalog()['models'][kind]['kind'] in ('marian','m2m_full','hy','madlad')}}

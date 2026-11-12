@@ -5,13 +5,17 @@ from language_lens.services import translation_assets as assets, translation_bac
 
 def test_only_benchmarked_pair_function_exceptions_are_routed():
     selected={pair for pair,value in assets.catalog()['words'].items() if value=='full'}
-    assert len(selected)==40
+    assert len(selected)==124
     assert {'cs-uk','da-nb','ru-uk','uk-ru','fr-ja','fr-zh','en-ja','zh-ja'}<=selected
     assert {'es-fr','es-it','es-pb','es-ro'}<=selected
-    assert not {'de-nl','cs-ru','en-fi','ar-en','en-ko'} & selected
-    assert assets.selection('pt','en')=={'full':None,'word':None}
+    assert {'en-fi','en-it','pt-en','nl-en','nl-fr','ja-zh','ja-hi','da-uk','fr-uk','es-uk','zh-uk','el-ja'} <= selected
+    assert {'ja-hu','hi-uk','fi-es','nl-uk'} <= selected
+    assert not {'de-nl','cs-ru','ar-en','en-ko'} & selected
+    assert assets.selection('pt','en')['full']['model']=='madlad400-3b-native'
+    assert assets.selection('pt','en')['word']=='full'
     assert assets.selection('en','nl')=={'full':{'model':'t5-en-nl-24l','pivot':None},'word':None}
-    assert assets.selection('nl','en')=={'full':None,'word':None}
+    assert assets.selection('nl','en')['full']['model']=='t5-en-nl-24l'
+    assert assets.selection('nl','en')['word']=='full'
     assert assets.selection('pb','en')=={'full':None,'word':None}
     assert assets.selection('ar','en')=={'full':None,'word':None}
     assert assets.selection('ko','en')=={'full':None,'word':None}
@@ -66,20 +70,24 @@ def test_full_text_decodes_all_sentences_and_preserves_paragraphs(monkeypatch):
     assert model.translate('first|second\n\nthird|last')=='FIRST SECOND\n\nTHIRD LAST'
 
 
-def test_dutch_full_text_uses_t5_but_word_lookup_and_reverse_keep_argos(monkeypatch):
-    constructed=[]
+def test_t5_forward_and_reverse_share_weights_with_direction_specific_options(monkeypatch):
+    constructed=[];calls=[]
     class T5:
         def __init__(self,model):constructed.append(model)
-        def translate(self,text):return 'Dutch '+text
+        def translate(self,text,**options):
+            calls.append((text,options));return 'T5 '+text
         def close(self):constructed.append('closed')
     monkeypatch.setattr(backends,'T5Model',T5)
     translator=backends.RoutedTranslator()
     translator.argos=SimpleNamespace(translate=lambda text,s,t:'Argos '+text,
         word_candidates=lambda text,s,t,**kw:WordTranslation(('Argos word',)))
-    assert translator.translate('first','en','nl')=='Dutch first'
-    assert translator.translate('second','en','nl')=='Dutch second'
+    assert translator.translate('first','en','nl')=='T5 first'
+    assert translator.translate('second','en','nl')=='T5 second'
     assert translator.word_candidates('Where','en','nl').candidates==('Argos word',)
-    assert translator.translate('reverse','nl','en')=='Argos reverse'
+    assert translator.translate('reverse','nl','en')=='T5 reverse'
+    assert calls[-1][1]==dict(source='nl',prefix='translate Dutch to English: ')
+    assert translator.word_candidates('woord','nl','en').candidates==('T5 woord',)
+    assert not translator.argos_required('nl','en')
     assert translator.argos_required('en','nl')  # Still needed for independent words.
     assert constructed==['t5-en-nl-24l']
     translator.close()

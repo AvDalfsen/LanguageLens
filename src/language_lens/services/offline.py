@@ -184,6 +184,11 @@ def offline_ready(source: str, target: str, word_lookup: bool = True, *, route=N
         from language_lens.services import sentence_models
         if not sentence_models.compatible(records["sentence_models"]):
             return False
+        from language_lens.services import translation_assets
+        if (translation_assets.selection(source, target)['full'] or {}).get('pipeline'):
+            required_sentences = sentence_models.identities(translation_assets.sentence_languages(source, target))
+            if any(records['sentence_models'].get(code) != digest for code, digest in required_sentences.items()):
+                return False
         if required and records.get("language_pack") != packs.identity(required):
             return False
         if records["version"] != 3 or records["runtime"] != runtime_identity() or not records["files"]:
@@ -239,7 +244,7 @@ def prepare(source: str, target: str, report, progress, word_lookup: bool = True
     package_module = translator._modules()[0] if translator.argos_required(source,target) else None
     route = translator.route(source, target)
     prepared_translation = translation_state(package_module, route)
-    sentence_languages = list(dict.fromkeys([source,*(item.from_code for item in route)]))
+    sentence_languages = translation_assets.sentence_languages(source, target, route)
     paths.extend(sentence_models.prepare(sentence_languages, report, progress))
     # All inference, including the fixed warmup sample, is now offline.
     from language_lens.services.voices import selected_voice

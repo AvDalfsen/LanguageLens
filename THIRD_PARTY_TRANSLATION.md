@@ -43,6 +43,41 @@ No TranslateLocally executable or shared TranslateLocally settings are used in
 production. Only active-pair backends enter memory. The Settings retention
 toggle controls whether they survive between captures; it defaults to off.
 
+## Selected native model packs
+
+The additional Marian OPUS-MT models are published by Helsinki-NLP. Their
+individual pinned revisions and licenses (CC BY 4.0 or Apache 2.0) are recorded
+in the production catalogue. Attribution belongs to the Helsinki-NLP / OPUS-MT
+authors; model cards identify training data and associated citations:
+https://huggingface.co/Helsinki-NLP. Marian publisher weights are converted to
+CTranslate2 int8; native SentencePiece files are unmodified. Catalogued output
+hashes must match before a pack can be used. CC BY 4.0 terms are available at
+https://creativecommons.org/licenses/by/4.0/.
+
+M2M100 1.2B is published by Meta/Facebook under MIT:
+https://huggingface.co/facebook/m2m100_1.2B. Its native full-text decoder and
+the existing 418M checkpoint are also used for scalar words on selected routes.
+
+Hy-MT2 1.8B Q4_K_M is published by Tencent under Apache 2.0:
+https://huggingface.co/tencent/Hy-MT2-1.8B-GGUF. Its separate pinned CPU runtime
+is llama.cpp (MIT), https://github.com/ggml-org/llama.cpp, with the bundled
+OpenMP and runtime notices retained beside the executables.
+
+MADLAD-400 3B is published by Google under Apache 2.0:
+https://huggingface.co/google/madlad400-3b-mt. The selected unmodified
+CTranslate2 int8 conversion is distributed by Nextcloud AI:
+https://huggingface.co/Nextcloud-AI/madlad400-3b-mt-ct2-int8. Language Lens uses
+the pinned original Google SentencePiece tokenizer and its native text policy.
+No Transformers or Torch imports are added to capture workers.
+
+The bilingual T5 checkpoint also serves Dutch-to-English and the selected
+Dutch-to-French composite route, using its published reverse-direction prefix.
+The latter keeps the actual Argos English-to-French second leg.
+
+See [model-pack build instructions](docs/translation-route-rollout.md). Packs
+are separate from application wheels and source control. No redistribution or
+public model release is performed by running a capture or ordinary app build.
+
 ## Apache License 2.0
 
 

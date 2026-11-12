@@ -5,7 +5,7 @@ import pytest
 
 from language_lens.domain import WordTranslation
 from language_lens.services import translation_assets as assets, translation_backends as backends, offline
-from language_lens.services.native_translation import NativeCT2Model, HyModel, repair_latin_boundaries
+from language_lens.services.native_translation import NativeCT2Model, HyModel, MadladModel, repair_latin_boundaries
 from language_lens.services.translation import TranslationUnavailable
 
 
@@ -139,3 +139,61 @@ def test_local_pack_prepares_shared_full_word_files_without_network(monkeypatch,
     previous=assets.identity('da','nb')
     cat['models']['test']['kind']='m2m_full'
     assert assets.identity('da','nb')!=previous
+
+
+def test_madlad_native_codec_preserves_byte_pieces_and_publisher_cleanup():
+    special={0:'<pad>',1:'</s>',2:'<unk>'}
+    sp=SimpleNamespace(unk_id=lambda:2,bos_id=lambda:-1,eos_id=lambda:1,pad_id=lambda:0,
+        id_to_piece=special.__getitem__,decode=lambda pieces:''.join(pieces).replace('▁',' '))
+    pieces=['▁We','▁are','▁n\'t','▁ready','▁.','</s>']
+    assert MadladModel.decode(sp,pieces)=="We aren't ready."
+    assert pieces[0]=='▁We'  # The original journal token list is not modified.
+
+
+def test_madlad_uses_native_target_tag_and_exact_bounded_sentence_inputs(monkeypatch):
+    from language_lens.services import sentence_models
+    monkeypatch.setattr(sentence_models,'split',lambda text,source:text.split('|'))
+    inputs=[]
+    model=MadladModel.__new__(MadladModel)
+    model.sp=SimpleNamespace(piece_to_id=lambda tag:3 if tag=='<2en>' else 0,unk_id=lambda:0,
+        bos_id=lambda:-1,eos_id=lambda:1,pad_id=lambda:2,
+        id_to_piece=lambda i:{0:'<unk>',1:'</s>',2:'<pad>'}[i],
+        encode=lambda text,**kw:inputs.append(text) or ['<2en>','▁source'],
+        decode=lambda pieces:''.join(pieces).replace('▁',' '))
+    calls=[]
+    def infer(batch,**options):
+        calls.append((batch,options));return [SimpleNamespace(hypotheses=[['▁result','</s>']])]
+    model.backend=SimpleNamespace(translate_batch=infer)
+    assert model.translate('one|two\n\nthree','pt','en',dict(input_bound=3,output_bound=4))=='result result\n\nresult'
+    assert inputs==['<2en> one','<2en> two','<2en> three']
+    assert calls[0][0]==[['<2en>','▁source','</s>']]
+    assert calls[0][1]==dict(beam_size=4,length_penalty=1,max_input_length=0,max_decoding_length=4)
+    with pytest.raises(TranslationUnavailable):
+        model.translate('one','pt','en',dict(input_bound=2,output_bound=4))
+    assert len(calls)==3
+    with pytest.raises(TranslationUnavailable):
+        model.translate('one','pt','xx',dict(input_bound=3,output_bound=4))
+
+
+def test_selected_native_pivot_requires_only_remaining_argos_leg(monkeypatch):
+    calls=[]
+    class T5:
+        def __init__(self,model):pass
+        def translate(self,text,**options):return 'English '+text
+        def close(self):pass
+    monkeypatch.setattr(backends,'T5Model',T5)
+    monkeypatch.setattr(assets,'ready',lambda *args:True)
+    monkeypatch.setattr(assets,'prepare',lambda *args,**kw:None)
+    translator=backends.RoutedTranslator()
+    translator.argos=SimpleNamespace(
+        route=lambda *args:calls.append(('route',args)) or [],
+        is_pair_installed=lambda *args:calls.append(('installed',args)) or True,
+        install_pair=lambda *args,**kw:calls.append(('install',args[:2])),
+        translate=lambda text,s,t:calls.append(('translate',(text,s,t))) or 'French result')
+    translator.route('nl','fr')
+    assert translator.is_pair_installed('nl','fr')
+    translator.install_pair('nl','fr')
+    assert calls[:3]==[('route',('en','fr')),('installed',('en','fr')),('install',('en','fr'))]
+    assert translator.word_candidates('woord','nl','fr').candidates==('French result',)
+    assert calls[-1]==('translate',('English woord','en','fr'))
+    translator.close()

@@ -79,6 +79,5 @@ def test_sentence_and_word_calls_both_prepare_the_repair(package, monkeypatch):
 
 def test_repair_policy_invalidates_only_relevant_argos_readiness_records():
     assert assets.identity('es', 'nl')['argos_precision'] == precision.POLICY_ID
-    assert assets.identity('es', 'ja')['argos_precision'] == precision.POLICY_ID
-    for pair in [('es','fr'),('es','en'),('fr','es'),('nl','en'),('es','es')]:
+    for pair in [('es','fr'),('es','ja'),('es','en'),('fr','es'),('nl','en'),('es','es')]:
         assert 'argos_precision' not in assets.identity(*pair)

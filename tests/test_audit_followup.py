@@ -91,8 +91,10 @@ def test_sentence_failure_does_not_block_individual_words(monkeypatch, tmp_path)
             if word == "bad":
                 raise RuntimeError("private selected text")
             return WordTranslation(("goed",))
-    from language_lens.services import translation
-    monkeypatch.setattr(translation, "ArgosTranslator", Translator)
+        def close(self):
+            pass
+    from language_lens.services import translation_backends
+    monkeypatch.setattr(translation_backends, "RoutedTranslator", Translator)
     events = []
     task_worker.execute("translate", {"settings": asdict(Settings()), "text": "bad good", "words": ["bad", "good"]}, tmp_path, events.append)
     results = [item["result"] for item in events if "result" in item]

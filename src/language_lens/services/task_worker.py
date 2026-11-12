@@ -46,6 +46,9 @@ def execute(command, payload, scratch, emit):
         if ready:
             packages = translator.route(source, target)
             route = [packages[0].from_code, *(item.to_code for item in packages)] if packages else ([source] if source==target else [source,target])
+            from language_lens.services.translation_assets import selection, full_steps
+            if (selection(source, target)['full'] or {}).get('pipeline'):
+                route = [source, *(step['target'] for step in full_steps(source, target))]
         from language_lens.services.local_files import pair_file_summary
         from language_lens.services.errors import KnownTaskError
         try:
@@ -73,7 +76,7 @@ def execute(command, payload, scratch, emit):
             elif command == "prepare":
                 prepare(source, target, report, progress, settings.word_lookup_enabled)
             elif command == "remove":
-                if translator.argos_required(source,target):remove_route(source, target, report)
+                if translator.argos_required(source,target):remove_route(*translator.argos_pair(source, target), report)
                 from language_lens.services.translation_assets import remove
                 remove(source,target)
                 from language_lens.services.offline import marker_path

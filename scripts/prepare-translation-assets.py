@@ -55,7 +55,7 @@ def main():
                     pilot=ROOT/'artifacts/en-nl-specialist-research-2026-10-15'
                     source=pilot/'models/t5';tokenizer=pilot/'downloads/t5'
                 for item in model['files']:
-                    path=(tokenizer if item['name'] in ('sentencepiece.bpe.model','tokenizer.json') else source)/item['name']
+                    path=(tokenizer if item['name'] in ('sentencepiece.bpe.model','tokenizer.json','vocab.json') else source)/item['name']
                     if not matches(path,item):raise RuntimeError('Benchmark artifact is not the selected checkpoint.')
                     shutil.copyfile(path,stage/item['name'])
             else:
@@ -65,8 +65,9 @@ def main():
                     download(url,source/item['name'],item)
                 from ctranslate2.converters import TransformersConverter
                 TransformersConverter(str(source),low_cpu_mem_usage=True).convert(str(stage),quantization='int8',force=True)
-                tokenizer_name='tokenizer.json' if model['kind']=='t5' else 'sentencepiece.bpe.model'
-                shutil.copyfile(source/tokenizer_name,stage/tokenizer_name)
+                for item in model['files']:
+                    if not (stage/item['name']).exists() and matches(source/item['name'],item):
+                        shutil.copyfile(source/item['name'],stage/item['name'])
             if not all(matches(stage/item['name'],item) for item in model['files']):
                 raise RuntimeError('Conversion does not match the benchmark. Use the pinned translation build requirements.')
             destination.mkdir(exist_ok=True)

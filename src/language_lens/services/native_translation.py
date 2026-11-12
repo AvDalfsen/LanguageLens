@@ -101,6 +101,56 @@ class NativeCT2Model:
         self.backend.unload_model()
 
 
+class MadladModel:
+    """Publisher SentencePiece input/decoding with the verified CT2 checkpoint."""
+    def __init__(self, model_id):
+        import ctranslate2
+        import sentencepiece
+        info = assets.catalog()['models'][model_id]
+        directory = assets.verified_model(model_id)
+        self.sp = sentencepiece.SentencePieceProcessor(model_file=str(directory / info['source_tokenizer']))
+        self.backend = ctranslate2.Translator(str(directory), device='cpu',
+            compute_type='int8_float32', intra_threads=2, inter_threads=1)
+        self.last_units = []
+
+    @staticmethod
+    def decode(sp, pieces):
+        special = {sp.id_to_piece(i) for i in (sp.unk_id(), sp.bos_id(), sp.eos_id(), sp.pad_id()) if i >= 0}
+        pieces = [p for p in pieces if p not in special]
+        if pieces and pieces[0].startswith('▁'):
+            pieces[0] = pieces[0][1:]
+        value = sp.decode(pieces).strip()
+        for old, new in [(' .','.'), (' ?','?'), (' !','!'), (' ,',','), (" ' ","'"),
+                         (" n't","n't"), (" 'm","'m"), (" 's","'s"), (" 've","'ve"), (" 're","'re")]:
+            value = value.replace(old, new)
+        return value
+
+    def translate(self, text, source, target, options):
+        from language_lens.services.sentence_models import split
+        target = {'pb':'pt', 'nb':'no'}.get(target, target)
+        tag = '<2' + target + '>'
+        if self.sp.piece_to_id(tag) == self.sp.unk_id():
+            raise TranslationUnavailable('Unsupported native direction.')
+        lines = []; self.last_units = []
+        for line in text.split('\n'):
+            joined = []
+            for unit in split(line, source) if line.strip() else ():
+                tokens = self.sp.encode(tag + ' ' + unit, out_type=str) + [self.sp.id_to_piece(self.sp.eos_id())]
+                if len(tokens) > options['input_bound']:
+                    raise TranslationUnavailable('Translation input limit reached.')
+                out = self.backend.translate_batch([tokens], beam_size=4, length_penalty=1,
+                    max_input_length=0, max_decoding_length=options['output_bound'])[0].hypotheses[0]
+                self.last_units.append({'source':unit, 'input_tokens':tokens, 'output_tokens':out})
+                if len(out) >= options['output_bound']:
+                    raise TranslationUnavailable('Translation output limit reached.')
+                joined.extend(out)
+            lines.append(self.decode(self.sp, joined))
+        return '\n'.join(lines)
+
+    def close(self):
+        self.backend.unload_model()
+
+
 class HyModel:
     """Owned loopback llama.cpp server; external capture networking stays blocked."""
     def __init__(self, model_id):

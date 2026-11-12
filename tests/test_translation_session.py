@@ -77,6 +77,17 @@ def test_language_change_and_maintenance_release_retained_models(qapp,fake):
     job=service.submit('translate',request);wait(qapp,lambda:not job.active)
     sessions.invalidate();assert service.closed and service.process is None
 
+
+@pytest.mark.parametrize('source,target', [('fi','es'), ('hi','uk'), ('nl','uk')])
+def test_explicit_native_pipeline_can_be_scheduled_and_released(qapp, fake, source, target):
+    service = sessions.TranslationSession()
+    request = payload(source=source, target=target, words=())
+    job = service.submit('translate', request)
+    wait(qapp, lambda: not job.active)
+    assert records(fake)[-1]['command'] == 'sentence'
+    service.shutdown()
+    assert service.process is None
+
 def test_hover_and_expanded_request_precede_speculative_words(qapp,fake):
     service=sessions.TranslationSession();request=payload(words=('first','middle','last'))
     job=service.submit('translate',request)

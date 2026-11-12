@@ -1,30 +1,62 @@
 {
-  "version": "2026-11-04-native-v3",
+  "version": "2026-11-05-repairs-v5",
   "default": "argos",
   "full_text": {
     "en-es": {
-      "model": "en-es-base-memory-3.0",
-      "pivot": null
+      "model": "marian-wave-opus-en-es",
+      "pivot": null,
+      "options": {
+        "prefix": "",
+        "normalize": true,
+        "input_bound": 1024,
+        "output_bound": 1023,
+        "require_eos": false,
+        "repair_latin_boundaries": false
+      }
     },
     "en-fi": {
-      "model": "en-fi-base-memory-3.0",
-      "pivot": null
+      "model": "marian-gap-en-fi",
+      "pivot": null,
+      "options": {
+        "prefix": "",
+        "normalize": true,
+        "input_bound": 1024,
+        "output_bound": 1023,
+        "require_eos": false,
+        "repair_latin_boundaries": false
+      }
     },
     "en-hi": {
       "model": "en-hi-tiny-3.0",
       "pivot": null
     },
     "en-it": {
-      "model": "en-it-base-memory-3.0",
-      "pivot": null
+      "model": "marian-wave-opus-en-it",
+      "pivot": null,
+      "options": {
+        "prefix": "",
+        "normalize": true,
+        "input_bound": 1024,
+        "output_bound": 1023,
+        "require_eos": false,
+        "repair_latin_boundaries": false
+      }
     },
     "en-pl": {
       "model": "en-pl-base-memory-3.0",
       "pivot": null
     },
     "en-tr": {
-      "model": "en-tr-tiny-3.0",
-      "pivot": null
+      "model": "marian-wave-opus-en-tr",
+      "pivot": null,
+      "options": {
+        "prefix": "",
+        "normalize": true,
+        "input_bound": 1024,
+        "output_bound": 1023,
+        "require_eos": false,
+        "repair_latin_boundaries": false
+      }
     },
     "en-uk": {
       "model": "en-uk-base-memory-3.0",
@@ -557,6 +589,991 @@
         "repair_latin_boundaries": false,
         "disable_unk": true
       }
+    },
+    "fr-uk": {
+      "model": "hy-mt2-1.8b-q4",
+      "pivot": null,
+      "options": {
+        "target_name": "Ukrainian",
+        "decoding": {
+          "temperature": 0.7,
+          "top_p": 0.6,
+          "top_k": 20,
+          "repeat_penalty": 1.05
+        }
+      }
+    },
+    "es-uk": {
+      "model": "hy-mt2-1.8b-q4",
+      "pivot": null,
+      "options": {
+        "target_name": "Ukrainian",
+        "decoding": {
+          "temperature": 0.7,
+          "top_p": 0.6,
+          "top_k": 20,
+          "repeat_penalty": 1.05
+        }
+      }
+    },
+    "pt-en": {
+      "model": "madlad400-3b-native",
+      "pivot": null,
+      "options": {
+        "input_bound": 1024,
+        "output_bound": 1024
+      }
+    },
+    "fr-en": {
+      "model": "marian-opus-fr-en-big",
+      "pivot": null,
+      "options": {
+        "prefix": "",
+        "normalize": false,
+        "input_bound": 1024,
+        "output_bound": 1023,
+        "require_eos": false,
+        "repair_latin_boundaries": false
+      }
+    },
+    "cs-tr": {
+      "model": "m2m",
+      "pivot": null,
+      "options": {
+        "prefix": "",
+        "normalize": false,
+        "input_bound": 1024,
+        "output_bound": 1023,
+        "require_eos": false,
+        "repair_latin_boundaries": false
+      }
+    },
+    "da-uk": {
+      "model": "marian-direct-gmq-zle-v1",
+      "pivot": null,
+      "options": {
+        "prefix": ">>ukr<<",
+        "normalize": true,
+        "input_bound": 1024,
+        "output_bound": 1023,
+        "require_eos": true,
+        "repair_latin_boundaries": false
+      }
+    },
+    "el-ja": {
+      "model": "m2m-full-m2m12b-native-int8-v1",
+      "pivot": null,
+      "options": {
+        "prefix": "",
+        "normalize": false,
+        "input_bound": 1024,
+        "output_bound": 1023,
+        "require_eos": true,
+        "repair_latin_boundaries": false
+      }
+    },
+    "el-uk": {
+      "model": "m2m",
+      "pivot": null,
+      "options": {
+        "prefix": "",
+        "normalize": false,
+        "input_bound": 1024,
+        "output_bound": 1023,
+        "require_eos": false,
+        "repair_latin_boundaries": false
+      }
+    },
+    "en-da": {
+      "model": "marian-wave-opus-en-gmq",
+      "pivot": null,
+      "options": {
+        "prefix": ">>dan<<",
+        "normalize": true,
+        "input_bound": 1024,
+        "output_bound": 1023,
+        "require_eos": false,
+        "repair_latin_boundaries": false
+      }
+    },
+    "en-fr": {
+      "model": "marian-wave-opus-en-fr",
+      "pivot": null,
+      "options": {
+        "prefix": "",
+        "normalize": true,
+        "input_bound": 1024,
+        "output_bound": 1023,
+        "require_eos": false,
+        "repair_latin_boundaries": false
+      }
+    },
+    "en-nb": {
+      "model": "marian-wave-opus-en-gmq",
+      "pivot": null,
+      "options": {
+        "prefix": ">>nob<<",
+        "normalize": true,
+        "input_bound": 1024,
+        "output_bound": 1023,
+        "require_eos": false,
+        "repair_latin_boundaries": false
+      }
+    },
+    "en-pb": {
+      "model": "marian-wave-opus-en-pt",
+      "pivot": null,
+      "options": {
+        "prefix": "",
+        "normalize": true,
+        "input_bound": 1024,
+        "output_bound": 1023,
+        "require_eos": false,
+        "repair_latin_boundaries": false
+      }
+    },
+    "en-ru": {
+      "model": "marian-wave-opus-en-zle",
+      "pivot": null,
+      "options": {
+        "prefix": ">>rus<<",
+        "normalize": true,
+        "input_bound": 1024,
+        "output_bound": 1023,
+        "require_eos": false,
+        "repair_latin_boundaries": false
+      }
+    },
+    "en-sv": {
+      "model": "marian-wave-opus-en-gmq",
+      "pivot": null,
+      "options": {
+        "prefix": ">>swe<<",
+        "normalize": true,
+        "input_bound": 1024,
+        "output_bound": 1023,
+        "require_eos": false,
+        "repair_latin_boundaries": false
+      }
+    },
+    "fr-pb": {
+      "model": "marian-family-itc",
+      "pivot": null,
+      "options": {
+        "prefix": ">>por<<",
+        "normalize": true,
+        "input_bound": 1024,
+        "output_bound": 1023,
+        "require_eos": false,
+        "repair_latin_boundaries": false
+      }
+    },
+    "fr-pt": {
+      "model": "marian-family-itc",
+      "pivot": null,
+      "options": {
+        "prefix": ">>por<<",
+        "normalize": true,
+        "input_bound": 1024,
+        "output_bound": 1023,
+        "require_eos": false,
+        "repair_latin_boundaries": false
+      }
+    },
+    "hu-en": {
+      "model": "marian-selected-hu-en-big-20261104-v1",
+      "pivot": null,
+      "options": {
+        "prefix": "",
+        "normalize": true,
+        "input_bound": 1024,
+        "output_bound": 1023,
+        "require_eos": false,
+        "repair_latin_boundaries": false
+      }
+    },
+    "it-fr": {
+      "model": "marian-family-itc",
+      "pivot": null,
+      "options": {
+        "prefix": ">>fra<<",
+        "normalize": true,
+        "input_bound": 1024,
+        "output_bound": 1023,
+        "require_eos": false,
+        "repair_latin_boundaries": false
+      }
+    },
+    "it-pb": {
+      "model": "marian-family-itc",
+      "pivot": null,
+      "options": {
+        "prefix": ">>por<<",
+        "normalize": true,
+        "input_bound": 1024,
+        "output_bound": 1023,
+        "require_eos": false,
+        "repair_latin_boundaries": false
+      }
+    },
+    "it-pt": {
+      "model": "marian-family-itc",
+      "pivot": null,
+      "options": {
+        "prefix": ">>por<<",
+        "normalize": true,
+        "input_bound": 1024,
+        "output_bound": 1023,
+        "require_eos": false,
+        "repair_latin_boundaries": false
+      }
+    },
+    "it-tr": {
+      "model": "m2m",
+      "pivot": null,
+      "options": {
+        "prefix": "",
+        "normalize": false,
+        "input_bound": 1024,
+        "output_bound": 1023,
+        "require_eos": false,
+        "repair_latin_boundaries": false
+      }
+    },
+    "it-uk": {
+      "model": "m2m",
+      "pivot": null,
+      "options": {
+        "prefix": "",
+        "normalize": false,
+        "input_bound": 1024,
+        "output_bound": 1023,
+        "require_eos": false,
+        "repair_latin_boundaries": false
+      }
+    },
+    "ja-hi": {
+      "model": "m2m",
+      "pivot": null,
+      "options": {
+        "prefix": "",
+        "normalize": false,
+        "input_bound": 1024,
+        "output_bound": 1023,
+        "require_eos": false,
+        "repair_latin_boundaries": false
+      }
+    },
+    "ja-it": {
+      "model": "m2m",
+      "pivot": null,
+      "options": {
+        "prefix": "",
+        "normalize": false,
+        "input_bound": 1024,
+        "output_bound": 1023,
+        "require_eos": false,
+        "repair_latin_boundaries": false
+      }
+    },
+    "ja-zh": {
+      "model": "m2m",
+      "pivot": null,
+      "options": {
+        "prefix": "",
+        "normalize": false,
+        "input_bound": 1024,
+        "output_bound": 1023,
+        "require_eos": false,
+        "repair_latin_boundaries": false
+      }
+    },
+    "nl-fr": {
+      "model": "t5-en-nl-24l",
+      "pivot": "fr",
+      "options": {
+        "source": "nl",
+        "prefix": "translate Dutch to English: "
+      }
+    },
+    "pb-fr": {
+      "model": "marian-family-itc",
+      "pivot": null,
+      "options": {
+        "prefix": ">>fra<<",
+        "normalize": true,
+        "input_bound": 1024,
+        "output_bound": 1023,
+        "require_eos": false,
+        "repair_latin_boundaries": false
+      }
+    },
+    "pb-it": {
+      "model": "marian-family-itc",
+      "pivot": null,
+      "options": {
+        "prefix": ">>ita<<",
+        "normalize": true,
+        "input_bound": 1024,
+        "output_bound": 1023,
+        "require_eos": false,
+        "repair_latin_boundaries": false
+      }
+    },
+    "pb-uk": {
+      "model": "m2m",
+      "pivot": null,
+      "options": {
+        "prefix": "",
+        "normalize": false,
+        "input_bound": 1024,
+        "output_bound": 1023,
+        "require_eos": false,
+        "repair_latin_boundaries": false
+      }
+    },
+    "pl-ru": {
+      "model": "marian-direct-zlw-zle-v1",
+      "pivot": null,
+      "options": {
+        "prefix": ">>rus<<",
+        "normalize": true,
+        "input_bound": 1024,
+        "output_bound": 1023,
+        "require_eos": true,
+        "repair_latin_boundaries": false
+      }
+    },
+    "pt-es": {
+      "model": "marian-family-itc",
+      "pivot": null,
+      "options": {
+        "prefix": ">>spa<<",
+        "normalize": true,
+        "input_bound": 1024,
+        "output_bound": 1023,
+        "require_eos": false,
+        "repair_latin_boundaries": false
+      }
+    },
+    "pt-fr": {
+      "model": "marian-family-itc",
+      "pivot": null,
+      "options": {
+        "prefix": ">>fra<<",
+        "normalize": true,
+        "input_bound": 1024,
+        "output_bound": 1023,
+        "require_eos": false,
+        "repair_latin_boundaries": false
+      }
+    },
+    "pt-it": {
+      "model": "marian-family-itc",
+      "pivot": null,
+      "options": {
+        "prefix": ">>ita<<",
+        "normalize": true,
+        "input_bound": 1024,
+        "output_bound": 1023,
+        "require_eos": false,
+        "repair_latin_boundaries": false
+      }
+    },
+    "pt-ro": {
+      "model": "marian-family-itc",
+      "pivot": null,
+      "options": {
+        "prefix": ">>ron<<",
+        "normalize": true,
+        "input_bound": 1024,
+        "output_bound": 1023,
+        "require_eos": false,
+        "repair_latin_boundaries": false,
+        "disable_unk": true
+      }
+    },
+    "pt-uk": {
+      "model": "m2m",
+      "pivot": null,
+      "options": {
+        "prefix": "",
+        "normalize": false,
+        "input_bound": 1024,
+        "output_bound": 1023,
+        "require_eos": false,
+        "repair_latin_boundaries": false
+      }
+    },
+    "sv-ro": {
+      "model": "marian-direct-sv-ro-b2-v1",
+      "pivot": null,
+      "options": {
+        "prefix": "",
+        "normalize": true,
+        "input_bound": 512,
+        "output_bound": 511,
+        "require_eos": true,
+        "repair_latin_boundaries": false
+      }
+    },
+    "sv-ru": {
+      "model": "marian-direct-gmq-zle-v1",
+      "pivot": null,
+      "options": {
+        "prefix": ">>rus<<",
+        "normalize": true,
+        "input_bound": 1024,
+        "output_bound": 1023,
+        "require_eos": true,
+        "repair_latin_boundaries": false
+      }
+    },
+    "zh-tr": {
+      "model": "m2m",
+      "pivot": null,
+      "options": {
+        "prefix": "",
+        "normalize": false,
+        "input_bound": 1024,
+        "output_bound": 1023,
+        "require_eos": false,
+        "repair_latin_boundaries": false
+      }
+    },
+    "zh-uk": {
+      "model": "m2m",
+      "pivot": null,
+      "options": {
+        "prefix": "",
+        "normalize": false,
+        "input_bound": 1024,
+        "output_bound": 1023,
+        "require_eos": false,
+        "repair_latin_boundaries": false
+      }
+    },
+    "nl-en": {
+      "model": "t5-en-nl-24l",
+      "pivot": null,
+      "options": {
+        "source": "nl",
+        "prefix": "translate Dutch to English: "
+      }
+    },
+    "es-ja": {
+      "model": "hy-mt2-1.8b-q4",
+      "pivot": null,
+      "options": {
+        "target_name": "Japanese",
+        "decoding": {
+          "temperature": 0.7,
+          "top_p": 0.6,
+          "top_k": 20,
+          "repeat_penalty": 1.05
+        }
+      }
+    },
+    "hi-ja": {
+      "model": "m2m",
+      "pivot": null,
+      "options": {
+        "prefix": "",
+        "normalize": false,
+        "input_bound": 1024,
+        "output_bound": 1023,
+        "require_eos": false,
+        "repair_latin_boundaries": false
+      }
+    },
+    "hi-tr": {
+      "model": "m2m",
+      "pivot": null,
+      "options": {
+        "prefix": "",
+        "normalize": false,
+        "input_bound": 1024,
+        "output_bound": 1023,
+        "require_eos": false,
+        "repair_latin_boundaries": false
+      }
+    },
+    "hu-tr": {
+      "model": "m2m-full-m2m12b-native-int8-v1",
+      "pivot": null,
+      "options": {
+        "prefix": "",
+        "normalize": false,
+        "input_bound": 1024,
+        "output_bound": 1023,
+        "require_eos": true,
+        "repair_latin_boundaries": false
+      }
+    },
+    "hu-uk": {
+      "model": "m2m-full-m2m12b-native-int8-v1",
+      "pivot": null,
+      "options": {
+        "prefix": "",
+        "normalize": false,
+        "input_bound": 1024,
+        "output_bound": 1023,
+        "require_eos": true,
+        "repair_latin_boundaries": false
+      }
+    },
+    "ja-es": {
+      "model": "m2m",
+      "pivot": null,
+      "options": {
+        "prefix": "",
+        "normalize": false,
+        "input_bound": 1024,
+        "output_bound": 1023,
+        "require_eos": false,
+        "repair_latin_boundaries": false
+      }
+    },
+    "ja-nl": {
+      "model": "m2m",
+      "pivot": null,
+      "options": {
+        "prefix": "",
+        "normalize": false,
+        "input_bound": 1024,
+        "output_bound": 1023,
+        "require_eos": false,
+        "repair_latin_boundaries": false
+      }
+    },
+    "ja-pb": {
+      "model": "m2m",
+      "pivot": null,
+      "options": {
+        "prefix": "",
+        "normalize": false,
+        "input_bound": 1024,
+        "output_bound": 1023,
+        "require_eos": false,
+        "repair_latin_boundaries": false
+      }
+    },
+    "ja-pt": {
+      "model": "m2m",
+      "pivot": null,
+      "options": {
+        "prefix": "",
+        "normalize": false,
+        "input_bound": 1024,
+        "output_bound": 1023,
+        "require_eos": false,
+        "repair_latin_boundaries": false
+      }
+    },
+    "ja-ru": {
+      "model": "m2m",
+      "pivot": null,
+      "options": {
+        "prefix": "",
+        "normalize": false,
+        "input_bound": 1024,
+        "output_bound": 1023,
+        "require_eos": false,
+        "repair_latin_boundaries": false
+      }
+    },
+    "ja-sv": {
+      "model": "m2m",
+      "pivot": null,
+      "options": {
+        "prefix": "",
+        "normalize": false,
+        "input_bound": 1024,
+        "output_bound": 1023,
+        "require_eos": false,
+        "repair_latin_boundaries": false
+      }
+    },
+    "ja-tr": {
+      "model": "m2m-full-m2m12b-native-int8-v1",
+      "pivot": null,
+      "options": {
+        "prefix": "",
+        "normalize": false,
+        "input_bound": 1024,
+        "output_bound": 1023,
+        "require_eos": true,
+        "repair_latin_boundaries": false
+      }
+    },
+    "ja-uk": {
+      "model": "m2m",
+      "pivot": null,
+      "options": {
+        "prefix": "",
+        "normalize": false,
+        "input_bound": 1024,
+        "output_bound": 1023,
+        "require_eos": false,
+        "repair_latin_boundaries": false
+      }
+    },
+    "pb-ro": {
+      "model": "marian-family-itc",
+      "pivot": null,
+      "options": {
+        "prefix": ">>ron<<",
+        "normalize": true,
+        "input_bound": 1024,
+        "output_bound": 1023,
+        "require_eos": false,
+        "repair_latin_boundaries": false,
+        "disable_unk": true
+      }
+    },
+    "pl-tr": {
+      "model": "m2m",
+      "pivot": null,
+      "options": {
+        "prefix": "",
+        "normalize": false,
+        "input_bound": 1024,
+        "output_bound": 1023,
+        "require_eos": false,
+        "repair_latin_boundaries": false
+      }
+    },
+    "ro-it": {
+      "model": "marian-family-itc",
+      "pivot": null,
+      "options": {
+        "prefix": ">>ita<<",
+        "normalize": true,
+        "input_bound": 1024,
+        "output_bound": 1023,
+        "require_eos": false,
+        "repair_latin_boundaries": false
+      }
+    },
+    "ro-pb": {
+      "model": "marian-family-itc",
+      "pivot": null,
+      "options": {
+        "prefix": ">>por<<",
+        "normalize": true,
+        "input_bound": 1024,
+        "output_bound": 1023,
+        "require_eos": false,
+        "repair_latin_boundaries": false
+      }
+    },
+    "ro-uk": {
+      "model": "m2m",
+      "pivot": null,
+      "options": {
+        "prefix": "",
+        "normalize": false,
+        "input_bound": 1024,
+        "output_bound": 1023,
+        "require_eos": false,
+        "repair_latin_boundaries": false
+      }
+    },
+    "tr-cs": {
+      "model": "m2m",
+      "pivot": null,
+      "options": {
+        "prefix": "",
+        "normalize": false,
+        "input_bound": 1024,
+        "output_bound": 1023,
+        "require_eos": false,
+        "repair_latin_boundaries": false
+      }
+    },
+    "tr-hi": {
+      "model": "m2m",
+      "pivot": null,
+      "options": {
+        "prefix": "",
+        "normalize": false,
+        "input_bound": 1024,
+        "output_bound": 1023,
+        "require_eos": false,
+        "repair_latin_boundaries": false
+      }
+    },
+    "tr-ja": {
+      "model": "m2m",
+      "pivot": null,
+      "options": {
+        "prefix": "",
+        "normalize": false,
+        "input_bound": 1024,
+        "output_bound": 1023,
+        "require_eos": false,
+        "repair_latin_boundaries": false
+      }
+    },
+    "tr-pl": {
+      "model": "m2m",
+      "pivot": null,
+      "options": {
+        "prefix": "",
+        "normalize": false,
+        "input_bound": 1024,
+        "output_bound": 1023,
+        "require_eos": false,
+        "repair_latin_boundaries": false
+      }
+    },
+    "uk-cs": {
+      "model": "m2m",
+      "pivot": null,
+      "options": {
+        "prefix": "",
+        "normalize": false,
+        "input_bound": 1024,
+        "output_bound": 1023,
+        "require_eos": false,
+        "repair_latin_boundaries": false
+      }
+    },
+    "uk-da": {
+      "model": "m2m",
+      "pivot": null,
+      "options": {
+        "prefix": "",
+        "normalize": false,
+        "input_bound": 1024,
+        "output_bound": 1023,
+        "require_eos": false,
+        "repair_latin_boundaries": false
+      }
+    },
+    "uk-de": {
+      "model": "m2m",
+      "pivot": null,
+      "options": {
+        "prefix": "",
+        "normalize": false,
+        "input_bound": 1024,
+        "output_bound": 1023,
+        "require_eos": false,
+        "repair_latin_boundaries": false
+      }
+    },
+    "uk-es": {
+      "model": "m2m",
+      "pivot": null,
+      "options": {
+        "prefix": "",
+        "normalize": false,
+        "input_bound": 1024,
+        "output_bound": 1023,
+        "require_eos": false,
+        "repair_latin_boundaries": false
+      }
+    },
+    "uk-hu": {
+      "model": "m2m",
+      "pivot": null,
+      "options": {
+        "prefix": "",
+        "normalize": false,
+        "input_bound": 1024,
+        "output_bound": 1023,
+        "require_eos": false,
+        "repair_latin_boundaries": false
+      }
+    },
+    "uk-it": {
+      "model": "m2m",
+      "pivot": null,
+      "options": {
+        "prefix": "",
+        "normalize": false,
+        "input_bound": 1024,
+        "output_bound": 1023,
+        "require_eos": false,
+        "repair_latin_boundaries": false
+      }
+    },
+    "uk-ja": {
+      "model": "m2m-full-m2m12b-native-int8-v1",
+      "pivot": null,
+      "options": {
+        "prefix": "",
+        "normalize": false,
+        "input_bound": 1024,
+        "output_bound": 1023,
+        "require_eos": true,
+        "repair_latin_boundaries": false
+      }
+    },
+    "uk-nl": {
+      "model": "m2m",
+      "pivot": null,
+      "options": {
+        "prefix": "",
+        "normalize": false,
+        "input_bound": 1024,
+        "output_bound": 1023,
+        "require_eos": false,
+        "repair_latin_boundaries": false
+      }
+    },
+    "uk-pb": {
+      "model": "m2m",
+      "pivot": null,
+      "options": {
+        "prefix": "",
+        "normalize": false,
+        "input_bound": 1024,
+        "output_bound": 1023,
+        "require_eos": false,
+        "repair_latin_boundaries": false
+      }
+    },
+    "uk-pl": {
+      "model": "m2m",
+      "pivot": null,
+      "options": {
+        "prefix": "",
+        "normalize": false,
+        "input_bound": 1024,
+        "output_bound": 1023,
+        "require_eos": false,
+        "repair_latin_boundaries": false
+      }
+    },
+    "uk-pt": {
+      "model": "m2m",
+      "pivot": null,
+      "options": {
+        "prefix": "",
+        "normalize": false,
+        "input_bound": 1024,
+        "output_bound": 1023,
+        "require_eos": false,
+        "repair_latin_boundaries": false
+      }
+    },
+    "uk-ro": {
+      "model": "m2m",
+      "pivot": null,
+      "options": {
+        "prefix": "",
+        "normalize": false,
+        "input_bound": 1024,
+        "output_bound": 1023,
+        "require_eos": false,
+        "repair_latin_boundaries": false
+      }
+    },
+    "uk-sv": {
+      "model": "m2m",
+      "pivot": null,
+      "options": {
+        "prefix": "",
+        "normalize": false,
+        "input_bound": 1024,
+        "output_bound": 1023,
+        "require_eos": false,
+        "repair_latin_boundaries": false
+      }
+    },
+    "uk-tr": {
+      "model": "m2m-full-m2m12b-native-int8-v1",
+      "pivot": null,
+      "options": {
+        "prefix": "",
+        "normalize": false,
+        "input_bound": 1024,
+        "output_bound": 1023,
+        "require_eos": true,
+        "repair_latin_boundaries": false
+      }
+    },
+    "fi-es": {
+      "pipeline": [
+        {
+          "model": "marian-gap-fi-en",
+          "pivot": null,
+          "options": {
+            "prefix": "",
+            "normalize": true,
+            "input_bound": 1024,
+            "output_bound": 1023,
+            "require_eos": false,
+            "repair_latin_boundaries": false
+          },
+          "source": "fi",
+          "target": "en"
+        },
+        {
+          "model": "marian-wave-opus-en-es",
+          "pivot": null,
+          "options": {
+            "prefix": "",
+            "normalize": true,
+            "input_bound": 1024,
+            "output_bound": 1023,
+            "require_eos": false,
+            "repair_latin_boundaries": false
+          },
+          "source": "en",
+          "target": "es"
+        }
+      ]
+    },
+    "hi-uk": {
+      "pipeline": [
+        {
+          "model": "hi-en-tiny-3.0",
+          "pivot": null,
+          "source": "hi",
+          "target": "en"
+        },
+        {
+          "model": "en-uk-base-memory-3.0",
+          "pivot": null,
+          "source": "en",
+          "target": "uk"
+        }
+      ]
+    },
+    "nl-uk": {
+      "pipeline": [
+        {
+          "model": "t5-en-nl-24l",
+          "pivot": null,
+          "options": {
+            "source": "nl",
+            "prefix": "translate Dutch to English: "
+          },
+          "source": "nl",
+          "target": "en"
+        },
+        {
+          "model": "en-uk-base-memory-3.0",
+          "pivot": null,
+          "source": "en",
+          "target": "uk"
+        }
+      ]
+    },
+    "ja-hu": {
+      "model": "m2m-full-m2m12b-native-int8-v1",
+      "pivot": null,
+      "options": {
+        "prefix": "",
+        "normalize": false,
+        "input_bound": 1024,
+        "output_bound": 1023,
+        "require_eos": true,
+        "repair_latin_boundaries": false
+      }
     }
   },
   "words": {
@@ -600,7 +1617,91 @@
     "es-fr": "full",
     "es-it": "full",
     "es-pb": "full",
-    "es-ro": "full"
+    "es-ro": "full",
+    "fr-uk": "full",
+    "es-uk": "full",
+    "pt-en": "full",
+    "fr-en": "full",
+    "cs-tr": "full",
+    "da-uk": "full",
+    "el-ja": "full",
+    "el-uk": "full",
+    "en-da": "full",
+    "en-es": "full",
+    "en-fr": "full",
+    "en-nb": "full",
+    "en-pb": "full",
+    "en-ru": "full",
+    "en-sv": "full",
+    "en-tr": "full",
+    "fr-pb": "full",
+    "fr-pt": "full",
+    "hu-en": "full",
+    "it-fr": "full",
+    "it-pb": "full",
+    "it-pt": "full",
+    "it-tr": "full",
+    "it-uk": "full",
+    "ja-hi": "full",
+    "ja-it": "full",
+    "ja-zh": "full",
+    "nl-fr": "full",
+    "pb-fr": "full",
+    "pb-it": "full",
+    "pb-uk": "full",
+    "pl-ru": "full",
+    "pt-es": "full",
+    "pt-fr": "full",
+    "pt-it": "full",
+    "pt-ro": "full",
+    "pt-uk": "full",
+    "sv-ro": "full",
+    "sv-ru": "full",
+    "zh-tr": "full",
+    "zh-uk": "full",
+    "nl-en": "full",
+    "en-fi": "full",
+    "en-it": "full",
+    "es-ja": "full",
+    "hi-ja": "full",
+    "hi-tr": "full",
+    "hu-tr": "full",
+    "hu-uk": "full",
+    "ja-es": "full",
+    "ja-nl": "full",
+    "ja-pb": "full",
+    "ja-pt": "full",
+    "ja-ru": "full",
+    "ja-sv": "full",
+    "ja-tr": "full",
+    "ja-uk": "full",
+    "pb-ro": "full",
+    "pl-tr": "full",
+    "ro-it": "full",
+    "ro-pb": "full",
+    "ro-uk": "full",
+    "tr-cs": "full",
+    "tr-hi": "full",
+    "tr-ja": "full",
+    "tr-pl": "full",
+    "uk-cs": "full",
+    "uk-da": "full",
+    "uk-de": "full",
+    "uk-es": "full",
+    "uk-hu": "full",
+    "uk-it": "full",
+    "uk-ja": "full",
+    "uk-nl": "full",
+    "uk-pb": "full",
+    "uk-pl": "full",
+    "uk-pt": "full",
+    "uk-ro": "full",
+    "uk-sv": "full",
+    "uk-tr": "full",
+    "fi-es": "full",
+    "hi-uk": "full",
+    "nl-uk": "full",
+    "ja-hu": "full"
   },
   "models": {
     "en-es-base-memory-3.0": {
@@ -1124,7 +2225,7 @@
       "publisher": "https://mozilla.github.io/translations/firefox-models/"
     },
     "m2m": {
-      "kind": "m2m",
+      "kind": "m2m_full",
       "files": [
         {
           "name": "config.json",
@@ -1161,6 +2262,15 @@
           "compression": "zstd",
           "compressed_bytes": 1140195,
           "compressed_sha256": "84ea4ddfa6109dace8ad1681907ca237b556bee93e5b450d9b13b17abca27e39"
+        },
+        {
+          "name": "vocab.json",
+          "bytes": 3708092,
+          "sha256": "b6e77e474aeea8f441363aca7614317c06381f3eacfe10fb9856d5081d1074cc",
+          "url": "https://huggingface.co/facebook/m2m100_418M/resolve/55c2e61bbf05dfb8d7abccdc3fae6fc8512fd636/vocab.json",
+          "compressed_bytes": 3708092,
+          "compressed_sha256": "b6e77e474aeea8f441363aca7614317c06381f3eacfe10fb9856d5081d1074cc",
+          "compression": "none"
         }
       ],
       "license": "MIT",
@@ -1208,7 +2318,11 @@
           "sha256": "b6e77e474aeea8f441363aca7614317c06381f3eacfe10fb9856d5081d1074cc"
         }
       ],
-      "publisher": "https://huggingface.co/facebook/m2m100_418M"
+      "publisher": "https://huggingface.co/facebook/m2m100_418M",
+      "vocabulary": "shared_vocabulary.json",
+      "encoder": "vocab.json",
+      "source_tokenizer": "sentencepiece.bpe.model",
+      "target_tokenizer": "sentencepiece.bpe.model"
     },
     "small": {
       "kind": "small",
@@ -2706,7 +3820,7 @@
       "kind": "m2m_full",
       "repo": "facebook/m2m100_1.2B",
       "revision": "7b36184180524c1a1bbfa37f120a608046250b98",
-      "license": "cc-by-4.0",
+      "license": "MIT",
       "vocabulary": "shared_vocabulary.json",
       "source_tokenizer": "sentencepiece.bpe.model",
       "target_tokenizer": "sentencepiece.bpe.model",
@@ -2759,6 +3873,1334 @@
         }
       ],
       "encoder": "vocab.json"
+    },
+    "madlad400-3b-native": {
+      "kind": "madlad",
+      "repo": "Nextcloud-AI/madlad400-3b-mt-ct2-int8",
+      "revision": "aa32bbdeba7880eff2096ec044cb155a340a9400",
+      "license": "Apache-2.0",
+      "tokenizer_repo": "google/madlad400-3b-mt",
+      "tokenizer_revision": "fa184c675da0b5c9e1c8694fccd4e12e2d422094",
+      "source_tokenizer": "spiece.model",
+      "files": [
+        {
+          "name": "config.json",
+          "bytes": 224,
+          "sha256": "90fb54962455a4e0a0bc7235c0f063d7e46d9c1a1ae003af8059809abd6aeece",
+          "url": "https://huggingface.co/Nextcloud-AI/madlad400-3b-mt-ct2-int8/resolve/aa32bbdeba7880eff2096ec044cb155a340a9400/config.json",
+          "compressed_bytes": 224,
+          "compressed_sha256": "90fb54962455a4e0a0bc7235c0f063d7e46d9c1a1ae003af8059809abd6aeece",
+          "compression": "none"
+        },
+        {
+          "name": "model.bin",
+          "bytes": 2950208329,
+          "sha256": "77b9fd9ab97c1259d07089b5f854393dad81bc5fb5647d3f9a5d101c94f40daa",
+          "url": "https://huggingface.co/Nextcloud-AI/madlad400-3b-mt-ct2-int8/resolve/aa32bbdeba7880eff2096ec044cb155a340a9400/model.bin",
+          "compressed_bytes": 2950208329,
+          "compressed_sha256": "77b9fd9ab97c1259d07089b5f854393dad81bc5fb5647d3f9a5d101c94f40daa",
+          "compression": "none"
+        },
+        {
+          "name": "shared_vocabulary.json",
+          "bytes": 5477099,
+          "sha256": "c327551ce3ca6efc7b437e11a267f79979893332dda8a1d146e2c950815193f8",
+          "url": "https://huggingface.co/Nextcloud-AI/madlad400-3b-mt-ct2-int8/resolve/aa32bbdeba7880eff2096ec044cb155a340a9400/shared_vocabulary.json",
+          "compressed_bytes": 5477099,
+          "compressed_sha256": "c327551ce3ca6efc7b437e11a267f79979893332dda8a1d146e2c950815193f8",
+          "compression": "none"
+        },
+        {
+          "name": "spiece.model",
+          "bytes": 4427844,
+          "sha256": "ef11ac9a22c7503492f56d48dce53be20e339b63605983e9f27d2cd0e0f3922c",
+          "url": "https://huggingface.co/google/madlad400-3b-mt/resolve/fa184c675da0b5c9e1c8694fccd4e12e2d422094/spiece.model",
+          "compressed_bytes": 4427844,
+          "compressed_sha256": "ef11ac9a22c7503492f56d48dce53be20e339b63605983e9f27d2cd0e0f3922c",
+          "compression": "none"
+        }
+      ]
+    },
+    "marian-opus-fr-en-big": {
+      "kind": "marian",
+      "repo": "Helsinki-NLP/opus-mt-tc-big-fr-en",
+      "revision": "5fa3b3c9fa3bcd65fbf31206c3ec7419c9d9cd7d",
+      "license": "cc-by-4.0",
+      "vocabulary": "shared_vocabulary.json",
+      "source_tokenizer": "source.spm",
+      "target_tokenizer": "target.spm",
+      "normalizer_language": "fr",
+      "files": [
+        {
+          "name": "config.json",
+          "bytes": 233,
+          "sha256": "72901fbd8abd89fb5cf4a388f26fc681f5c4c58a1e1a88b30b879f107270e7ee",
+          "url": null,
+          "compressed_bytes": 233,
+          "compressed_sha256": "72901fbd8abd89fb5cf4a388f26fc681f5c4c58a1e1a88b30b879f107270e7ee",
+          "compression": "none"
+        },
+        {
+          "name": "model.bin",
+          "bytes": 233813603,
+          "sha256": "cca66d988a9305a7d3b61777dee9b8254cc5cbd8ae0ba12706788e0570dcd691",
+          "url": null,
+          "compressed_bytes": 233813603,
+          "compressed_sha256": "cca66d988a9305a7d3b61777dee9b8254cc5cbd8ae0ba12706788e0570dcd691",
+          "compression": "none"
+        },
+        {
+          "name": "shared_vocabulary.json",
+          "bytes": 1025007,
+          "sha256": "5fbf71ee8cd8bd0ff69f041a6accd4d61a62e9f304113e435650f9f33211cfaf",
+          "url": null,
+          "compressed_bytes": 1025007,
+          "compressed_sha256": "5fbf71ee8cd8bd0ff69f041a6accd4d61a62e9f304113e435650f9f33211cfaf",
+          "compression": "none"
+        },
+        {
+          "name": "source.spm",
+          "bytes": 819955,
+          "sha256": "622a0fef37ea7c6d7cd4a6530c2279d4688987c5417bba26fba9ae416f8b7758",
+          "url": null,
+          "compressed_bytes": 819955,
+          "compressed_sha256": "622a0fef37ea7c6d7cd4a6530c2279d4688987c5417bba26fba9ae416f8b7758",
+          "compression": "none"
+        },
+        {
+          "name": "target.spm",
+          "bytes": 802408,
+          "sha256": "69e8272c2d215294ae2e19c6fcef39fc26b386fcf64cd07f376b965740c80592",
+          "url": null,
+          "compressed_bytes": 802408,
+          "compressed_sha256": "69e8272c2d215294ae2e19c6fcef39fc26b386fcf64cd07f376b965740c80592",
+          "compression": "none"
+        }
+      ],
+      "build": {
+        "type": "transformers",
+        "quantization": "int8",
+        "source_files": [
+          {
+            "name": "config.json",
+            "url": "https://huggingface.co/Helsinki-NLP/opus-mt-tc-big-fr-en/resolve/5fa3b3c9fa3bcd65fbf31206c3ec7419c9d9cd7d/config.json",
+            "bytes": 1076,
+            "sha256": "ac35de27c1645637a46d3b2f41052365ef52a7c23e169719629381f6b1fb025c"
+          },
+          {
+            "name": "tokenizer_config.json",
+            "url": "https://huggingface.co/Helsinki-NLP/opus-mt-tc-big-fr-en/resolve/5fa3b3c9fa3bcd65fbf31206c3ec7419c9d9cd7d/tokenizer_config.json",
+            "bytes": 337,
+            "sha256": "2deaf7b45a3348b8e021002a3fce185bf402272230f41c544f99d3c105b71388"
+          },
+          {
+            "name": "source.spm",
+            "url": "https://huggingface.co/Helsinki-NLP/opus-mt-tc-big-fr-en/resolve/5fa3b3c9fa3bcd65fbf31206c3ec7419c9d9cd7d/source.spm",
+            "bytes": 819955,
+            "sha256": "622a0fef37ea7c6d7cd4a6530c2279d4688987c5417bba26fba9ae416f8b7758"
+          },
+          {
+            "name": "target.spm",
+            "url": "https://huggingface.co/Helsinki-NLP/opus-mt-tc-big-fr-en/resolve/5fa3b3c9fa3bcd65fbf31206c3ec7419c9d9cd7d/target.spm",
+            "bytes": 802408,
+            "sha256": "69e8272c2d215294ae2e19c6fcef39fc26b386fcf64cd07f376b965740c80592"
+          },
+          {
+            "name": "vocab.json",
+            "url": "https://huggingface.co/Helsinki-NLP/opus-mt-tc-big-fr-en/resolve/5fa3b3c9fa3bcd65fbf31206c3ec7419c9d9cd7d/vocab.json",
+            "bytes": 1332010,
+            "sha256": "2994b7def69d6495d8f02369b57e3f04e2474f76ce64eda2921643e1f76fef41"
+          },
+          {
+            "name": "README.md",
+            "url": "https://huggingface.co/Helsinki-NLP/opus-mt-tc-big-fr-en/resolve/5fa3b3c9fa3bcd65fbf31206c3ec7419c9d9cd7d/README.md",
+            "bytes": 10205,
+            "sha256": "0e74b1b29aff617090d9a1e82b7aaa419da05042a9e57007a0423ea4c4381a8c"
+          },
+          {
+            "name": "special_tokens_map.json",
+            "url": "https://huggingface.co/Helsinki-NLP/opus-mt-tc-big-fr-en/resolve/5fa3b3c9fa3bcd65fbf31206c3ec7419c9d9cd7d/special_tokens_map.json",
+            "bytes": 65,
+            "sha256": "09059cedc26bc46bc09a52f05b92d4922e11917e87f3b92059bb1a63a59ab2c4"
+          },
+          {
+            "name": "generation_config.json",
+            "url": "https://huggingface.co/Helsinki-NLP/opus-mt-tc-big-fr-en/resolve/5fa3b3c9fa3bcd65fbf31206c3ec7419c9d9cd7d/generation_config.json",
+            "bytes": 301,
+            "sha256": "e08b63c58a6de96ea4275ac59681cefbf88663a10419e65e1510156061c43a88"
+          },
+          {
+            "name": "model.safetensors",
+            "url": "https://huggingface.co/Helsinki-NLP/opus-mt-tc-big-fr-en/resolve/5fa3b3c9fa3bcd65fbf31206c3ec7419c9d9cd7d/model.safetensors",
+            "bytes": 461429130,
+            "sha256": "1e9d73c1af19660aad2e0733e12f8d06745eb54c77f48bae4831e377ccaf6d6e"
+          }
+        ]
+      }
+    },
+    "marian-wave-opus-en-gmq": {
+      "kind": "marian",
+      "repo": "Helsinki-NLP/opus-mt-tc-big-en-gmq",
+      "revision": "2f5da939880f7b69e9b5142074474b74889b8685",
+      "license": "cc-by-4.0",
+      "vocabulary": "shared_vocabulary.json",
+      "source_tokenizer": "source.spm",
+      "target_tokenizer": "target.spm",
+      "normalizer_language": "en",
+      "files": [
+        {
+          "name": "config.json",
+          "bytes": 233,
+          "sha256": "72901fbd8abd89fb5cf4a388f26fc681f5c4c58a1e1a88b30b879f107270e7ee",
+          "url": null,
+          "compressed_bytes": 233,
+          "compressed_sha256": "72901fbd8abd89fb5cf4a388f26fc681f5c4c58a1e1a88b30b879f107270e7ee",
+          "compression": "none"
+        },
+        {
+          "name": "model.bin",
+          "bytes": 235513103,
+          "sha256": "55494c815d79ef95efad2afef7382fad921f5cb44feac81bb53f9072d8166602",
+          "url": null,
+          "compressed_bytes": 235513103,
+          "compressed_sha256": "55494c815d79ef95efad2afef7382fad921f5cb44feac81bb53f9072d8166602",
+          "compression": "none"
+        },
+        {
+          "name": "shared_vocabulary.json",
+          "bytes": 1021428,
+          "sha256": "03f3c83ac932638b4382040dcf36c7b6c1daa10b441697734839945c87d5e47b",
+          "url": null,
+          "compressed_bytes": 1021428,
+          "compressed_sha256": "03f3c83ac932638b4382040dcf36c7b6c1daa10b441697734839945c87d5e47b",
+          "compression": "none"
+        },
+        {
+          "name": "source.spm",
+          "bytes": 794427,
+          "sha256": "05f3dec886e0b8ce55a962aa0f1c747b9606c6068d76e3e840ed9a0d2b64ce57",
+          "url": null,
+          "compressed_bytes": 794427,
+          "compressed_sha256": "05f3dec886e0b8ce55a962aa0f1c747b9606c6068d76e3e840ed9a0d2b64ce57",
+          "compression": "none"
+        },
+        {
+          "name": "target.spm",
+          "bytes": 799832,
+          "sha256": "c8b2f0d2cf9308d2fe38257c8ddb0ed93d20fc71057d917028e3ac237a4c5b13",
+          "url": null,
+          "compressed_bytes": 799832,
+          "compressed_sha256": "c8b2f0d2cf9308d2fe38257c8ddb0ed93d20fc71057d917028e3ac237a4c5b13",
+          "compression": "none"
+        }
+      ],
+      "build": {
+        "type": "transformers",
+        "quantization": "int8",
+        "source_files": [
+          {
+            "name": "config.json",
+            "url": "https://huggingface.co/Helsinki-NLP/opus-mt-tc-big-en-gmq/resolve/2f5da939880f7b69e9b5142074474b74889b8685/config.json",
+            "bytes": 1076,
+            "sha256": "fd124e1ba447d7def15b1cc85fccb0d83a6add0e032d7e0f3db09b095d1cd441"
+          },
+          {
+            "name": "tokenizer_config.json",
+            "url": "https://huggingface.co/Helsinki-NLP/opus-mt-tc-big-en-gmq/resolve/2f5da939880f7b69e9b5142074474b74889b8685/tokenizer_config.json",
+            "bytes": 339,
+            "sha256": "3a1cfc64d95686494e438d7ddae9a889b9ea0f955e518c25cb26c1e498dd3e47"
+          },
+          {
+            "name": "source.spm",
+            "url": "https://huggingface.co/Helsinki-NLP/opus-mt-tc-big-en-gmq/resolve/2f5da939880f7b69e9b5142074474b74889b8685/source.spm",
+            "bytes": 794427,
+            "sha256": "05f3dec886e0b8ce55a962aa0f1c747b9606c6068d76e3e840ed9a0d2b64ce57"
+          },
+          {
+            "name": "target.spm",
+            "url": "https://huggingface.co/Helsinki-NLP/opus-mt-tc-big-en-gmq/resolve/2f5da939880f7b69e9b5142074474b74889b8685/target.spm",
+            "bytes": 799832,
+            "sha256": "c8b2f0d2cf9308d2fe38257c8ddb0ed93d20fc71057d917028e3ac237a4c5b13"
+          },
+          {
+            "name": "vocab.json",
+            "url": "https://huggingface.co/Helsinki-NLP/opus-mt-tc-big-en-gmq/resolve/2f5da939880f7b69e9b5142074474b74889b8685/vocab.json",
+            "bytes": 1338331,
+            "sha256": "6ba9ec351c453286a43b8a9fda6664b6e1daf2c1121b40de515d7812425418b8"
+          },
+          {
+            "name": "README.md",
+            "url": "https://huggingface.co/Helsinki-NLP/opus-mt-tc-big-en-gmq/resolve/2f5da939880f7b69e9b5142074474b74889b8685/README.md",
+            "bytes": 9279,
+            "sha256": "698f2a1e7609dd6b0da091329c723987d9b051812aeae0aec715cee1307843d6"
+          },
+          {
+            "name": "special_tokens_map.json",
+            "url": "https://huggingface.co/Helsinki-NLP/opus-mt-tc-big-en-gmq/resolve/2f5da939880f7b69e9b5142074474b74889b8685/special_tokens_map.json",
+            "bytes": 65,
+            "sha256": "09059cedc26bc46bc09a52f05b92d4922e11917e87f3b92059bb1a63a59ab2c4"
+          },
+          {
+            "name": "generation_config.json",
+            "url": "https://huggingface.co/Helsinki-NLP/opus-mt-tc-big-en-gmq/resolve/2f5da939880f7b69e9b5142074474b74889b8685/generation_config.json",
+            "bytes": 301,
+            "sha256": "54b3c665514f41f891fc2b9c1a3e25d81865985badb8a2daa5936d330b554bcc"
+          },
+          {
+            "name": "model.safetensors",
+            "url": "https://huggingface.co/Helsinki-NLP/opus-mt-tc-big-en-gmq/resolve/2f5da939880f7b69e9b5142074474b74889b8685/model.safetensors",
+            "bytes": 464811630,
+            "sha256": "be1b2a7a2e8d7e85e129735bed91227365f059e710211270691102673f9e6189"
+          }
+        ]
+      }
+    },
+    "marian-wave-opus-en-es": {
+      "kind": "marian",
+      "repo": "Helsinki-NLP/opus-mt-tc-big-en-es",
+      "revision": "8f4d4924189681076e9c642b2fd85278d793fd4d",
+      "license": "cc-by-4.0",
+      "vocabulary": "shared_vocabulary.json",
+      "source_tokenizer": "source.spm",
+      "target_tokenizer": "target.spm",
+      "normalizer_language": "en",
+      "files": [
+        {
+          "name": "config.json",
+          "bytes": 233,
+          "sha256": "72901fbd8abd89fb5cf4a388f26fc681f5c4c58a1e1a88b30b879f107270e7ee",
+          "url": null,
+          "compressed_bytes": 233,
+          "compressed_sha256": "72901fbd8abd89fb5cf4a388f26fc681f5c4c58a1e1a88b30b879f107270e7ee",
+          "compression": "none"
+        },
+        {
+          "name": "model.bin",
+          "bytes": 235883903,
+          "sha256": "9332e2dd98f10fba1c3cf762d366c76f5f514122e630b074f2e7b9b1cc2072ea",
+          "url": null,
+          "compressed_bytes": 235883903,
+          "compressed_sha256": "9332e2dd98f10fba1c3cf762d366c76f5f514122e630b074f2e7b9b1cc2072ea",
+          "compression": "none"
+        },
+        {
+          "name": "shared_vocabulary.json",
+          "bytes": 1058959,
+          "sha256": "c7a6f1e3f43c2bff87035785f00792c3daeb079272263e4f5715b720c3269065",
+          "url": null,
+          "compressed_bytes": 1058959,
+          "compressed_sha256": "c7a6f1e3f43c2bff87035785f00792c3daeb079272263e4f5715b720c3269065",
+          "compression": "none"
+        },
+        {
+          "name": "source.spm",
+          "bytes": 804235,
+          "sha256": "b1763341d3a71262ed5aacc3f8287d3c3c2f2ae82295e11d03aea80879c98009",
+          "url": null,
+          "compressed_bytes": 804235,
+          "compressed_sha256": "b1763341d3a71262ed5aacc3f8287d3c3c2f2ae82295e11d03aea80879c98009",
+          "compression": "none"
+        },
+        {
+          "name": "target.spm",
+          "bytes": 824118,
+          "sha256": "c70086dcac73d9c759cca0b5f195a073033906dcd29433d6c5fe74e66b2cc8da",
+          "url": null,
+          "compressed_bytes": 824118,
+          "compressed_sha256": "c70086dcac73d9c759cca0b5f195a073033906dcd29433d6c5fe74e66b2cc8da",
+          "compression": "none"
+        }
+      ],
+      "build": {
+        "type": "transformers",
+        "quantization": "int8",
+        "source_files": [
+          {
+            "name": "config.json",
+            "url": "https://huggingface.co/Helsinki-NLP/opus-mt-tc-big-en-es/resolve/8f4d4924189681076e9c642b2fd85278d793fd4d/config.json",
+            "bytes": 1076,
+            "sha256": "40cf2a78774927cd8374514a73c96a3fc2285748fae1bcdfe197e1dc1cc54692"
+          },
+          {
+            "name": "tokenizer_config.json",
+            "url": "https://huggingface.co/Helsinki-NLP/opus-mt-tc-big-en-es/resolve/8f4d4924189681076e9c642b2fd85278d793fd4d/tokenizer_config.json",
+            "bytes": 337,
+            "sha256": "87237f0fcc8644b8acf407ddc3fd941748c4392c6083fa6f1d81da0ca66d2f23"
+          },
+          {
+            "name": "source.spm",
+            "url": "https://huggingface.co/Helsinki-NLP/opus-mt-tc-big-en-es/resolve/8f4d4924189681076e9c642b2fd85278d793fd4d/source.spm",
+            "bytes": 804235,
+            "sha256": "b1763341d3a71262ed5aacc3f8287d3c3c2f2ae82295e11d03aea80879c98009"
+          },
+          {
+            "name": "target.spm",
+            "url": "https://huggingface.co/Helsinki-NLP/opus-mt-tc-big-en-es/resolve/8f4d4924189681076e9c642b2fd85278d793fd4d/target.spm",
+            "bytes": 824118,
+            "sha256": "c70086dcac73d9c759cca0b5f195a073033906dcd29433d6c5fe74e66b2cc8da"
+          },
+          {
+            "name": "vocab.json",
+            "url": "https://huggingface.co/Helsinki-NLP/opus-mt-tc-big-en-es/resolve/8f4d4924189681076e9c642b2fd85278d793fd4d/vocab.json",
+            "bytes": 1378022,
+            "sha256": "ee2728c5deb7c2dbe255df52b02b45285fda8a7c4dafc236e6d2af5dbeab5a36"
+          },
+          {
+            "name": "README.md",
+            "url": "https://huggingface.co/Helsinki-NLP/opus-mt-tc-big-en-es/resolve/8f4d4924189681076e9c642b2fd85278d793fd4d/README.md",
+            "bytes": 8077,
+            "sha256": "c42997ca3767c6750c346d1da84758a9755422c7f5c5294f12a8f4d92f8a94bc"
+          },
+          {
+            "name": "special_tokens_map.json",
+            "url": "https://huggingface.co/Helsinki-NLP/opus-mt-tc-big-en-es/resolve/8f4d4924189681076e9c642b2fd85278d793fd4d/special_tokens_map.json",
+            "bytes": 65,
+            "sha256": "09059cedc26bc46bc09a52f05b92d4922e11917e87f3b92059bb1a63a59ab2c4"
+          },
+          {
+            "name": "generation_config.json",
+            "url": "https://huggingface.co/Helsinki-NLP/opus-mt-tc-big-en-es/resolve/8f4d4924189681076e9c642b2fd85278d793fd4d/generation_config.json",
+            "bytes": 301,
+            "sha256": "8f8c2aeb22e87bcb1ea19cb206f4d9341d178574ab41778ab104ee7cf8db8379"
+          },
+          {
+            "name": "model.safetensors",
+            "url": "https://huggingface.co/Helsinki-NLP/opus-mt-tc-big-en-es/resolve/8f4d4924189681076e9c642b2fd85278d793fd4d/model.safetensors",
+            "bytes": 465549630,
+            "sha256": "1cc0d454aed713ccd07b4cb7801f08f72c1f885c79c6fd76d2b0d99ea0d3cd2b"
+          }
+        ]
+      }
+    },
+    "marian-wave-opus-en-fr": {
+      "kind": "marian",
+      "repo": "Helsinki-NLP/opus-mt-tc-big-en-fr",
+      "revision": "6e062862ced6f5622a589ab2aadc2a1d4978db78",
+      "license": "cc-by-4.0",
+      "vocabulary": "shared_vocabulary.json",
+      "source_tokenizer": "source.spm",
+      "target_tokenizer": "target.spm",
+      "normalizer_language": "en",
+      "files": [
+        {
+          "name": "config.json",
+          "bytes": 233,
+          "sha256": "72901fbd8abd89fb5cf4a388f26fc681f5c4c58a1e1a88b30b879f107270e7ee",
+          "url": null,
+          "compressed_bytes": 233,
+          "compressed_sha256": "72901fbd8abd89fb5cf4a388f26fc681f5c4c58a1e1a88b30b879f107270e7ee",
+          "compression": "none"
+        },
+        {
+          "name": "model.bin",
+          "bytes": 233813603,
+          "sha256": "68473b88d245ecb48ef2e76bfcfb9935a4b677d4924e78a845a7bf5013fd6d45",
+          "url": null,
+          "compressed_bytes": 233813603,
+          "compressed_sha256": "68473b88d245ecb48ef2e76bfcfb9935a4b677d4924e78a845a7bf5013fd6d45",
+          "compression": "none"
+        },
+        {
+          "name": "shared_vocabulary.json",
+          "bytes": 1025007,
+          "sha256": "5fbf71ee8cd8bd0ff69f041a6accd4d61a62e9f304113e435650f9f33211cfaf",
+          "url": null,
+          "compressed_bytes": 1025007,
+          "compressed_sha256": "5fbf71ee8cd8bd0ff69f041a6accd4d61a62e9f304113e435650f9f33211cfaf",
+          "compression": "none"
+        },
+        {
+          "name": "source.spm",
+          "bytes": 802408,
+          "sha256": "18bb5a422a53a0bd699b005c8086cbd58a85c4be427fd57ca687c958588edcc9",
+          "url": null,
+          "compressed_bytes": 802408,
+          "compressed_sha256": "18bb5a422a53a0bd699b005c8086cbd58a85c4be427fd57ca687c958588edcc9",
+          "compression": "none"
+        },
+        {
+          "name": "target.spm",
+          "bytes": 819955,
+          "sha256": "6437b5600d2ae14888939e589773b09bc667c77e81326e20e3f57698a4078593",
+          "url": null,
+          "compressed_bytes": 819955,
+          "compressed_sha256": "6437b5600d2ae14888939e589773b09bc667c77e81326e20e3f57698a4078593",
+          "compression": "none"
+        }
+      ],
+      "build": {
+        "type": "transformers",
+        "quantization": "int8",
+        "source_files": [
+          {
+            "name": "config.json",
+            "url": "https://huggingface.co/Helsinki-NLP/opus-mt-tc-big-en-fr/resolve/6e062862ced6f5622a589ab2aadc2a1d4978db78/config.json",
+            "bytes": 1076,
+            "sha256": "ac35de27c1645637a46d3b2f41052365ef52a7c23e169719629381f6b1fb025c"
+          },
+          {
+            "name": "tokenizer_config.json",
+            "url": "https://huggingface.co/Helsinki-NLP/opus-mt-tc-big-en-fr/resolve/6e062862ced6f5622a589ab2aadc2a1d4978db78/tokenizer_config.json",
+            "bytes": 337,
+            "sha256": "9cca379c911ab0d3b9138e0de1c521f1d7bad69889e168b3eb0e0f9f47e5a7fd"
+          },
+          {
+            "name": "source.spm",
+            "url": "https://huggingface.co/Helsinki-NLP/opus-mt-tc-big-en-fr/resolve/6e062862ced6f5622a589ab2aadc2a1d4978db78/source.spm",
+            "bytes": 802408,
+            "sha256": "18bb5a422a53a0bd699b005c8086cbd58a85c4be427fd57ca687c958588edcc9"
+          },
+          {
+            "name": "target.spm",
+            "url": "https://huggingface.co/Helsinki-NLP/opus-mt-tc-big-en-fr/resolve/6e062862ced6f5622a589ab2aadc2a1d4978db78/target.spm",
+            "bytes": 819955,
+            "sha256": "6437b5600d2ae14888939e589773b09bc667c77e81326e20e3f57698a4078593"
+          },
+          {
+            "name": "vocab.json",
+            "url": "https://huggingface.co/Helsinki-NLP/opus-mt-tc-big-en-fr/resolve/6e062862ced6f5622a589ab2aadc2a1d4978db78/vocab.json",
+            "bytes": 1332010,
+            "sha256": "2994b7def69d6495d8f02369b57e3f04e2474f76ce64eda2921643e1f76fef41"
+          },
+          {
+            "name": "README.md",
+            "url": "https://huggingface.co/Helsinki-NLP/opus-mt-tc-big-en-fr/resolve/6e062862ced6f5622a589ab2aadc2a1d4978db78/README.md",
+            "bytes": 10312,
+            "sha256": "6c0d6e0cc97d03683a0cd177554c7173a0b173b4857973d4e4dedf01c2c108cc"
+          },
+          {
+            "name": "special_tokens_map.json",
+            "url": "https://huggingface.co/Helsinki-NLP/opus-mt-tc-big-en-fr/resolve/6e062862ced6f5622a589ab2aadc2a1d4978db78/special_tokens_map.json",
+            "bytes": 65,
+            "sha256": "09059cedc26bc46bc09a52f05b92d4922e11917e87f3b92059bb1a63a59ab2c4"
+          },
+          {
+            "name": "generation_config.json",
+            "url": "https://huggingface.co/Helsinki-NLP/opus-mt-tc-big-en-fr/resolve/6e062862ced6f5622a589ab2aadc2a1d4978db78/generation_config.json",
+            "bytes": 301,
+            "sha256": "e08b63c58a6de96ea4275ac59681cefbf88663a10419e65e1510156061c43a88"
+          },
+          {
+            "name": "model.safetensors",
+            "url": "https://huggingface.co/Helsinki-NLP/opus-mt-tc-big-en-fr/resolve/6e062862ced6f5622a589ab2aadc2a1d4978db78/model.safetensors",
+            "bytes": 461429130,
+            "sha256": "5c88b4f7a63934b8be72372b86661e616227c20be4b75612eeee7dca96494217"
+          }
+        ]
+      }
+    },
+    "marian-wave-opus-en-pt": {
+      "kind": "marian",
+      "repo": "Helsinki-NLP/opus-mt-tc-big-en-pt",
+      "revision": "9f2863d807ecf91a374bdbecb8d01e402e90622e",
+      "license": "cc-by-4.0",
+      "vocabulary": "shared_vocabulary.json",
+      "source_tokenizer": "source.spm",
+      "target_tokenizer": "target.spm",
+      "normalizer_language": "en",
+      "files": [
+        {
+          "name": "config.json",
+          "bytes": 233,
+          "sha256": "72901fbd8abd89fb5cf4a388f26fc681f5c4c58a1e1a88b30b879f107270e7ee",
+          "url": null,
+          "compressed_bytes": 233,
+          "compressed_sha256": "72901fbd8abd89fb5cf4a388f26fc681f5c4c58a1e1a88b30b879f107270e7ee",
+          "compression": "none"
+        },
+        {
+          "name": "model.bin",
+          "bytes": 235625373,
+          "sha256": "5c2b607d9f0c00e935a00a497aa4c523225288697fbca57ddb7f9ee96fe80006",
+          "url": null,
+          "compressed_bytes": 235625373,
+          "compressed_sha256": "5c2b607d9f0c00e935a00a497aa4c523225288697fbca57ddb7f9ee96fe80006",
+          "compression": "none"
+        },
+        {
+          "name": "shared_vocabulary.json",
+          "bytes": 1063207,
+          "sha256": "c27223d6d29d670bfab4f6b7e073694ba1479ca9a3a9e723a5d0996989a84ff0",
+          "url": null,
+          "compressed_bytes": 1063207,
+          "compressed_sha256": "c27223d6d29d670bfab4f6b7e073694ba1479ca9a3a9e723a5d0996989a84ff0",
+          "compression": "none"
+        },
+        {
+          "name": "source.spm",
+          "bytes": 802741,
+          "sha256": "7a7fcf812cf03a5785daa35d4932bbbe69e7e605c0fe56fce5a3f731d6c355aa",
+          "url": null,
+          "compressed_bytes": 802741,
+          "compressed_sha256": "7a7fcf812cf03a5785daa35d4932bbbe69e7e605c0fe56fce5a3f731d6c355aa",
+          "compression": "none"
+        },
+        {
+          "name": "target.spm",
+          "bytes": 824855,
+          "sha256": "b3cf20ccd4e48a89882cfdba157c05fa1cd71a6b69517dfc80e3a34d387ea91f",
+          "url": null,
+          "compressed_bytes": 824855,
+          "compressed_sha256": "b3cf20ccd4e48a89882cfdba157c05fa1cd71a6b69517dfc80e3a34d387ea91f",
+          "compression": "none"
+        }
+      ],
+      "build": {
+        "type": "transformers",
+        "quantization": "int8",
+        "source_files": [
+          {
+            "name": "config.json",
+            "url": "https://huggingface.co/Helsinki-NLP/opus-mt-tc-big-en-pt/resolve/9f2863d807ecf91a374bdbecb8d01e402e90622e/config.json",
+            "bytes": 1076,
+            "sha256": "ca76b1818f066007e94fb2519c0752320cee36a5d4947bf7ef4477c845feacc5"
+          },
+          {
+            "name": "tokenizer_config.json",
+            "url": "https://huggingface.co/Helsinki-NLP/opus-mt-tc-big-en-pt/resolve/9f2863d807ecf91a374bdbecb8d01e402e90622e/tokenizer_config.json",
+            "bytes": 337,
+            "sha256": "ad3762b908f346ceb1427259c041728c5e113a137e88b3e8153f6d8d62e9ceed"
+          },
+          {
+            "name": "source.spm",
+            "url": "https://huggingface.co/Helsinki-NLP/opus-mt-tc-big-en-pt/resolve/9f2863d807ecf91a374bdbecb8d01e402e90622e/source.spm",
+            "bytes": 802741,
+            "sha256": "7a7fcf812cf03a5785daa35d4932bbbe69e7e605c0fe56fce5a3f731d6c355aa"
+          },
+          {
+            "name": "target.spm",
+            "url": "https://huggingface.co/Helsinki-NLP/opus-mt-tc-big-en-pt/resolve/9f2863d807ecf91a374bdbecb8d01e402e90622e/target.spm",
+            "bytes": 824855,
+            "sha256": "b3cf20ccd4e48a89882cfdba157c05fa1cd71a6b69517dfc80e3a34d387ea91f"
+          },
+          {
+            "name": "vocab.json",
+            "url": "https://huggingface.co/Helsinki-NLP/opus-mt-tc-big-en-pt/resolve/9f2863d807ecf91a374bdbecb8d01e402e90622e/vocab.json",
+            "bytes": 1380764,
+            "sha256": "dad10ad0acbf34ad92af16cb37fd71732d2b73851274698d58c5439386b506a1"
+          },
+          {
+            "name": "README.md",
+            "url": "https://huggingface.co/Helsinki-NLP/opus-mt-tc-big-en-pt/resolve/9f2863d807ecf91a374bdbecb8d01e402e90622e/README.md",
+            "bytes": 6275,
+            "sha256": "c18db3029081e770aa17fb261d3c6220279275eaf81f2575d20e1b02e079e85d"
+          },
+          {
+            "name": "special_tokens_map.json",
+            "url": "https://huggingface.co/Helsinki-NLP/opus-mt-tc-big-en-pt/resolve/9f2863d807ecf91a374bdbecb8d01e402e90622e/special_tokens_map.json",
+            "bytes": 65,
+            "sha256": "09059cedc26bc46bc09a52f05b92d4922e11917e87f3b92059bb1a63a59ab2c4"
+          },
+          {
+            "name": "generation_config.json",
+            "url": "https://huggingface.co/Helsinki-NLP/opus-mt-tc-big-en-pt/resolve/9f2863d807ecf91a374bdbecb8d01e402e90622e/generation_config.json",
+            "bytes": 301,
+            "sha256": "0cf63469feb877c42fee042a5e9f429117297abee3d5641a4c347fec09597126"
+          },
+          {
+            "name": "model.safetensors",
+            "url": "https://huggingface.co/Helsinki-NLP/opus-mt-tc-big-en-pt/resolve/9f2863d807ecf91a374bdbecb8d01e402e90622e/model.safetensors",
+            "bytes": 465035080,
+            "sha256": "f1772ec97f6cb5b942bb6a5555a04272960a228a523f7ed47e24014236aa1716"
+          }
+        ]
+      }
+    },
+    "marian-wave-opus-en-zle": {
+      "kind": "marian",
+      "repo": "Helsinki-NLP/opus-mt-tc-big-en-zle",
+      "revision": "708be1d372fe4c358a352f404e6dc9ca0126ba48",
+      "license": "cc-by-4.0",
+      "vocabulary": "shared_vocabulary.json",
+      "source_tokenizer": "source.spm",
+      "target_tokenizer": "target.spm",
+      "normalizer_language": "en",
+      "files": [
+        {
+          "name": "config.json",
+          "bytes": 233,
+          "sha256": "72901fbd8abd89fb5cf4a388f26fc681f5c4c58a1e1a88b30b879f107270e7ee",
+          "url": null,
+          "compressed_bytes": 233,
+          "compressed_sha256": "72901fbd8abd89fb5cf4a388f26fc681f5c4c58a1e1a88b30b879f107270e7ee",
+          "compression": "none"
+        },
+        {
+          "name": "model.bin",
+          "bytes": 242630403,
+          "sha256": "fbd24e6fdfa27fb69d4bbce7968eccef693b7a6249ec09733269e96cf2d1a319",
+          "url": null,
+          "compressed_bytes": 242630403,
+          "compressed_sha256": "fbd24e6fdfa27fb69d4bbce7968eccef693b7a6249ec09733269e96cf2d1a319",
+          "compression": "none"
+        },
+        {
+          "name": "shared_vocabulary.json",
+          "bytes": 2152164,
+          "sha256": "558fb7414f75540fc3e9f272dac90cb85272083014978e5a8f81c7e35ae2a49b",
+          "url": null,
+          "compressed_bytes": 2152164,
+          "compressed_sha256": "558fb7414f75540fc3e9f272dac90cb85272083014978e5a8f81c7e35ae2a49b",
+          "compression": "none"
+        },
+        {
+          "name": "source.spm",
+          "bytes": 802747,
+          "sha256": "3612abfe04bf08344ba91115f0e15e228a7a15a621ea856bfd548097dbaeb43c",
+          "url": null,
+          "compressed_bytes": 802747,
+          "compressed_sha256": "3612abfe04bf08344ba91115f0e15e228a7a15a621ea856bfd548097dbaeb43c",
+          "compression": "none"
+        },
+        {
+          "name": "target.spm",
+          "bytes": 1017004,
+          "sha256": "22940e744b3a9fd166a04880938fb61f7dfa8ba4b5d2d3f6371a6c4ba8f3b019",
+          "url": null,
+          "compressed_bytes": 1017004,
+          "compressed_sha256": "22940e744b3a9fd166a04880938fb61f7dfa8ba4b5d2d3f6371a6c4ba8f3b019",
+          "compression": "none"
+        }
+      ],
+      "build": {
+        "type": "transformers",
+        "quantization": "int8",
+        "source_files": [
+          {
+            "name": "config.json",
+            "url": "https://huggingface.co/Helsinki-NLP/opus-mt-tc-big-en-zle/resolve/708be1d372fe4c358a352f404e6dc9ca0126ba48/config.json",
+            "bytes": 1076,
+            "sha256": "962d235879c9def4cfdf140be81436d4fb9da25271dd69079df2c90b459f1332"
+          },
+          {
+            "name": "tokenizer_config.json",
+            "url": "https://huggingface.co/Helsinki-NLP/opus-mt-tc-big-en-zle/resolve/708be1d372fe4c358a352f404e6dc9ca0126ba48/tokenizer_config.json",
+            "bytes": 339,
+            "sha256": "41deeedfc0e3ce366d6bde180dee025a8ca1bcd62b1451889301e8ea4bcbb609"
+          },
+          {
+            "name": "source.spm",
+            "url": "https://huggingface.co/Helsinki-NLP/opus-mt-tc-big-en-zle/resolve/708be1d372fe4c358a352f404e6dc9ca0126ba48/source.spm",
+            "bytes": 802747,
+            "sha256": "3612abfe04bf08344ba91115f0e15e228a7a15a621ea856bfd548097dbaeb43c"
+          },
+          {
+            "name": "target.spm",
+            "url": "https://huggingface.co/Helsinki-NLP/opus-mt-tc-big-en-zle/resolve/708be1d372fe4c358a352f404e6dc9ca0126ba48/target.spm",
+            "bytes": 1017004,
+            "sha256": "22940e744b3a9fd166a04880938fb61f7dfa8ba4b5d2d3f6371a6c4ba8f3b019"
+          },
+          {
+            "name": "vocab.json",
+            "url": "https://huggingface.co/Helsinki-NLP/opus-mt-tc-big-en-zle/resolve/708be1d372fe4c358a352f404e6dc9ca0126ba48/vocab.json",
+            "bytes": 2510527,
+            "sha256": "41dbdff4a0b5a6ab125715c3342c5ce6516e93ffd49608813240403f036c5efb"
+          },
+          {
+            "name": "README.md",
+            "url": "https://huggingface.co/Helsinki-NLP/opus-mt-tc-big-en-zle/resolve/708be1d372fe4c358a352f404e6dc9ca0126ba48/README.md",
+            "bytes": 10310,
+            "sha256": "20a1bf8e91021f5aae1b271c633fbb70319acce47206292f0063f39db1cb67f9"
+          },
+          {
+            "name": "special_tokens_map.json",
+            "url": "https://huggingface.co/Helsinki-NLP/opus-mt-tc-big-en-zle/resolve/708be1d372fe4c358a352f404e6dc9ca0126ba48/special_tokens_map.json",
+            "bytes": 65,
+            "sha256": "09059cedc26bc46bc09a52f05b92d4922e11917e87f3b92059bb1a63a59ab2c4"
+          },
+          {
+            "name": "generation_config.json",
+            "url": "https://huggingface.co/Helsinki-NLP/opus-mt-tc-big-en-zle/resolve/708be1d372fe4c358a352f404e6dc9ca0126ba48/generation_config.json",
+            "bytes": 301,
+            "sha256": "d851d84c804c745d92dae5659bd2d8e8b976b664dd0fbc39b82ee88340147802"
+          },
+          {
+            "name": "model.safetensors",
+            "url": "https://huggingface.co/Helsinki-NLP/opus-mt-tc-big-en-zle/resolve/708be1d372fe4c358a352f404e6dc9ca0126ba48/model.safetensors",
+            "bytes": 478977130,
+            "sha256": "e68caa9a233c177a3489257b69c18cece6da97767ab2581918ce3fc3c3899416"
+          }
+        ]
+      }
+    },
+    "marian-wave-opus-en-tr": {
+      "kind": "marian",
+      "repo": "Helsinki-NLP/opus-mt-tc-big-en-tr",
+      "revision": "e539fc16a8a1a0ea5950eb339b595bfcce990e90",
+      "license": "cc-by-4.0",
+      "vocabulary": "shared_vocabulary.json",
+      "source_tokenizer": "source.spm",
+      "target_tokenizer": "target.spm",
+      "normalizer_language": "en",
+      "files": [
+        {
+          "name": "config.json",
+          "bytes": 233,
+          "sha256": "72901fbd8abd89fb5cf4a388f26fc681f5c4c58a1e1a88b30b879f107270e7ee",
+          "url": null,
+          "compressed_bytes": 233,
+          "compressed_sha256": "72901fbd8abd89fb5cf4a388f26fc681f5c4c58a1e1a88b30b879f107270e7ee",
+          "compression": "none"
+        },
+        {
+          "name": "model.bin",
+          "bytes": 237977893,
+          "sha256": "a5a148aae553f2573fd1f9ba735a03385f050437f98e51f8b5c4e4f9c4de3719",
+          "url": null,
+          "compressed_bytes": 237977893,
+          "compressed_sha256": "a5a148aae553f2573fd1f9ba735a03385f050437f98e51f8b5c4e4f9c4de3719",
+          "compression": "none"
+        },
+        {
+          "name": "shared_vocabulary.json",
+          "bytes": 1170026,
+          "sha256": "44dd886d9f538a4b22e58d89758bd336e73b06c753a436f7531436daafcaedee",
+          "url": null,
+          "compressed_bytes": 1170026,
+          "compressed_sha256": "44dd886d9f538a4b22e58d89758bd336e73b06c753a436f7531436daafcaedee",
+          "compression": "none"
+        },
+        {
+          "name": "source.spm",
+          "bytes": 796953,
+          "sha256": "180d3f94ddfee5585d78b702290ded0f4f9bd40f299349c8383b32a579fefad4",
+          "url": null,
+          "compressed_bytes": 796953,
+          "compressed_sha256": "180d3f94ddfee5585d78b702290ded0f4f9bd40f299349c8383b32a579fefad4",
+          "compression": "none"
+        },
+        {
+          "name": "target.spm",
+          "bytes": 833391,
+          "sha256": "cd0c475692178b6c626aadaef01bd8f98d8053946938e4e67005fc1e4811d797",
+          "url": null,
+          "compressed_bytes": 833391,
+          "compressed_sha256": "cd0c475692178b6c626aadaef01bd8f98d8053946938e4e67005fc1e4811d797",
+          "compression": "none"
+        }
+      ],
+      "build": {
+        "type": "transformers",
+        "quantization": "int8",
+        "source_files": [
+          {
+            "name": "config.json",
+            "url": "https://huggingface.co/Helsinki-NLP/opus-mt-tc-big-en-tr/resolve/e539fc16a8a1a0ea5950eb339b595bfcce990e90/config.json",
+            "bytes": 1137,
+            "sha256": "d5ff17d7f5373c403a3ed253d963e5f487a2b95607abdb873429ad4de64db598"
+          },
+          {
+            "name": "tokenizer_config.json",
+            "url": "https://huggingface.co/Helsinki-NLP/opus-mt-tc-big-en-tr/resolve/e539fc16a8a1a0ea5950eb339b595bfcce990e90/tokenizer_config.json",
+            "bytes": 337,
+            "sha256": "d1c0ae7cc1a0792a689b16354433fd8825df850248e31a92b037233a1875b1da"
+          },
+          {
+            "name": "source.spm",
+            "url": "https://huggingface.co/Helsinki-NLP/opus-mt-tc-big-en-tr/resolve/e539fc16a8a1a0ea5950eb339b595bfcce990e90/source.spm",
+            "bytes": 796953,
+            "sha256": "180d3f94ddfee5585d78b702290ded0f4f9bd40f299349c8383b32a579fefad4"
+          },
+          {
+            "name": "target.spm",
+            "url": "https://huggingface.co/Helsinki-NLP/opus-mt-tc-big-en-tr/resolve/e539fc16a8a1a0ea5950eb339b595bfcce990e90/target.spm",
+            "bytes": 833391,
+            "sha256": "cd0c475692178b6c626aadaef01bd8f98d8053946938e4e67005fc1e4811d797"
+          },
+          {
+            "name": "vocab.json",
+            "url": "https://huggingface.co/Helsinki-NLP/opus-mt-tc-big-en-tr/resolve/e539fc16a8a1a0ea5950eb339b595bfcce990e90/vocab.json",
+            "bytes": 1501287,
+            "sha256": "01ef522455d2bf22b0716416ee34688cc2b3f5fa257f742665d21b6acc450ac1"
+          },
+          {
+            "name": "README.md",
+            "url": "https://huggingface.co/Helsinki-NLP/opus-mt-tc-big-en-tr/resolve/e539fc16a8a1a0ea5950eb339b595bfcce990e90/README.md",
+            "bytes": 7151,
+            "sha256": "c79a92d2daf4cc9751e46ea4f47b42a4cd7fde60c8408738a1628a24f28efd23"
+          },
+          {
+            "name": "special_tokens_map.json",
+            "url": "https://huggingface.co/Helsinki-NLP/opus-mt-tc-big-en-tr/resolve/e539fc16a8a1a0ea5950eb339b595bfcce990e90/special_tokens_map.json",
+            "bytes": 65,
+            "sha256": "09059cedc26bc46bc09a52f05b92d4922e11917e87f3b92059bb1a63a59ab2c4"
+          },
+          {
+            "name": "generation_config.json",
+            "url": "https://huggingface.co/Helsinki-NLP/opus-mt-tc-big-en-tr/resolve/e539fc16a8a1a0ea5950eb339b595bfcce990e90/generation_config.json",
+            "bytes": 301,
+            "sha256": "ce15a9d95dab088acce51412f52923d21211575a610d892cd6fa63d07ec7cc16"
+          },
+          {
+            "name": "pytorch_model.bin",
+            "url": "https://huggingface.co/Helsinki-NLP/opus-mt-tc-big-en-tr/resolve/e539fc16a8a1a0ea5950eb339b595bfcce990e90/pytorch_model.bin",
+            "bytes": 469780741,
+            "sha256": "7bc7e1973431752bcbb083c090c3c8f1e6eb3389d2e2e0faf9bf1a85d969a789"
+          }
+        ]
+      }
+    },
+    "marian-selected-hu-en-big-20261104-v1": {
+      "kind": "marian",
+      "repo": "Helsinki-NLP/opus-mt-tc-big-hu-en",
+      "revision": "c184817a80146c4e315c97ae18e59d1fe84972bb",
+      "license": "cc-by-4.0",
+      "vocabulary": "shared_vocabulary.json",
+      "source_tokenizer": "source.spm",
+      "target_tokenizer": "target.spm",
+      "normalizer_language": "hu",
+      "files": [
+        {
+          "name": "config.json",
+          "bytes": 233,
+          "sha256": "72901fbd8abd89fb5cf4a388f26fc681f5c4c58a1e1a88b30b879f107270e7ee",
+          "url": null,
+          "compressed_bytes": 233,
+          "compressed_sha256": "72901fbd8abd89fb5cf4a388f26fc681f5c4c58a1e1a88b30b879f107270e7ee",
+          "compression": "none"
+        },
+        {
+          "name": "model.bin",
+          "bytes": 237888283,
+          "sha256": "c87f438c3a97e95b213cc24806085d6948e5877d7661af1234bf7febfbe8bacd",
+          "url": null,
+          "compressed_bytes": 237888283,
+          "compressed_sha256": "c87f438c3a97e95b213cc24806085d6948e5877d7661af1234bf7febfbe8bacd",
+          "compression": "none"
+        },
+        {
+          "name": "shared_vocabulary.json",
+          "bytes": 1170889,
+          "sha256": "3e726c643aa24886038c712c3ff94c837c12dc0ccd245db81017905a9114536d",
+          "url": null,
+          "compressed_bytes": 1170889,
+          "compressed_sha256": "3e726c643aa24886038c712c3ff94c837c12dc0ccd245db81017905a9114536d",
+          "compression": "none"
+        },
+        {
+          "name": "source.spm",
+          "bytes": 834496,
+          "sha256": "b5d97cc1e75ab4fec33b9dc0490f078329057d0ab37069ea086394c2be10c0ac",
+          "url": null,
+          "compressed_bytes": 834496,
+          "compressed_sha256": "b5d97cc1e75ab4fec33b9dc0490f078329057d0ab37069ea086394c2be10c0ac",
+          "compression": "none"
+        },
+        {
+          "name": "target.spm",
+          "bytes": 794916,
+          "sha256": "3850fefdba11c1abc87aacd021530c977b26f095dc6f800a674baa112513208d",
+          "url": null,
+          "compressed_bytes": 794916,
+          "compressed_sha256": "3850fefdba11c1abc87aacd021530c977b26f095dc6f800a674baa112513208d",
+          "compression": "none"
+        }
+      ],
+      "build": {
+        "type": "transformers",
+        "quantization": "int8",
+        "source_files": [
+          {
+            "name": "config.json",
+            "url": "https://huggingface.co/Helsinki-NLP/opus-mt-tc-big-hu-en/resolve/c184817a80146c4e315c97ae18e59d1fe84972bb/config.json",
+            "bytes": 1076,
+            "sha256": "e3e55398614f0f8b56f6a45ee2aa2a8ae79a8ca0ae636c8d952af3671d22c9ad"
+          },
+          {
+            "name": "tokenizer_config.json",
+            "url": "https://huggingface.co/Helsinki-NLP/opus-mt-tc-big-hu-en/resolve/c184817a80146c4e315c97ae18e59d1fe84972bb/tokenizer_config.json",
+            "bytes": 337,
+            "sha256": "2e14e6e34e018cd2d80c807ea8e38295408777b68d0dd9d448ed7154dfe039bf"
+          },
+          {
+            "name": "source.spm",
+            "url": "https://huggingface.co/Helsinki-NLP/opus-mt-tc-big-hu-en/resolve/c184817a80146c4e315c97ae18e59d1fe84972bb/source.spm",
+            "bytes": 834496,
+            "sha256": "b5d97cc1e75ab4fec33b9dc0490f078329057d0ab37069ea086394c2be10c0ac"
+          },
+          {
+            "name": "target.spm",
+            "url": "https://huggingface.co/Helsinki-NLP/opus-mt-tc-big-hu-en/resolve/c184817a80146c4e315c97ae18e59d1fe84972bb/target.spm",
+            "bytes": 794916,
+            "sha256": "3850fefdba11c1abc87aacd021530c977b26f095dc6f800a674baa112513208d"
+          },
+          {
+            "name": "vocab.json",
+            "url": "https://huggingface.co/Helsinki-NLP/opus-mt-tc-big-hu-en/resolve/c184817a80146c4e315c97ae18e59d1fe84972bb/vocab.json",
+            "bytes": 1501628,
+            "sha256": "1c31c8794969f31e3e6fb56e6891082489a3ccea693cf9ff3fed789bf496f10c"
+          },
+          {
+            "name": "README.md",
+            "url": "https://huggingface.co/Helsinki-NLP/opus-mt-tc-big-hu-en/resolve/c184817a80146c4e315c97ae18e59d1fe84972bb/README.md",
+            "bytes": 6292,
+            "sha256": "58ba1e1857e0e1072e0e5abc07acc3b7c3247043bfa20f37916027288b301124"
+          },
+          {
+            "name": "special_tokens_map.json",
+            "url": "https://huggingface.co/Helsinki-NLP/opus-mt-tc-big-hu-en/resolve/c184817a80146c4e315c97ae18e59d1fe84972bb/special_tokens_map.json",
+            "bytes": 65,
+            "sha256": "09059cedc26bc46bc09a52f05b92d4922e11917e87f3b92059bb1a63a59ab2c4"
+          },
+          {
+            "name": "generation_config.json",
+            "url": "https://huggingface.co/Helsinki-NLP/opus-mt-tc-big-hu-en/resolve/c184817a80146c4e315c97ae18e59d1fe84972bb/generation_config.json",
+            "bytes": 301,
+            "sha256": "4e3824780345f574e0badfcfd48010efdc082503af240b6864f266de3641c234"
+          },
+          {
+            "name": "model.safetensors",
+            "url": "https://huggingface.co/Helsinki-NLP/opus-mt-tc-big-hu-en/resolve/c184817a80146c4e315c97ae18e59d1fe84972bb/model.safetensors",
+            "bytes": 469538930,
+            "sha256": "b421a78c412de4f51958aff3e39d2eb4e296081d7bce7f1615b6f841f449c56b"
+          }
+        ]
+      }
+    },
+    "marian-direct-sv-ro-b2-v1": {
+      "kind": "marian",
+      "repo": "Helsinki-NLP/opus-mt-sv-ro",
+      "revision": "42f9f444100195d97ded47c6babbd6d3a6d7b18d",
+      "license": "apache-2.0",
+      "vocabulary": "shared_vocabulary.json",
+      "source_tokenizer": "source.spm",
+      "target_tokenizer": "target.spm",
+      "normalizer_language": "sv",
+      "files": [
+        {
+          "name": "config.json",
+          "bytes": 233,
+          "sha256": "72901fbd8abd89fb5cf4a388f26fc681f5c4c58a1e1a88b30b879f107270e7ee",
+          "url": null,
+          "compressed_bytes": 233,
+          "compressed_sha256": "72901fbd8abd89fb5cf4a388f26fc681f5c4c58a1e1a88b30b879f107270e7ee",
+          "compression": "none"
+        },
+        {
+          "name": "model.bin",
+          "bytes": 75476275,
+          "sha256": "41eb1a7fe4714efe195b22f9150ca5fc3f34f2e0dd1bfdeb5a2893c49726a4c0",
+          "url": null,
+          "compressed_bytes": 75476275,
+          "compressed_sha256": "41eb1a7fe4714efe195b22f9150ca5fc3f34f2e0dd1bfdeb5a2893c49726a4c0",
+          "compression": "none"
+        },
+        {
+          "name": "shared_vocabulary.json",
+          "bytes": 1133056,
+          "sha256": "8f3b91969026944e8529f3dfbd764ff16db27a7b7861e2a060f1bc7e430e13c1",
+          "url": null,
+          "compressed_bytes": 1133056,
+          "compressed_sha256": "8f3b91969026944e8529f3dfbd764ff16db27a7b7861e2a060f1bc7e430e13c1",
+          "compression": "none"
+        },
+        {
+          "name": "source.spm",
+          "bytes": 810783,
+          "sha256": "9097dae32e42d097a1544ef19c06da37924c41d8344406fd8f89381bdab50c85",
+          "url": null,
+          "compressed_bytes": 810783,
+          "compressed_sha256": "9097dae32e42d097a1544ef19c06da37924c41d8344406fd8f89381bdab50c85",
+          "compression": "none"
+        },
+        {
+          "name": "target.spm",
+          "bytes": 812257,
+          "sha256": "2db6d9be5512c56ee0bcd2bf66a4ab89284b27c01e8f7d19a2795e5a65d2df6e",
+          "url": null,
+          "compressed_bytes": 812257,
+          "compressed_sha256": "2db6d9be5512c56ee0bcd2bf66a4ab89284b27c01e8f7d19a2795e5a65d2df6e",
+          "compression": "none"
+        }
+      ],
+      "build": {
+        "type": "transformers",
+        "quantization": "int8",
+        "source_files": [
+          {
+            "name": "config.json",
+            "url": "https://huggingface.co/Helsinki-NLP/opus-mt-sv-ro/resolve/42f9f444100195d97ded47c6babbd6d3a6d7b18d/config.json",
+            "bytes": 1381,
+            "sha256": "c667302f6ceaa4780441975b79527d927e41891b7cdde0bfc2e10cffcb7ba355"
+          },
+          {
+            "name": "tokenizer_config.json",
+            "url": "https://huggingface.co/Helsinki-NLP/opus-mt-sv-ro/resolve/42f9f444100195d97ded47c6babbd6d3a6d7b18d/tokenizer_config.json",
+            "bytes": 42,
+            "sha256": "07eac6a9e0163237c1fafa15d497c2bbbdcafa63662ed8b1b2bce1ffbd4d137b"
+          },
+          {
+            "name": "source.spm",
+            "url": "https://huggingface.co/Helsinki-NLP/opus-mt-sv-ro/resolve/42f9f444100195d97ded47c6babbd6d3a6d7b18d/source.spm",
+            "bytes": 810783,
+            "sha256": "9097dae32e42d097a1544ef19c06da37924c41d8344406fd8f89381bdab50c85"
+          },
+          {
+            "name": "target.spm",
+            "url": "https://huggingface.co/Helsinki-NLP/opus-mt-sv-ro/resolve/42f9f444100195d97ded47c6babbd6d3a6d7b18d/target.spm",
+            "bytes": 812257,
+            "sha256": "2db6d9be5512c56ee0bcd2bf66a4ab89284b27c01e8f7d19a2795e5a65d2df6e"
+          },
+          {
+            "name": "vocab.json",
+            "url": "https://huggingface.co/Helsinki-NLP/opus-mt-sv-ro/resolve/42f9f444100195d97ded47c6babbd6d3a6d7b18d/vocab.json",
+            "bytes": 1350487,
+            "sha256": "24d9bf44919db71aa623c59836f6a951054105d0fa898c3af126e1a6b8666be6"
+          },
+          {
+            "name": "README.md",
+            "url": "https://huggingface.co/Helsinki-NLP/opus-mt-sv-ro/resolve/42f9f444100195d97ded47c6babbd6d3a6d7b18d/README.md",
+            "bytes": 816,
+            "sha256": "33b53f5629d977976fd032261d7ccff916bd989a332347515a4752e5976f246b"
+          },
+          {
+            "name": "generation_config.json",
+            "url": "https://huggingface.co/Helsinki-NLP/opus-mt-sv-ro/resolve/42f9f444100195d97ded47c6babbd6d3a6d7b18d/generation_config.json",
+            "bytes": 293,
+            "sha256": "6667361d45700fd4266d957e5adcd9a398631f366b40de2fa2d73341d678e776"
+          },
+          {
+            "name": "pytorch_model.bin",
+            "url": "https://huggingface.co/Helsinki-NLP/opus-mt-sv-ro/resolve/42f9f444100195d97ded47c6babbd6d3a6d7b18d/pytorch_model.bin",
+            "bytes": 295941873,
+            "sha256": "2488032ea1f15390a572857125165b7ba9c12912deca1dd3cfb5448fd1848659"
+          }
+        ]
+      }
+    },
+    "marian-gap-en-fi": {
+      "kind": "marian",
+      "repo": "Helsinki-NLP/opus-mt-tc-big-en-fi",
+      "revision": "8e570bbad861fb72104883353cf307ce1fe7b5e0",
+      "license": "cc-by-4.0",
+      "vocabulary": "shared_vocabulary.json",
+      "source_tokenizer": "source.spm",
+      "target_tokenizer": "target.spm",
+      "normalizer_language": "en",
+      "files": [
+        {
+          "name": "config.json",
+          "bytes": 233,
+          "sha256": "72901fbd8abd89fb5cf4a388f26fc681f5c4c58a1e1a88b30b879f107270e7ee",
+          "url": null,
+          "compressed_bytes": 233,
+          "compressed_sha256": "72901fbd8abd89fb5cf4a388f26fc681f5c4c58a1e1a88b30b879f107270e7ee",
+          "compression": "none"
+        },
+        {
+          "name": "model.bin",
+          "bytes": 238790563,
+          "sha256": "26a234c6860ceeff2f1e4ddee2cc3fef66852beada8d5039c0b7c8bcbaa58706",
+          "url": null,
+          "compressed_bytes": 238790563,
+          "compressed_sha256": "26a234c6860ceeff2f1e4ddee2cc3fef66852beada8d5039c0b7c8bcbaa58706",
+          "compression": "none"
+        },
+        {
+          "name": "shared_vocabulary.json",
+          "bytes": 1124008,
+          "sha256": "5dd31657388249d4fb376302dbaf559d152a493d3cdd08144f5a1834d7d95c8d",
+          "url": null,
+          "compressed_bytes": 1124008,
+          "compressed_sha256": "5dd31657388249d4fb376302dbaf559d152a493d3cdd08144f5a1834d7d95c8d",
+          "compression": "none"
+        },
+        {
+          "name": "source.spm",
+          "bytes": 797685,
+          "sha256": "a4eeca5b2be408db6354e253f879a314dff03a08742530272bd4461336df2417",
+          "url": null,
+          "compressed_bytes": 797685,
+          "compressed_sha256": "a4eeca5b2be408db6354e253f879a314dff03a08742530272bd4461336df2417",
+          "compression": "none"
+        },
+        {
+          "name": "target.spm",
+          "bytes": 835977,
+          "sha256": "435dcf642c54ee6427752a15d884dc0fd180442cf4018b931872f9ee2788d29d",
+          "url": null,
+          "compressed_bytes": 835977,
+          "compressed_sha256": "435dcf642c54ee6427752a15d884dc0fd180442cf4018b931872f9ee2788d29d",
+          "compression": "none"
+        }
+      ],
+      "build": {
+        "type": "transformers",
+        "quantization": "int8",
+        "source_files": [
+          {
+            "name": "config.json",
+            "url": "https://huggingface.co/Helsinki-NLP/opus-mt-tc-big-en-fi/resolve/8e570bbad861fb72104883353cf307ce1fe7b5e0/config.json",
+            "bytes": 1076,
+            "sha256": "dbdad900a2d6f1dbe74a6045a1e3d8e216d7c62fc99dfa07850a47b9b5d5c1b5"
+          },
+          {
+            "name": "tokenizer_config.json",
+            "url": "https://huggingface.co/Helsinki-NLP/opus-mt-tc-big-en-fi/resolve/8e570bbad861fb72104883353cf307ce1fe7b5e0/tokenizer_config.json",
+            "bytes": 337,
+            "sha256": "68bb94b2d81565689e104fdd7d36bbf93ff0f11449479df7fea32ae5839b3eae"
+          },
+          {
+            "name": "source.spm",
+            "url": "https://huggingface.co/Helsinki-NLP/opus-mt-tc-big-en-fi/resolve/8e570bbad861fb72104883353cf307ce1fe7b5e0/source.spm",
+            "bytes": 797685,
+            "sha256": "a4eeca5b2be408db6354e253f879a314dff03a08742530272bd4461336df2417"
+          },
+          {
+            "name": "target.spm",
+            "url": "https://huggingface.co/Helsinki-NLP/opus-mt-tc-big-en-fi/resolve/8e570bbad861fb72104883353cf307ce1fe7b5e0/target.spm",
+            "bytes": 835977,
+            "sha256": "435dcf642c54ee6427752a15d884dc0fd180442cf4018b931872f9ee2788d29d"
+          },
+          {
+            "name": "vocab.json",
+            "url": "https://huggingface.co/Helsinki-NLP/opus-mt-tc-big-en-fi/resolve/8e570bbad861fb72104883353cf307ce1fe7b5e0/vocab.json",
+            "bytes": 1460003,
+            "sha256": "f68e1abac509ab7c485f342b1dc964d0056088c2e3bf25366fee72de8c7a2f3d"
+          },
+          {
+            "name": "README.md",
+            "url": "https://huggingface.co/Helsinki-NLP/opus-mt-tc-big-en-fi/resolve/8e570bbad861fb72104883353cf307ce1fe7b5e0/README.md",
+            "bytes": 7793,
+            "sha256": "4978038d4904d79126a20c3ddeac1f9a2aa7c57865a67c0ba7457f52f855ade7"
+          },
+          {
+            "name": "special_tokens_map.json",
+            "url": "https://huggingface.co/Helsinki-NLP/opus-mt-tc-big-en-fi/resolve/8e570bbad861fb72104883353cf307ce1fe7b5e0/special_tokens_map.json",
+            "bytes": 65,
+            "sha256": "09059cedc26bc46bc09a52f05b92d4922e11917e87f3b92059bb1a63a59ab2c4"
+          },
+          {
+            "name": "generation_config.json",
+            "url": "https://huggingface.co/Helsinki-NLP/opus-mt-tc-big-en-fi/resolve/8e570bbad861fb72104883353cf307ce1fe7b5e0/generation_config.json",
+            "bytes": 301,
+            "sha256": "93407b1f4b73a1f783a0287fb4cf1c97bdb3d0dd00d6fb35c79b1f9e21da3391"
+          },
+          {
+            "name": "model.safetensors",
+            "url": "https://huggingface.co/Helsinki-NLP/opus-mt-tc-big-en-fi/resolve/8e570bbad861fb72104883353cf307ce1fe7b5e0/model.safetensors",
+            "bytes": 471334730,
+            "sha256": "3952afc9376069a5e6b7057d41c531b0da8de0b65d5ae9f0db012b03709fe58b"
+          }
+        ]
+      }
+    },
+    "marian-wave-opus-en-it": {
+      "kind": "marian",
+      "repo": "Helsinki-NLP/opus-mt-tc-big-en-it",
+      "revision": "592d2cfb0797867f1dd223e49141de051faa65c7",
+      "license": "cc-by-4.0",
+      "vocabulary": "shared_vocabulary.json",
+      "source_tokenizer": "source.spm",
+      "target_tokenizer": "target.spm",
+      "normalizer_language": "en",
+      "files": [
+        {
+          "name": "config.json",
+          "bytes": 233,
+          "sha256": "72901fbd8abd89fb5cf4a388f26fc681f5c4c58a1e1a88b30b879f107270e7ee",
+          "url": null,
+          "compressed_bytes": 233,
+          "compressed_sha256": "72901fbd8abd89fb5cf4a388f26fc681f5c4c58a1e1a88b30b879f107270e7ee",
+          "compression": "none"
+        },
+        {
+          "name": "model.bin",
+          "bytes": 235260753,
+          "sha256": "56f3c2c9119c64018b05a07e221e6064fd15cf761d9d0418a29e72d0d41f0f43",
+          "url": null,
+          "compressed_bytes": 235260753,
+          "compressed_sha256": "56f3c2c9119c64018b05a07e221e6064fd15cf761d9d0418a29e72d0d41f0f43",
+          "compression": "none"
+        },
+        {
+          "name": "shared_vocabulary.json",
+          "bytes": 1024215,
+          "sha256": "51008eafa076154c3a96b439b956b3ae3942510f3108067026dced8219289f8a",
+          "url": null,
+          "compressed_bytes": 1024215,
+          "compressed_sha256": "51008eafa076154c3a96b439b956b3ae3942510f3108067026dced8219289f8a",
+          "compression": "none"
+        },
+        {
+          "name": "source.spm",
+          "bytes": 802852,
+          "sha256": "50e828d41b3ea6c89ef4c3312cb74ba3d942f4d313ec19c5115aa535cb5ba286",
+          "url": null,
+          "compressed_bytes": 802852,
+          "compressed_sha256": "50e828d41b3ea6c89ef4c3312cb74ba3d942f4d313ec19c5115aa535cb5ba286",
+          "compression": "none"
+        },
+        {
+          "name": "target.spm",
+          "bytes": 820134,
+          "sha256": "cf5ee094f498d8391ff2bbd52c4488c3d53f72175ff9b3e8094bfd45ffc77c59",
+          "url": null,
+          "compressed_bytes": 820134,
+          "compressed_sha256": "cf5ee094f498d8391ff2bbd52c4488c3d53f72175ff9b3e8094bfd45ffc77c59",
+          "compression": "none"
+        }
+      ],
+      "build": {
+        "type": "transformers",
+        "quantization": "int8",
+        "source_files": [
+          {
+            "name": "config.json",
+            "url": "https://huggingface.co/Helsinki-NLP/opus-mt-tc-big-en-it/resolve/592d2cfb0797867f1dd223e49141de051faa65c7/config.json",
+            "bytes": 1076,
+            "sha256": "5861e40439bcde373a169f2d14c495d0f966276d7188375e040267168bdeceb2"
+          },
+          {
+            "name": "tokenizer_config.json",
+            "url": "https://huggingface.co/Helsinki-NLP/opus-mt-tc-big-en-it/resolve/592d2cfb0797867f1dd223e49141de051faa65c7/tokenizer_config.json",
+            "bytes": 337,
+            "sha256": "5eabd035534ff0632cdc4b292cac52466ef6bfa45e909cf9739b7ebfdb2430d5"
+          },
+          {
+            "name": "source.spm",
+            "url": "https://huggingface.co/Helsinki-NLP/opus-mt-tc-big-en-it/resolve/592d2cfb0797867f1dd223e49141de051faa65c7/source.spm",
+            "bytes": 802852,
+            "sha256": "50e828d41b3ea6c89ef4c3312cb74ba3d942f4d313ec19c5115aa535cb5ba286"
+          },
+          {
+            "name": "target.spm",
+            "url": "https://huggingface.co/Helsinki-NLP/opus-mt-tc-big-en-it/resolve/592d2cfb0797867f1dd223e49141de051faa65c7/target.spm",
+            "bytes": 820134,
+            "sha256": "cf5ee094f498d8391ff2bbd52c4488c3d53f72175ff9b3e8094bfd45ffc77c59"
+          },
+          {
+            "name": "vocab.json",
+            "url": "https://huggingface.co/Helsinki-NLP/opus-mt-tc-big-en-it/resolve/592d2cfb0797867f1dd223e49141de051faa65c7/vocab.json",
+            "bytes": 1339648,
+            "sha256": "9766cd57e5d252f2b905fff26fdb8c9b2d1f7b29dd9e1fffdffecf723980a394"
+          },
+          {
+            "name": "README.md",
+            "url": "https://huggingface.co/Helsinki-NLP/opus-mt-tc-big-en-it/resolve/592d2cfb0797867f1dd223e49141de051faa65c7/README.md",
+            "bytes": 6266,
+            "sha256": "41b613845635a5abc7408b9ad792643d19107eca95d5491ea794e35a730768c5"
+          },
+          {
+            "name": "special_tokens_map.json",
+            "url": "https://huggingface.co/Helsinki-NLP/opus-mt-tc-big-en-it/resolve/592d2cfb0797867f1dd223e49141de051faa65c7/special_tokens_map.json",
+            "bytes": 65,
+            "sha256": "09059cedc26bc46bc09a52f05b92d4922e11917e87f3b92059bb1a63a59ab2c4"
+          },
+          {
+            "name": "generation_config.json",
+            "url": "https://huggingface.co/Helsinki-NLP/opus-mt-tc-big-en-it/resolve/592d2cfb0797867f1dd223e49141de051faa65c7/generation_config.json",
+            "bytes": 301,
+            "sha256": "9a66d67058bcb09dd2989fe532cfe826c0c3e2bc61d470649b105aa3d6e5e939"
+          },
+          {
+            "name": "model.safetensors",
+            "url": "https://huggingface.co/Helsinki-NLP/opus-mt-tc-big-en-it/resolve/592d2cfb0797867f1dd223e49141de051faa65c7/model.safetensors",
+            "bytes": 464309380,
+            "sha256": "5c8e2b4c7c161fb30cb609818d187101697d06e5c6265700adfa91126478b6d1"
+          }
+        ]
+      }
     }
   },
   "bergamot_runtime": {
